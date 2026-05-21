@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'SaaS Lanchonete',
-        short_name: 'Lanchonete',
-        description: 'Sistema de Gestão para Bares e Lanchonetes',
+        name: 'Star Food',
+        short_name: 'Star Food',
+        description: 'Sistema de Gestão para Bares e Lanchonetes Star Food',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
