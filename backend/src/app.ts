@@ -13,13 +13,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Auto-migration middleware
-app.use(async (req, res, next) => {
-  try {
-    await runAutoMigration();
-  } catch (err) {
-    console.error('[MIGRATION_MIDDLEWARE_ERROR]', err);
-  }
+// Auto-migration: runs in background on first request, never blocks API responses
+app.use((req, res, next) => {
+  runAutoMigration().catch((err) =>
+    console.error('[MIGRATION_BACKGROUND_ERROR]', err)
+  );
   next();
 });
 
