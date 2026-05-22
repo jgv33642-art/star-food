@@ -1,6 +1,7 @@
-
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { TrendingUp, DollarSign, Activity, Users, ArrowUpRight, ArrowDownRight, MoreHorizontal } from 'lucide-react';
+import { TrendingUp, DollarSign, Activity, Users, ArrowUpRight, MoreHorizontal, Loader2 } from 'lucide-react';
+import { api } from '../lib/api';
 
 const dataFaturamento = [
   { name: 'Seg', atual: 4000, altura: 'h-[40%]' },
@@ -27,18 +28,76 @@ const dataPagamento = [
   { name: 'Débito', value: '10%', color: 'bg-purple-500' },
 ];
 
+interface DashboardStats {
+  today_revenue?: number;
+  month_revenue?: number;
+  avg_ticket?: number;
+  active_orders?: number;
+  open_tables?: number;
+  total_tables?: number;
+}
+
+function formatBRL(value: number | undefined): string {
+  if (value === undefined || value === null) return '—';
+  return `R$ ${Number(value).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+}
+
 export const AdminDashboard = () => {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get<DashboardStats>('/dashboard/stats')
+      .then((data) => setStats(data))
+      .catch(() => setStats({}))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const cards = [
+    {
+      title: 'Faturamento Hoje',
+      value: loading ? null : formatBRL(stats?.today_revenue),
+      icon: DollarSign,
+      trend: '+12.5%',
+      isUp: true,
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-500/10',
+    },
+    {
+      title: 'Faturamento Mensal',
+      value: loading ? null : formatBRL(stats?.month_revenue),
+      icon: Activity,
+      trend: '+5.2%',
+      isUp: true,
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+    },
+    {
+      title: 'Ticket Médio',
+      value: loading ? null : formatBRL(stats?.avg_ticket),
+      icon: TrendingUp,
+      trend: '-2.1%',
+      isUp: false,
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
+    },
+    {
+      title: 'Mesas Abertas',
+      value: loading ? null : stats?.open_tables !== undefined ? `${stats.open_tables} / ${stats.total_tables ?? '?'}` : '—',
+      icon: Users,
+      trend: '+8.4%',
+      isUp: true,
+      color: 'text-purple-500',
+      bg: 'bg-purple-500/10',
+    },
+  ];
+
   return (
     <Layout title="Dashboard Gerencial">
-      
+
       {/* Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
-          { title: 'Faturamento Hoje', value: 'R$ 4.250,00', icon: DollarSign, trend: '+12.5%', isUp: true, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
-          { title: 'Faturamento Mensal', value: 'R$ 45.890,00', icon: Activity, trend: '+5.2%', isUp: true, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-          { title: 'Ticket Médio', value: 'R$ 38,50', icon: TrendingUp, trend: '-2.1%', isUp: false, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-          { title: 'Lucro Estimado (Mês)', value: 'R$ 18.200,00', icon: Users, trend: '+8.4%', isUp: true, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-        ].map((card, idx) => (
+        {cards.map((card, idx) => (
           <div key={idx} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-all group">
             <div className="flex justify-between items-start mb-4">
               <div className={`p-3 rounded-xl ${card.bg} group-hover:scale-110 transition-transform`}>
@@ -50,10 +109,17 @@ export const AdminDashboard = () => {
             </div>
             <div>
               <p className="text-slate-400 font-medium text-sm mb-1">{card.title}</p>
-              <h3 className="text-2xl font-bold text-white">{card.value}</h3>
+              {card.value === null ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
+                  <span className="text-slate-500 text-sm">Carregando...</span>
+                </div>
+              ) : (
+                <h3 className="text-2xl font-bold text-white">{card.value}</h3>
+              )}
             </div>
             <div className={`mt-4 flex items-center gap-1 text-sm font-medium ${card.isUp ? 'text-emerald-400' : 'text-red-400'}`}>
-              {card.isUp ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+              <ArrowUpRight className="w-4 h-4" />
               <span>{card.trend}</span>
               <span className="text-slate-500 font-normal ml-1">vs mês anterior</span>
             </div>
@@ -62,7 +128,7 @@ export const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Main Chart (CSS Mock) */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center mb-8">
@@ -75,7 +141,7 @@ export const AdminDashboard = () => {
               <option>Semana passada</option>
             </select>
           </div>
-          
+
           <div className="h-[250px] w-full flex items-end justify-between gap-2 px-2">
             {dataFaturamento.map((dia, idx) => (
               <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group">
@@ -92,17 +158,17 @@ export const AdminDashboard = () => {
         {/* Payment Methods (CSS Mock) */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col">
           <h3 className="text-lg font-bold text-white mb-6">Métodos de Pagamento</h3>
-          
+
           <div className="flex-1 flex flex-col justify-center">
             {/* Pseudo-Pie Chart Visual */}
             <div className="w-40 h-40 rounded-full border-[16px] border-slate-800 relative mx-auto mb-8 shadow-inner flex items-center justify-center">
-               <div className="text-center">
-                 <span className="block text-2xl font-black text-white">45%</span>
-                 <span className="text-xs text-slate-400 uppercase font-bold">PIX</span>
-               </div>
-               {/* Decorative highlights */}
-               <div className="absolute top-[-16px] right-[-16px] w-20 h-20 border-[16px] border-indigo-500 rounded-tr-full rounded-bl-full opacity-80 mix-blend-screen"></div>
-               <div className="absolute bottom-[-16px] left-[-16px] w-16 h-16 border-[16px] border-emerald-500 rounded-bl-full rounded-tr-full opacity-80 mix-blend-screen"></div>
+              <div className="text-center">
+                <span className="block text-2xl font-black text-white">45%</span>
+                <span className="text-xs text-slate-400 uppercase font-bold">PIX</span>
+              </div>
+              {/* Decorative highlights */}
+              <div className="absolute top-[-16px] right-[-16px] w-20 h-20 border-[16px] border-indigo-500 rounded-tr-full rounded-bl-full opacity-80 mix-blend-screen"></div>
+              <div className="absolute bottom-[-16px] left-[-16px] w-16 h-16 border-[16px] border-emerald-500 rounded-bl-full rounded-tr-full opacity-80 mix-blend-screen"></div>
             </div>
 
             <div className="space-y-4">
@@ -124,7 +190,7 @@ export const AdminDashboard = () => {
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-white">Produtos Mais Vendidos</h3>
           </div>
-          
+
           <div className="space-y-6 mt-4">
             {dataProdutos.map((prod, idx) => (
               <div key={idx}>

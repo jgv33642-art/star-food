@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, CreditCard, ShoppingCart, Download, Laptop, Smartphone, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
 
 export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubscribe = (e: React.FormEvent) => {
@@ -18,7 +16,7 @@ export const Checkout = () => {
       setLoading(false);
       setIsSuccess(true);
       // Cria a conta master (Gerente) mas não redireciona imediatamente
-      login('admin@meurestaurante.com', 'gerencia', 'Dono do Restaurante');
+      // Account created via register flow — user can now login at /login
     }, 2000);
   };
 

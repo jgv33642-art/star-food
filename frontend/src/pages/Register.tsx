@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
-import { useAuth, Role } from '../context/AuthContext';
-import { Utensils, Mail, Lock, User, CheckCircle2, Shield, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Mail, Lock, User, Building2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Register = () => {
+  const [companyName, setCompanyName] = useState('');
+  const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState<Role>('garcom');
-  
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !name) return;
-    
-    // Simulate registration then auto-login
-    login(email, role);
-    navigate('/');
+    if (!companyName || !userName || !email || !password) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await register(companyName, userName, email, password);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Erro ao criar conta. Verifique os dados e tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,54 +57,52 @@ export const Register = () => {
             Criar Nova Conta
           </h2>
           <p className="text-slate-400 text-center mb-8">
-            Preencha os dados abaixo para cadastrar um novo usuário no sistema.
+            Preencha os dados abaixo para cadastrar sua empresa no sistema.
           </p>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Nome completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="Nome da empresa / lanchonete"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
                 className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
+                disabled={loading}
               />
             </div>
 
             <div className="relative">
-              <label className="block text-sm font-medium text-slate-300 mb-2 mt-2">Qual será o seu acesso?</label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['garcom', 'caixa', 'gerencia'] as Role[]).map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRole(r)}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all flex flex-col items-center gap-1 ${
-                      role === r 
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-500' 
-                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:bg-slate-800'
-                    }`}
-                  >
-                    {r === 'garcom' && <Utensils className="w-4 h-4" />}
-                    {r === 'caixa' && <CheckCircle2 className="w-4 h-4" />}
-                    {r === 'gerencia' && <Shield className="w-4 h-4" />}
-                    <span className="capitalize">{r === 'garcom' ? 'Garçom' : r === 'caixa' ? 'Caixa' : 'Gerência'}</span>
-                  </button>
-                ))}
-              </div>
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Seu nome completo"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                required
+                disabled={loading}
+              />
             </div>
 
             <div className="relative mt-4">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
               <input
-                type="text"
-                placeholder="Email corporativo ou nome de usuário"
+                type="email"
+                placeholder="Email corporativo"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -107,14 +115,23 @@ export const Register = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
+                disabled={loading}
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all mt-4"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all mt-4 flex items-center justify-center gap-2"
             >
-              Confirmar Cadastro
+              {loading ? (
+                <>
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Criando conta...
+                </>
+              ) : (
+                'Confirmar Cadastro'
+              )}
             </button>
           </form>
 

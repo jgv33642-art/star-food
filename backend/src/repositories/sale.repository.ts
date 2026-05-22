@@ -1,0 +1,96 @@
+import { pool } from '../config/db';
+
+export class SaleRepository {
+  async findAll(companyId: string) {
+    const result = await pool.query(
+      `SELECT
+        s.id, s.company_id, s.order_id, s.cash_register_id, s.customer_id,
+        s.total_amount, s.discount, s.final_amount, s.status, s.created_at,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', si.id,
+              'product_id', si.product_id,
+              'quantity', si.quantity,
+              'price', si.price
+            )
+          ) FILTER (WHERE si.id IS NOT NULL),
+          '[]'
+        ) AS items
+      FROM sales s
+      LEFT JOIN sale_items si ON si.sale_id = s.id
+      WHERE s.company_id = $1
+      GROUP BY s.id
+      ORDER BY s.created_at DESC`,
+      [companyId]
+    );
+    return result.rows;
+  }
+
+  async findById(companyId: string, id: string) {
+    const result = await pool.query(
+      `SELECT
+        s.id, s.company_id, s.order_id, s.cash_register_id, s.customer_id,
+        s.total_amount, s.discount, s.final_amount, s.status, s.created_at,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', si.id,
+              'product_id', si.product_id,
+              'quantity', si.quantity,
+              'price', si.price
+            )
+          ) FILTER (WHERE si.id IS NOT NULL),
+          '[]'
+        ) AS items
+      FROM sales s
+      LEFT JOIN sale_items si ON si.sale_id = s.id
+      WHERE s.id = $1 AND s.company_id = $2
+      GROUP BY s.id`,
+      [id, companyId]
+    );
+    return result.rows[0];
+  }
+
+  async create(
+    companyId: string,
+    data: {
+      orderId?: string;
+      cashRegisterId?: string;
+      customerId?: string;
+      totalAmount: number;
+      discount: number;
+      finalAmount: number;
+      items: { productId: string; quantity: number; price: number }[];
+    }
+  ) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const { orderId, cashRegisterId, customerId, totalAmount, discount, finalAmount, items } = data;
+
+      const saleResult = await client.query(
+        `INSERT INTO sales (company_id, order_id, cash_register_id, customer_id, total_amount, discount, final_amount, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'paid') RETURNING *`,
+        [companyId, orderId || null, cashRegisterId || null, customerId || null, totalAmount, discount, finalAmount]
+      );
+      const sale = saleResult.rows[0];
+
+      for (const item of items) {
+        await client.query(
+          `INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)`,
+          [sale.id, item.productId, item.quantity, item.price]
+        );
+      }
+
+      await client.query('COMMIT');
+      return sale;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+}
