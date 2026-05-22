@@ -24,6 +24,7 @@ export class SaleService {
       totalAmount: number;
       discount: number;
       finalAmount: number;
+      paymentMethod?: string;
       items: { productId: string; quantity: number; price: number }[];
     }
   ) {

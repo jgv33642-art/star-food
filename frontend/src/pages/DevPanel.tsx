@@ -59,6 +59,8 @@ export const DevPanel = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [updatingCompanyId, setUpdatingCompanyId] = useState<string | null>(null);
+  const [dbUrl, setDbUrl] = useState('');
+  const [savingDbUrl, setSavingDbUrl] = useState(false);
 
   const logsEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -174,6 +176,37 @@ export const DevPanel = () => {
       setErrorMessage('Erro ao comunicar com o servidor.');
     } finally {
       setUpdatingCompanyId(null);
+    }
+  };
+
+  const handleSaveDbUrl = async () => {
+    if (!dbUrl.trim()) {
+      setErrorMessage('Por favor, insira uma string de conexão válida.');
+      return;
+    }
+    setSavingDbUrl(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    try {
+      const res = await fetch(`${API_URL}/update-env`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ databaseUrl: dbUrl })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSuccessMessage(data.message || 'DATABASE_URL atualizada com sucesso!');
+        setDbUrl(''); // clear on success
+        fetchDiagnostics(false);
+      } else {
+        setErrorMessage(data.error || 'Erro ao atualizar DATABASE_URL.');
+      }
+    } catch (err: any) {
+      setErrorMessage('Erro de conexão ao tentar salvar a DATABASE_URL.');
+    } finally {
+      setSavingDbUrl(false);
     }
   };
 
@@ -302,6 +335,43 @@ export const DevPanel = () => {
             <p className="text-xs text-slate-500 mt-2">
               Verificação direta via catálogo PostgreSQL.
             </p>
+          </div>
+        </div>
+
+        {/* DB Connection Config Card */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group hover:border-indigo-500/30 transition-all">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <h3 className="font-bold text-white flex items-center gap-2 text-sm mb-3">
+            <Database className="w-4 h-4 text-indigo-400" /> ATUALIZAR STRING DE CONEXÃO POSTGRESQL (DATABASE_URL)
+          </h3>
+          <p className="text-xs text-slate-400 mb-4">
+            Insira abaixo a URL de conexão do seu banco de dados PostgreSQL (como Supabase, Neon ou local). O sistema atualizará automaticamente o arquivo <code className="text-indigo-400">.env</code> e reconectará a API sem precisar reiniciar o processo.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={dbUrl}
+              onChange={(e) => setDbUrl(e.target.value)}
+              placeholder="postgres://usuario:senha@host:porta/banco"
+              className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-300 text-xs rounded-xl px-4 py-3 focus:outline-none transition-all placeholder:text-slate-700"
+            />
+            <button
+              onClick={handleSaveDbUrl}
+              disabled={savingDbUrl || apiStatus === 'offline'}
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white font-bold text-xs py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/10 disabled:opacity-50"
+            >
+              {savingDbUrl ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  Salvar e Conectar
+                </>
+              )}
+            </button>
           </div>
         </div>
 

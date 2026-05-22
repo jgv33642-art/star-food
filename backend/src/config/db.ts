@@ -1,9 +1,20 @@
 import { Pool } from 'pg';
 import { env } from './env';
 
-export const pool = new Pool({
+export let pool = new Pool({
   connectionString: env.DATABASE_URL,
 });
+
+export function updatePool(connectionString: string) {
+  try {
+    pool.end().catch(err => console.error('Erro ao fechar pool anterior:', err));
+  } catch (err) {
+    console.error('Erro ao tentar fechar o pool:', err);
+  }
+  pool = new Pool({
+    connectionString,
+  });
+}
 
 /**
  * Executes a query with Row Level Security (RLS) configured for the given company_id

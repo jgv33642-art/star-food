@@ -6,11 +6,13 @@ export class SaleRepository {
       `SELECT
         s.id, s.company_id, s.order_id, s.cash_register_id, s.customer_id,
         s.total_amount, s.discount, s.final_amount, s.status, s.created_at,
+        COALESCE((SELECT method FROM payments WHERE sale_id = s.id LIMIT 1), 'dinheiro') AS payment_method,
         COALESCE(
           json_agg(
             json_build_object(
               'id', si.id,
               'product_id', si.product_id,
+              'product_name', p.name,
               'quantity', si.quantity,
               'price', si.price
             )
@@ -19,6 +21,7 @@ export class SaleRepository {
         ) AS items
       FROM sales s
       LEFT JOIN sale_items si ON si.sale_id = s.id
+      LEFT JOIN products p ON p.id = si.product_id
       WHERE s.company_id = $1
       GROUP BY s.id
       ORDER BY s.created_at DESC`,
@@ -32,11 +35,13 @@ export class SaleRepository {
       `SELECT
         s.id, s.company_id, s.order_id, s.cash_register_id, s.customer_id,
         s.total_amount, s.discount, s.final_amount, s.status, s.created_at,
+        COALESCE((SELECT method FROM payments WHERE sale_id = s.id LIMIT 1), 'dinheiro') AS payment_method,
         COALESCE(
           json_agg(
             json_build_object(
               'id', si.id,
               'product_id', si.product_id,
+              'product_name', p.name,
               'quantity', si.quantity,
               'price', si.price
             )
@@ -45,6 +50,7 @@ export class SaleRepository {
         ) AS items
       FROM sales s
       LEFT JOIN sale_items si ON si.sale_id = s.id
+      LEFT JOIN products p ON p.id = si.product_id
       WHERE s.id = $1 AND s.company_id = $2
       GROUP BY s.id`,
       [id, companyId]
@@ -61,6 +67,7 @@ export class SaleRepository {
       totalAmount: number;
       discount: number;
       finalAmount: number;
+      paymentMethod?: string;
       items: { productId: string; quantity: number; price: number }[];
     }
   ) {
@@ -68,7 +75,7 @@ export class SaleRepository {
     try {
       await client.query('BEGIN');
 
-      const { orderId, cashRegisterId, customerId, totalAmount, discount, finalAmount, items } = data;
+      const { orderId, cashRegisterId, customerId, totalAmount, discount, finalAmount, paymentMethod, items } = data;
 
       const saleResult = await client.query(
         `INSERT INTO sales (company_id, order_id, cash_register_id, customer_id, total_amount, discount, final_amount, status)
@@ -83,6 +90,12 @@ export class SaleRepository {
           [sale.id, item.productId, item.quantity, item.price]
         );
       }
+
+      // Insert payment record
+      await client.query(
+        `INSERT INTO payments (sale_id, method, amount) VALUES ($1, $2, $3)`,
+        [sale.id, paymentMethod || 'dinheiro', finalAmount]
+      );
 
       await client.query('COMMIT');
       return sale;

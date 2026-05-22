@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { pool } from '../config/db';
+import { pool, updatePool } from '../config/db';
+import { env } from '../config/env';
 import fs from 'fs';
 import path from 'path';
 
@@ -99,9 +100,10 @@ export class DevController {
 
   repairDatabase = async (req: Request, res: Response, next: NextFunction) => {
     const logs: any[] = [];
-    const client = await pool.connect();
+    let client;
     try {
       logs.push({ type: 'info', message: 'Iniciando processo de auto-reparo do banco de dados...' });
+      client = await pool.connect();
       
       // Resolve path of database.sql in a robust way for local and Vercel Serverless runtimes
       let sqlPath = path.resolve(process.cwd(), '../database.sql');
@@ -210,7 +212,7 @@ export class DevController {
       logs.push({ type: 'error', message: `Falha no processo de auto-reparo: ${error.message}` });
       res.status(500).json({ success: false, error: error.message, logs });
     } finally {
-      client.release();
+      if (client) client.release();
     }
   };
 
@@ -231,6 +233,72 @@ export class DevController {
       }
 
       res.json({ success: true, company: result.rows[0] });
+    } catch (error: any) {
+      next(error);
+    }
+  };
+
+  updateEnv = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { databaseUrl } = req.body;
+      if (!databaseUrl) {
+        return res.status(400).json({ success: false, error: 'DATABASE_URL é obrigatória.' });
+      }
+
+      const pathsToTry = [
+        path.resolve(process.cwd(), '.env'),
+        path.resolve(process.cwd(), 'backend/.env'),
+        path.resolve(__dirname, '../../.env'),
+        path.resolve(__dirname, '../../../.env'),
+      ];
+
+      let envPath = '';
+      for (const p of pathsToTry) {
+        if (fs.existsSync(p)) {
+          envPath = p;
+          break;
+        }
+      }
+
+      if (!envPath) {
+        envPath = path.resolve(process.cwd(), '.env');
+      }
+
+      let envContent = '';
+      if (fs.existsSync(envPath)) {
+        envContent = fs.readFileSync(envPath, 'utf8');
+      }
+
+      const lines = envContent.split('\n');
+      let found = false;
+      const updatedLines = lines.map(line => {
+        if (line.trim().startsWith('DATABASE_URL=')) {
+          found = true;
+          return `DATABASE_URL="${databaseUrl}"`;
+        }
+        return line;
+      });
+
+      if (!found) {
+        updatedLines.push(`DATABASE_URL="${databaseUrl}"`);
+      }
+
+      fs.writeFileSync(envPath, updatedLines.join('\n'), 'utf8');
+
+      process.env.DATABASE_URL = databaseUrl;
+      env.DATABASE_URL = databaseUrl;
+
+      updatePool(databaseUrl);
+
+      try {
+        await pool.query('SELECT 1');
+        res.json({ success: true, message: 'DATABASE_URL atualizada e banco conectado com sucesso!' });
+      } catch (dbErr: any) {
+        res.json({ 
+          success: true, 
+          message: 'DATABASE_URL salva, mas a conexão falhou: ' + (dbErr.message || 'Erro de conexão') 
+        });
+      }
     } catch (error: any) {
       next(error);
     }

@@ -11,6 +11,7 @@ export class OrderRepository {
             json_build_object(
               'id', oi.id,
               'product_id', oi.product_id,
+              'product_name', p.name,
               'quantity', oi.quantity,
               'price', oi.price,
               'notes', oi.notes
@@ -21,6 +22,7 @@ export class OrderRepository {
       FROM orders o
       LEFT JOIN tables t ON t.id = o.table_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
       WHERE o.company_id = $1
       GROUP BY o.id, t.number
       ORDER BY o.opened_at DESC`,
@@ -39,6 +41,7 @@ export class OrderRepository {
             json_build_object(
               'id', oi.id,
               'product_id', oi.product_id,
+              'product_name', p.name,
               'quantity', oi.quantity,
               'price', oi.price,
               'notes', oi.notes
@@ -49,6 +52,7 @@ export class OrderRepository {
       FROM orders o
       LEFT JOIN tables t ON t.id = o.table_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
       WHERE o.id = $1 AND o.company_id = $2
       GROUP BY o.id, t.number`,
       [id, companyId]
