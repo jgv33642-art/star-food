@@ -103,12 +103,25 @@ export class DevController {
     try {
       logs.push({ type: 'info', message: 'Iniciando processo de auto-reparo do banco de dados...' });
       
-      // Resolve path of database.sql. Since backend is in lanchonete/backend and database.sql is in lanchonete/database.sql
-      const sqlPath = path.resolve(process.cwd(), '../database.sql');
+      // Resolve path of database.sql in a robust way for local and Vercel Serverless runtimes
+      let sqlPath = path.resolve(process.cwd(), '../database.sql');
+      if (!fs.existsSync(sqlPath)) {
+        sqlPath = path.resolve(process.cwd(), './database.sql');
+      }
+      if (!fs.existsSync(sqlPath)) {
+        sqlPath = path.resolve(__dirname, '../../../../database.sql');
+      }
+      if (!fs.existsSync(sqlPath)) {
+        sqlPath = path.resolve(__dirname, '../../../database.sql');
+      }
+      if (!fs.existsSync(sqlPath)) {
+        sqlPath = path.resolve(__dirname, '../../database.sql');
+      }
+
       logs.push({ type: 'info', message: `Lendo arquivo de esquema: ${sqlPath}` });
 
       if (!fs.existsSync(sqlPath)) {
-        throw new Error(`Arquivo de esquema não encontrado em: ${sqlPath}`);
+        throw new Error(`Arquivo de esquema não encontrado após buscar em caminhos relativos.`);
       }
 
       const sqlContent = fs.readFileSync(sqlPath, 'utf8');

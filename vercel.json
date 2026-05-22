@@ -1,5 +1,16 @@
 {
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm install --prefix frontend"
+  "installCommand": "npm install --prefix frontend && npm install",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.ts"
+    }
+  ],
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "database.sql"
+    }
+  }
 }

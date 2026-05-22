@@ -5,8 +5,10 @@ config();
 
 const envSchema = z.object({
   PORT: z.string().default('3000'),
-  DATABASE_URL: z.string(),
-  JWT_SECRET: z.string(),
+  DATABASE_URL: z.string().optional(),
+  POSTGRES_URL: z.string().optional(),
+  POSTGRES_URL_NON_POOLING: z.string().optional(),
+  JWT_SECRET: z.string().optional().default('star-food-secret-jwt-token-fallback'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 
@@ -17,4 +19,17 @@ if (!_env.success) {
   throw new Error('Invalid environment variables');
 }
 
-export const env = _env.data;
+// Extract valid database URL from available envs
+const rawDbUrl = _env.data.DATABASE_URL || _env.data.POSTGRES_URL || _env.data.POSTGRES_URL_NON_POOLING;
+
+if (!rawDbUrl) {
+  console.error('❌ Database connection string not found. Please provide DATABASE_URL or POSTGRES_URL.');
+  throw new Error('Missing database connection string');
+}
+
+export const env = {
+  ..._env.data,
+  DATABASE_URL: rawDbUrl,
+  JWT_SECRET: _env.data.JWT_SECRET,
+};
+export type EnvType = typeof env;
