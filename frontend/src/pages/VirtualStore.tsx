@@ -56,9 +56,7 @@ export const VirtualStore = () => {
       <header className="bg-white px-4 py-4 sticky top-0 z-30 shadow-sm flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md">
-              S
-            </div>
+            <img src="/logo.png" alt="Star Food" className="w-12 h-12 object-contain rounded-full shadow-md" />
             <div>
               <h1 className="font-black text-lg leading-tight">Star Food</h1>
               <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-0.5">

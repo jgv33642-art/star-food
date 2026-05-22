@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, ArrowRight, ShieldCheck, Zap, BarChart3, Lock, X } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Zap, BarChart3, Lock, X } from 'lucide-react';
 
 export const Landing = () => {
   const navigate = useNavigate();
@@ -38,9 +38,7 @@ export const Landing = () => {
       {/* Header */}
       <header className="relative z-10 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <Utensils className="text-white w-6 h-6" />
-          </div>
+          <img src="/logo.png" alt="Star Food" className="w-12 h-12 object-contain rounded-2xl" />
           <span className="text-2xl font-bold tracking-tight">Star Food</span>
         </div>
         <div className="flex items-center gap-4">
