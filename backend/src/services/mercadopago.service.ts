@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import { env } from '../config/env';
 
 // Configurar o SDK do Mercado Pago
@@ -55,6 +55,32 @@ export class MercadoPagoService {
     } catch (error) {
       console.error('Erro ao criar preferência do Mercado Pago:', error);
       throw new Error('Não foi possível gerar o link de pagamento.');
+    }
+  }
+
+  /**
+   * Busca as informações reais de um pagamento diretamente no servidor do Mercado Pago (Validação Reversa)
+   */
+  async verifyPayment(paymentId: string | number) {
+    if (!client) {
+      throw new Error('Mercado Pago Access Token não configurado no backend.');
+    }
+
+    const payment = new Payment(client);
+
+    try {
+      const response = await payment.get({ id: paymentId });
+      
+      return {
+        id: response.id,
+        status: response.status, // Ex: 'approved', 'pending', 'rejected'
+        externalReference: response.external_reference, // O companyId que passamos na criação
+        items: response.additional_info?.items || [],
+        transactionAmount: response.transaction_amount,
+      };
+    } catch (error) {
+      console.error(`Erro ao buscar pagamento ${paymentId} no Mercado Pago:`, error);
+      throw new Error('Não foi possível validar o pagamento.');
     }
   }
 }
