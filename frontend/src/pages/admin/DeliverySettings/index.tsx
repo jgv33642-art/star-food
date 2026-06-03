@@ -8,7 +8,7 @@ export const DeliverySettings = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('appearance');
   const [isSaving, setIsSaving] = useState(false);
-  const [settings, setSettings] = useState<any>({});
+  const [settings] = useState<any>({});
 
   const hasPremiumPlan = () => {
     if (!user?.plan) return false;

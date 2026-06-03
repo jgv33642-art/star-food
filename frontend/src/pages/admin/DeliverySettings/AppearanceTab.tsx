@@ -1,14 +1,19 @@
 import { useState } from 'react';
 
 // Using standard props for simplicity without needing to import Supabase for this dummy example.
-export const AppearanceTab = ({ companyId, initialSettings }: any) => {
+export const AppearanceTab = ({ initialSettings }: any) => {
   const [primaryColor, setPrimaryColor] = useState(initialSettings?.primary_color || '#0f172a');
   const [secondaryColor, setSecondaryColor] = useState(initialSettings?.secondary_color || '#f59e0b');
   const [logoUrl, setLogoUrl] = useState(initialSettings?.logo_url);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Logic goes here
+  const handleLogoUpload = async (_e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsUploading(true);
+    // Dummy logic
+    setTimeout(() => {
+      setLogoUrl('https://via.placeholder.com/150');
+      setIsUploading(false);
+    }, 1000);
   };
 
   return (

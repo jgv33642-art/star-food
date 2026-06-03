@@ -180,6 +180,7 @@ export const Login = () => {
         email: res.user.email,
         role: mappedRole as any,
         companyId: res.user.companyId || res.user.company_id || '',
+        plan: res.user.plan || 'basic',
       });
 
       navigate('/');

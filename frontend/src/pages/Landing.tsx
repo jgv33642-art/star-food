@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Zap, BarChart3, Lock, X, Smartphone, Check } from 'lucide-react';
+import { ShieldCheck, Zap, BarChart3, Lock, X, Smartphone, Check } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 
 export const Landing = () => {
