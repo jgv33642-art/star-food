@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import { ShieldCheck, ArrowRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,34 @@ interface UpgradePlanProps {
 }
 
 export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps) => {
+  const [loading, setLoading] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleUpgrade = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ plan: requiredPlan })
+      });
+
+      const data = await response.json();
+      if (data.initPoint) {
+        window.location.href = data.initPoint;
+      }
+    } catch (error) {
+      console.error('Erro ao gerar link de pagamento:', error);
+      alert('Não foi possível iniciar o pagamento no momento.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -39,14 +66,13 @@ export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps)
             Faça um upgrade agora para escalar ainda mais as suas vendas.
           </p>
 
-          <Link
-            to="/admin/configuracoes" // We can redirect to a billing management page or just the Landing page
-            onClick={onClose}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-white text-slate-900 hover:bg-slate-100 font-bold rounded-xl transition-all"
+          <button
+            onClick={handleUpgrade}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-white text-slate-900 hover:bg-slate-100 font-bold rounded-xl transition-all disabled:opacity-50"
           >
-            Fazer Upgrade Agora
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+            {loading ? 'Redirecionando...' : 'Fazer Upgrade Agora'}
+          </button>
           <button
             onClick={onClose}
             className="w-full py-3 text-slate-400 hover:text-white font-medium mt-3"

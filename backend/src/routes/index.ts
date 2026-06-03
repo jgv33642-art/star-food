@@ -15,6 +15,7 @@ import companyRoutes from './company.routes';
 import stockRoutes from './stock.routes';
 import reportsRoutes from './reports.routes';
 import settingsRoutes from './settings.routes';
+import paymentRoutes from './payment.routes';
 
 const router = Router();
 
@@ -34,5 +35,6 @@ router.use('/companies', companyRoutes);
 router.use('/stock', stockRoutes);
 router.use('/reports', reportsRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/payments', paymentRoutes);
 
 export default router;

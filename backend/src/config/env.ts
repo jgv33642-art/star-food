@@ -10,6 +10,8 @@ const envSchema = z.object({
   POSTGRES_URL_NON_POOLING: z.string().optional(),
   JWT_SECRET: z.string().optional().default('star-food-secret-jwt-token-fallback'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  MERCADO_PAGO_ACCESS_TOKEN: z.string().optional(),
+  MERCADO_PAGO_PUBLIC_KEY: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

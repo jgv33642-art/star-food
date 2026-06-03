@@ -26,8 +26,9 @@ const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: 
 };
 
 export const Checkout = () => {
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(searchParams.get('status') === 'success');
   const [error, setError] = useState('');
   
   // Form state
@@ -37,7 +38,6 @@ export const Checkout = () => {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { register } = useAuth();
 
   const planKey = searchParams.get('plan') || 'basic';
@@ -58,12 +58,35 @@ export const Checkout = () => {
     setLoading(true);
 
     try {
-      // Chama o contexto de Auth, que agora aceita o planKey
+      // 1. Cria a conta no banco (com status de plano aguardando pagamento ou criado como basic/start provisoriamente)
       await register(companyName, userName, email, password, planKey);
-      setIsSuccess(true);
+      
+      // 2. Chama nossa nova rota de pagamentos passando o plano
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ plan: planKey })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Falha ao gerar link de pagamento');
+      }
+
+      if (data.initPoint) {
+        // 3. Redireciona o usuário para a tela segura do Mercado Pago
+        window.location.href = data.initPoint;
+      } else {
+        // Fallback em caso de erro sem exception
+        setIsSuccess(true);
+      }
     } catch (err: any) {
       setError(err.message || 'Erro ao processar o pagamento e criar conta.');
-    } finally {
       setLoading(false);
     }
   };
@@ -171,7 +194,7 @@ export const Checkout = () => {
         <div className="p-8 md:w-2/3">
           <h2 className="text-2xl font-black text-white mb-6">Criar Conta e Assinar</h2>
           
-          <form onSubmit={handleSubscribe} className="space-y-6">
+          <form onSubmit={handleSubscribe} className="space-y-6 mt-6">
             {error && (
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
                 {error}
@@ -202,18 +225,6 @@ export const Checkout = () => {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                   <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="********" />
                 </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">Dados do Cartão</label>
-              <div className="relative">
-                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input type="text" required className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0000 0000 0000 0000" />
-              </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <input type="text" required className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="MM/AA" />
-                <input type="text" required className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="CVC" />
               </div>
             </div>
 
