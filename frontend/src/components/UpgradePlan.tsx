@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ShieldCheck, ArrowRight, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShieldCheck, X } from 'lucide-react';
 
 interface UpgradePlanProps {
   isOpen: boolean;
@@ -17,6 +16,7 @@ export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps)
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      // @ts-ignore
       const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
         method: 'POST',
         headers: {

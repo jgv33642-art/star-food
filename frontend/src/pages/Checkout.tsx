@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ShieldCheck, ArrowLeft, CreditCard, ShoppingCart, Download, Laptop, Smartphone, CheckCircle, User, Lock } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, ShoppingCart, Download, Laptop, Smartphone, CheckCircle, User, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -63,6 +63,7 @@ export const Checkout = () => {
       
       // 2. Chama nossa nova rota de pagamentos passando o plano
       const token = localStorage.getItem('token');
+      // @ts-ignore
       const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
         method: 'POST',
         headers: {
