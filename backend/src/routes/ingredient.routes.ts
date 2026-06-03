@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { IngredientController } from '../controllers/ingredient.controller';
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware, requirePlan } from '../middlewares/auth.middleware';
 
 const router = Router();
 const ingredientController = new IngredientController();
 
-router.use(authMiddleware);
+router.use(authMiddleware, requirePlan('basic', 'pro'));
 
 router.get('/', ingredientController.getAll);
 router.get('/:id', ingredientController.getById);

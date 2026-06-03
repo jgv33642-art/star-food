@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { ProductController } from '../controllers/product.controller';
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware, requireRole } from '../middlewares/auth.middleware';
+import { tenantGuard } from '../middlewares/tenant.guard';
 import { validateRequest } from '../middlewares/validate.middleware';
 import { createProductSchema, updateProductSchema } from '../schemas/product.schema';
 
 const router = Router();
 const productController = new ProductController();
 
-router.use(authMiddleware);
+router.use(authMiddleware, tenantGuard);
 
 /**
  * @swagger
@@ -80,7 +81,7 @@ router.get('/:id', productController.getById);
  *       201:
  *         description: Product created successfully
  */
-router.post('/', validateRequest(createProductSchema), productController.create);
+router.post('/', requireRole('admin', 'manager', 'gerencia', 'cashier', 'caixa'), validateRequest(createProductSchema), productController.create);
 
 /**
  * @swagger
@@ -124,7 +125,7 @@ router.post('/', validateRequest(createProductSchema), productController.create)
  *       200:
  *         description: Product updated successfully
  */
-router.put('/:id', validateRequest(updateProductSchema), productController.update);
+router.put('/:id', requireRole('admin', 'manager', 'gerencia', 'cashier', 'caixa'), validateRequest(updateProductSchema), productController.update);
 
 /**
  * @swagger
@@ -145,6 +146,6 @@ router.put('/:id', validateRequest(updateProductSchema), productController.updat
  *       200:
  *         description: Product deleted successfully
  */
-router.delete('/:id', productController.delete);
+router.delete('/:id', requireRole('admin', 'manager', 'gerencia', 'cashier', 'caixa'), productController.delete);
 
 export default router;

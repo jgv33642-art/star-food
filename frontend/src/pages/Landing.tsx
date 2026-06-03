@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Zap, BarChart3, Lock, X } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Zap, BarChart3, Lock, X, Smartphone, Check } from 'lucide-react';
+import { usePWA } from '../hooks/usePWA';
 
 export const Landing = () => {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ export const Landing = () => {
   const [step, setStep] = useState(1);
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
+  const { isInstallable, installApp } = usePWA();
 
   const handleDevSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,21 +77,153 @@ export const Landing = () => {
             Controle pedidos, pagamentos e faturamento em tempo real.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link 
-              to="/checkout"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
-            >
-              Adquirir Meu Acesso <ArrowRight className="w-5 h-5" />
-            </Link>
-            
-            <Link 
-              to="/login"
-              className="w-full sm:w-auto px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 text-lg font-bold rounded-2xl transition-all flex items-center justify-center"
-            >
-              Já sou cliente
-            </Link>
+          {/* Pricing Section */}
+          <div className="max-w-5xl mx-auto mb-16 text-left">
+            <div className="flex justify-center mb-10">
+              <div className="bg-slate-900 border border-slate-800 p-1 rounded-2xl inline-flex relative">
+                <button 
+                  onClick={() => setIsAnnual(false)}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${!isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                >
+                  Faturamento Mensal
+                </button>
+                <button 
+                  onClick={() => setIsAnnual(true)}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                >
+                  Faturamento Anual <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full ml-1 absolute -top-2 -right-4 animate-bounce">Economize 10%</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Plano Start */}
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 flex flex-col relative">
+                <h3 className="text-2xl font-bold mb-2 text-center">Plano Start</h3>
+                <p className="text-slate-400 mb-6 text-center">Para quem está literalmente começando.</p>
+                <div className="mb-8 text-center">
+                  <span className="text-5xl font-black">R$ {isAnnual ? '1.618,80' : '149,90'}</span>
+                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 134,90 por mês</div>}
+                </div>
+                
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Atendimento de Balcão e Retirada</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>1 Usuário (Logado por vez)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Relatórios Simplificados</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Suporte via Ticket/Bot</span>
+                  </li>
+                </ul>
+                
+                <Link 
+                  to={`/checkout?plan=start&billing=${isAnnual ? 'annual' : 'monthly'}`}
+                  className="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
+                >
+                  Assinar Plano Start
+                </Link>
+              </div>
+
+              {/* Plano Básico */}
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 flex flex-col relative">
+                <h3 className="text-2xl font-bold mb-2 text-center">Plano Básico</h3>
+                <p className="text-slate-400 mb-6 text-center">Gestão completa para operação local.</p>
+                <div className="mb-8 text-center">
+                  <span className="text-5xl font-black">R$ {isAnnual ? '3.238,92' : '299,90'}</span>
+                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 269,90 por mês</div>}
+                </div>
+                
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Atendimento de Mesas e Comandas</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Controle de Estoque e Compras</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Relatórios Avançados (DRE/Lucro)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                    <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
+                    <span>Suporte em Horário Comercial</span>
+                  </li>
+                </ul>
+                
+                <Link 
+                  to={`/checkout?plan=basic&billing=${isAnnual ? 'annual' : 'monthly'}`}
+                  className="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
+                >
+                  Assinar Plano Básico
+                </Link>
+              </div>
+
+              {/* Plano Pro */}
+              <div className="bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-indigo-500/50 rounded-3xl p-8 flex flex-col relative transform lg:-translate-y-4 shadow-2xl shadow-indigo-500/10 mt-8 lg:mt-0">
+                <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                  Mais Popular
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-white text-center">Plano Pro</h3>
+                <p className="text-indigo-200 mb-6 text-center">O carro-chefe para quem quer Delivery.</p>
+                <div className="mb-8 text-center">
+                  <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">R$ {isAnnual ? '4.318,92' : '399,90'}</span>
+                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 359,90 por mês</div>}
+                </div>
+                
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-slate-200">
+                    <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" /> 
+                    <span>Tudo do Básico</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-200">
+                    <Check className="w-5 h-5 text-amber-400 flex-shrink-0" /> 
+                    <span className="font-bold text-amber-400">Site de Delivery Exclusivo (White Label)</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-200">
+                    <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" /> 
+                    <span>Gestor de Pedidos em Tempo Real</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-200">
+                    <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" /> 
+                    <span>Suporte Prioritário 24/7</span>
+                  </li>
+                </ul>
+                
+                <Link 
+                  to={`/checkout?plan=pro&billing=${isAnnual ? 'annual' : 'monthly'}`}
+                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] flex items-center justify-center text-center"
+                >
+                  Assinar Plano Pro
+                </Link>
+              </div>
+            </div>
           </div>
+
+          {isInstallable && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={installApp}
+                className="flex items-center gap-2 px-6 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40 rounded-2xl text-base font-bold transition-all hover:scale-105"
+              >
+                <Smartphone className="w-5 h-5 animate-pulse text-indigo-300" />
+                Instalar Aplicativo Star Food
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Features Preview */}
@@ -128,6 +263,8 @@ export const Landing = () => {
             </p>
           </div>
         </motion.div>
+
+
       </main>
 
 

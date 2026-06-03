@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { 
   Search, 
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
+import { useSocket } from '../hooks/useSocket';
 
 interface OrderItem {
   id: string;
@@ -46,6 +48,9 @@ interface CashRegister {
 }
 
 export const CashierDashboard = () => {
+  const navigate = useNavigate();
+  const socket = useSocket();
+
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -64,8 +69,8 @@ export const CashierDashboard = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [showCloseModal, setShowCloseModal] = useState(false);
 
-  const fetchCashierAndOrders = async () => {
-    setLoading(true);
+  const fetchCashierAndOrders = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       // 1. Fetch current cashier status
@@ -79,20 +84,40 @@ export const CashierDashboard = () => {
 
       // 2. Fetch open orders
       const allOrders = await api.get<Order[]>('/orders');
-      // Filter open orders (we can filter in frontend for robustness)
       const openOrders = allOrders.filter(o => o.status === 'open');
       setOrders(openOrders);
     } catch (err: any) {
       console.error(err);
       setError('Erro ao carregar dados do Caixa: ' + (err.message || 'Erro desconhecido'));
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCashierAndOrders();
+    fetchCashierAndOrders(true);
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      console.log('⚡ Socket event received: refreshing cashier orders list');
+      fetchCashierAndOrders(false);
+    };
+
+    socket.on('new_order', handleUpdate);
+    socket.on('order_status_changed', handleUpdate);
+    socket.on('order_payment_partial', handleUpdate);
+    socket.on('order_closed', handleUpdate);
+
+    return () => {
+      socket.off('new_order', handleUpdate);
+      socket.off('order_status_changed', handleUpdate);
+      socket.off('order_payment_partial', handleUpdate);
+      socket.off('order_closed', handleUpdate);
+    };
+  }, [socket]);
 
   const handleOpenCashier = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,8 +183,7 @@ export const CashierDashboard = () => {
   };
 
   const handleSelectOrder = (order: Order) => {
-    setSelectedOrder(order);
-    setStep(2);
+    navigate(`/caixa/pagamento/${order.id}`);
   };
 
   const handlePayment = async () => {

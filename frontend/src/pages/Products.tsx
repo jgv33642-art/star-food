@@ -19,6 +19,7 @@ interface Product {
   description?: string;
   cost?: number;
   minimum_stock?: number;
+  sku?: string;
 }
 
 interface ProductDisplay {
@@ -29,6 +30,7 @@ interface ProductDisplay {
   price: number;
   stock: number;
   status: string;
+  sku?: string;
 }
 
 export const Products = () => {
@@ -46,6 +48,7 @@ export const Products = () => {
   const [newCategoryId, setNewCategoryId] = useState('');
   const [newPrice, setNewPrice] = useState('');
   const [newStatus, setNewStatus] = useState('Ativo');
+  const [newSku, setNewSku] = useState('');
 
   const fetchData = async () => {
     setLoading(true);
@@ -68,6 +71,7 @@ export const Products = () => {
         price: Number(p.price),
         stock: p.stock_quantity,
         status: p.active ? 'Ativo' : 'Inativo',
+        sku: p.sku || '',
       }));
       setProducts(mapped);
     } catch (err: any) {
@@ -92,6 +96,7 @@ export const Products = () => {
     setNewCategoryId(categories[0]?.id || '');
     setNewPrice('');
     setNewStatus('Ativo');
+    setNewSku('');
     setIsModalOpen(true);
   };
 
@@ -101,6 +106,7 @@ export const Products = () => {
     setNewCategoryId(prod.categoryId);
     setNewPrice(String(prod.price));
     setNewStatus(prod.status);
+    setNewSku(prod.sku || '');
     setIsModalOpen(true);
   };
 
@@ -115,6 +121,7 @@ export const Products = () => {
         categoryId: newCategoryId,
         price: parseFloat(newPrice),
         active: newStatus === 'Ativo',
+        sku: newSku.trim() || null,
       };
 
       if (editingProduct) {
@@ -129,6 +136,27 @@ export const Products = () => {
       setError(err.message || 'Erro ao salvar produto.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleToggleActive = async (prodId: string, currentStatus: string) => {
+    const isActive = currentStatus === 'Ativo';
+    const nextActive = !isActive;
+    const nextStatusStr = nextActive ? 'Ativo' : 'Inativo';
+
+    // Optimistic Update
+    setProducts((prev) =>
+      prev.map((p) => (p.id === prodId ? { ...p, status: nextStatusStr } : p))
+    );
+
+    try {
+      await api.put(`/products/${prodId}`, { active: nextActive });
+    } catch (err: any) {
+      setError(err.message || 'Erro ao atualizar status do produto.');
+      // Revert on error
+      setProducts((prev) =>
+        prev.map((p) => (p.id === prodId ? { ...p, status: currentStatus } : p))
+      );
     }
   };
 
@@ -184,6 +212,7 @@ export const Products = () => {
               <thead>
                 <tr className="bg-slate-950/50 border-b border-slate-800">
                   <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Nome do Produto</th>
+                  <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Código/SKU</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Categoria</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Preço</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
@@ -193,14 +222,14 @@ export const Products = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center">
+                    <td colSpan={6} className="py-12 text-center">
                       <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mx-auto" />
                       <p className="text-slate-500 mt-2">Carregando produtos...</p>
                     </td>
                   </tr>
                 ) : filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-500">
+                    <td colSpan={6} className="py-8 text-center text-slate-500">
                       Nenhum produto encontrado.
                     </td>
                   </tr>
@@ -211,6 +240,9 @@ export const Products = () => {
                         <p className="text-white font-bold">{prod.name}</p>
                         <p className="text-slate-500 text-xs text-wrap max-w-xs">ID: #{prod.id}</p>
                       </td>
+                      <td className="py-4 px-6 font-mono text-xs text-slate-300">
+                        {prod.sku || `SF-${prod.id.substring(0, 6).toUpperCase()}`}
+                      </td>
                       <td className="py-4 px-6">
                         <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-lg text-xs font-medium">{prod.category}</span>
                       </td>
@@ -218,9 +250,24 @@ export const Products = () => {
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(prod.price)}
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${prod.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                          {prod.status}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleToggleActive(prod.id, prod.status)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer ${
+                              prod.status === 'Ativo' ? 'bg-emerald-500' : 'bg-slate-700'
+                            }`}
+                            title={prod.status === 'Ativo' ? 'Clique para desativar' : 'Clique para ativar'}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                prod.status === 'Ativo' ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
+                          <span className={`text-xs font-bold ${prod.status === 'Ativo' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                            {prod.status}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center justify-end gap-2">
@@ -285,6 +332,17 @@ export const Products = () => {
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       placeholder="Ex: X-Burger Especial"
+                      className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Código / SKU (Opcional)</label>
+                    <input
+                      type="text"
+                      value={newSku}
+                      onChange={(e) => setNewSku(e.target.value)}
+                      placeholder="Ex: 7891234567890 (deixe em branco para autogerar)"
                       className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
                   </div>

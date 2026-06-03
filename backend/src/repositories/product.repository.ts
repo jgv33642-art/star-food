@@ -12,13 +12,13 @@ export class ProductRepository {
   }
 
   async create(companyId: string, data: any) {
-    const { name, categoryId, description, price, cost, stockQuantity, minimumStock, active } = data;
+    const { name, categoryId, description, price, cost, stockQuantity, minimumStock, active, sku } = data;
     const result = await queryWithRLS(
       companyId,
       `INSERT INTO products 
-      (company_id, name, category_id, description, price, cost, stock_quantity, minimum_stock, active) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [companyId, name, categoryId, description, price, cost, stockQuantity || 0, minimumStock || 0, active !== undefined ? active : true]
+      (company_id, name, category_id, description, price, cost, stock_quantity, minimum_stock, active, sku) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [companyId, name, categoryId, description, price, cost, stockQuantity || 0, minimumStock || 0, active !== undefined ? active : true, sku || null]
     );
     return result.rows[0];
   }

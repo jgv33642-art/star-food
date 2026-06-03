@@ -1,64 +1,184 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { Plus, Minus, Search, Send, X, Trash2, ArrowLeft, Printer } from 'lucide-react';
+import { Plus, Minus, Search, Send, X, Trash2, ArrowLeft, Printer, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
 
-const MENU_ITEMS = [
-  { id: 1, name: 'X-Burger Especial', price: 25.90, category: 'Lanches' },
-  { id: 2, name: 'Porção de Fritas', price: 18.50, category: 'Porções' },
-  { id: 3, name: 'Coca-Cola 2L', price: 12.00, category: 'Bebidas' },
-  { id: 4, name: 'Suco Natural', price: 8.00, category: 'Bebidas' },
-  { id: 5, name: 'Cerveja Artesanal', price: 15.00, category: 'Bebidas' },
-  { id: 6, name: 'Pizza Calabresa', price: 45.00, category: 'Pizzas' },
-];
+const getEmoji = (productName: string, categoryName: string) => {
+  const name = productName.toLowerCase();
+  const cat = categoryName.toLowerCase();
+  if (name.includes('burg') || name.includes('bacon') || name.includes('sandu') || cat.includes('lanche')) return '🍔';
+  if (name.includes('pizz') || cat.includes('pizza')) return '🍕';
+  if (name.includes('frita') || name.includes('batata') || name.includes('porc')) return '🍟';
+  if (name.includes('coca') || name.includes('suco') || name.includes('refrigerante') || name.includes('agua') || name.includes('refri') || cat.includes('bebida') || cat.includes('suco')) return '🥤';
+  if (name.includes('pudim') || name.includes('bolo') || name.includes('sorvete') || name.includes('doce') || cat.includes('sobremesa') || cat.includes('doce')) return '🍮';
+  return '🍽️';
+};
 
-const ACTIVE_TABLES = [
-  { mesa: '12', comanda: '4501' },
-  { mesa: '04', comanda: '4502' },
-  { mesa: '08', comanda: '4503' },
-  { mesa: '15', comanda: '4504' },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category_id: string;
+  category_name?: string;
+}
+
+interface Table {
+  id: string;
+  number: number;
+  status: 'free' | 'busy' | 'closing';
+}
 
 interface OrderItem {
-  item: typeof MENU_ITEMS[0];
+  id?: string;
+  product_id: string;
+  product_name: string;
   quantity: number;
+  price: number;
+  notes: string | null;
+}
+
+interface Order {
+  id: string;
+  table_id: string | null;
+  table_number: number | null;
+  status: string;
+  items: OrderItem[];
 }
 
 export const WaiterDashboard = () => {
-  const [activeContext, setActiveContext] = useState<{ mesa: string, comanda: string } | null>(null);
+  const { user } = useAuth();
+  const { queueAction, setCache, getCache } = useOfflineQueue();
+
+  const [tables, setTables] = useState<Table[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Active Context (Selected table/order)
+  const [activeContext, setActiveContext] = useState<{ table: Table, order: Order | null } | null>(null);
   const [tableSearch, setTableSearch] = useState('');
   
-  const [newTable, setNewTable] = useState('');
-  const [newComanda, setNewComanda] = useState('');
-  
-  const [order, setOrder] = useState<OrderItem[]>([]);
-  
+  // Launch state (new items being added in this session)
+  const [pendingItems, setPendingItems] = useState<{ product: Product, quantity: number }[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuSearch, setMenuSearch] = useState('');
+  const [categories, setCategories] = useState<string[]>(['Todos', 'Bebidas', 'Drinks', 'Porções', 'Lanches', 'Combos', 'Sobremesas', 'Adicionais']);
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
 
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const kitchenItems = order.filter(o => o.item.category !== 'Bebidas');
-  const barItems = order.filter(o => o.item.category === 'Bebidas');
+  // Load all master data and open orders
+  const fetchData = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
+    try {
+      let tablesData: Table[] = [];
+      let productsData: any[] = [];
+      let ordersData: Order[] = [];
+      let categoriesData: any[] = [];
 
-  const filteredMenu = MENU_ITEMS.filter(item => 
-    item.name.toLowerCase().includes(menuSearch.toLowerCase())
-  );
+      if (navigator.onLine) {
+        [tablesData, productsData, ordersData, categoriesData] = await Promise.all([
+          api.get<Table[]>('/tables'),
+          api.get<any[]>('/products'),
+          api.get<Order[]>('/orders'),
+          api.get<any[]>('/categories')
+        ]);
 
-  const addItem = (item: typeof MENU_ITEMS[0]) => {
-    setOrder(prev => {
-      const existing = prev.find(o => o.item.id === item.id);
-      if (existing) {
-        return prev.map(o => o.item.id === item.id ? { ...o, quantity: o.quantity + 1 } : o);
+        await setCache('tables', tablesData);
+        await setCache('products', productsData);
+        await setCache('orders', ordersData);
+        await setCache('categories', categoriesData);
+      } else {
+        tablesData = await getCache<Table[]>('tables') || [];
+        productsData = await getCache<any[]>('products') || [];
+        ordersData = await getCache<Order[]>('orders') || [];
+        categoriesData = await getCache<any[]>('categories') || [];
       }
-      return [...prev, { item, quantity: 1 }];
+
+      setTables(Array.isArray(tablesData) ? tablesData : []);
+      
+      const catsList = Array.isArray(categoriesData) ? categoriesData : [];
+      const catMap: Record<string, string> = {};
+      catsList.forEach((c: any) => {
+        catMap[c.id] = c.name;
+      });
+
+      const defaultCats = ["Bebidas", "Drinks", "Porções", "Lanches", "Combos", "Sobremesas", "Adicionais"];
+      const fetchedCats = catsList.map((c: any) => c.name);
+      const uniqueCats = Array.from(new Set([...defaultCats, ...fetchedCats]));
+      setCategories(['Todos', ...uniqueCats]);
+      
+      const mappedProds: Product[] = (Array.isArray(productsData) ? productsData : [])
+        .filter(p => p.active !== false)
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          price: Number(p.price),
+          category_id: p.category_id,
+          category_name: catMap[p.category_id] || 'Outros'
+        }));
+      setProducts(mappedProds);
+
+      const openOrders = (Array.isArray(ordersData) ? ordersData : []).filter(o => o.status === 'open');
+      setOrders(openOrders);
+
+      // Refresh selected table/order context if open
+      if (activeContext) {
+        const currentTable = (tablesData || []).find(t => t.id === activeContext.table.id);
+        const currentOrder = openOrders.find(o => o.table_id === activeContext.table.id);
+        if (currentTable) {
+          setActiveContext({
+            table: currentTable,
+            order: currentOrder || null
+          });
+        }
+      }
+      setError(null);
+    } catch (err: any) {
+      console.error(err);
+      setError('Erro ao carregar dados do Garçom: ' + (err.message || 'Erro desconhecido'));
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  // Initial Load and Polling
+  useEffect(() => {
+    fetchData(true);
+
+    const interval = setInterval(() => {
+      if (navigator.onLine) {
+        fetchData(false);
+      }
+    }, 5000); // 5 seconds polling
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const filteredMenu = products.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(menuSearch.toLowerCase());
+    const matchesCategory = selectedCategory === 'Todos' || item.category_name === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const addPendingItem = (product: Product) => {
+    setPendingItems(prev => {
+      const existing = prev.find(o => o.product.id === product.id);
+      if (existing) {
+        return prev.map(o => o.product.id === product.id ? { ...o, quantity: o.quantity + 1 } : o);
+      }
+      return [...prev, { product, quantity: 1 }];
     });
   };
 
-  const updateQuantity = (id: number, delta: number) => {
-    setOrder(prev => prev.map(o => {
-      if (o.item.id === id) {
+  const updateQuantity = (id: string, delta: number) => {
+    setPendingItems(prev => prev.map(o => {
+      if (o.product.id === id) {
         const next = o.quantity + delta;
         return next > 0 ? { ...o, quantity: next } : o;
       }
@@ -66,173 +186,298 @@ export const WaiterDashboard = () => {
     }));
   };
 
-  const removeItem = (id: number) => {
-    setOrder(prev => prev.filter(o => o.item.id !== id));
+  const removePendingItem = (id: string) => {
+    setPendingItems(prev => prev.filter(o => o.product.id !== id));
   };
 
-  const total = order.reduce((sum, { item, quantity }) => sum + (item.price * quantity), 0);
+  const total = pendingItems.reduce((sum, { product, quantity }) => sum + (product.price * quantity), 0);
 
-  const handleOpenComanda = (mesa: string, comanda: string) => {
-    if (!mesa || !comanda) return;
-    setActiveContext({ mesa, comanda });
-    setOrder([]); // mock: load existing items here in a real app
+  const handleSelectTable = (table: Table) => {
+    const activeOrder = orders.find(o => o.table_id === table.id) || null;
+    setActiveContext({ table, order: activeOrder });
+    setPendingItems([]);
+  };
+
+  const handleOpenNewComanda = async () => {
+    if (!activeContext || activeContext.order) return;
+    setLoading(true);
+    try {
+      if (navigator.onLine) {
+        const newOrder = await api.post<Order>('/orders', {
+          tableId: activeContext.table.id,
+          waiterId: user?.id
+        });
+        await api.put(`/tables/${activeContext.table.id}`, {
+          status: 'busy',
+          number: activeContext.table.number
+        });
+        
+        await fetchData(false);
+        setActiveContext(prev => prev ? { ...prev, order: newOrder } : null);
+      } else {
+        const tempOrderId = 'temp-' + Date.now();
+        const newOrder: Order = {
+          id: tempOrderId,
+          table_id: activeContext.table.id,
+          table_number: activeContext.table.number,
+          status: 'open',
+          items: []
+        };
+
+        await queueAction('create_order', {
+          tempOrderId,
+          tableId: activeContext.table.id,
+          waiterId: user?.id,
+          tableNumber: activeContext.table.number
+        });
+
+        const updatedTables = tables.map(t => t.id === activeContext.table.id ? { ...t, status: 'busy' as const } : t);
+        setTables(updatedTables);
+        setOrders(prev => [...prev, newOrder]);
+        setActiveContext({
+          table: { ...activeContext.table, status: 'busy' },
+          order: newOrder
+        });
+
+        await setCache('tables', updatedTables);
+        await setCache('orders', [...orders, newOrder]);
+      }
+    } catch (err: any) {
+      alert('Erro ao abrir comanda: ' + (err.message || 'Erro de conexão'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenPrintModal = () => {
-    if (order.length === 0) return;
+    if (pendingItems.length === 0) return;
     setIsPrintModalOpen(true);
   };
 
-  const confirmAndPrint = () => {
+  const confirmAndPrint = async () => {
+    if (!activeContext || !activeContext.order) return;
     setIsPrinting(true);
-    // Simula o tempo de impressão na cozinha e no bar
-    setTimeout(() => {
-      setOrder([]);
-      setActiveContext(null);
-      setNewTable('');
-      setNewComanda('');
-      setTableSearch('');
+    try {
+      const orderId = activeContext.order.id;
+      const orderItemsToQueue = pendingItems.map(item => ({
+        productId: item.product.id,
+        product_name: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price,
+        notes: ''
+      }));
+
+      if (navigator.onLine) {
+        for (const item of orderItemsToQueue) {
+          await api.post(`/orders/${orderId}/items`, {
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+            notes: ''
+          });
+        }
+        await fetchData(false);
+      } else {
+        await queueAction('add_items', {
+          orderId,
+          items: orderItemsToQueue
+        });
+
+        const updatedOrders = orders.map(o => {
+          if (o.id === orderId) {
+            const existingItems = o.items || [];
+            const newItems: OrderItem[] = orderItemsToQueue.map(item => ({
+              product_id: item.productId,
+              product_name: item.product_name,
+              quantity: item.quantity,
+              price: item.price,
+              notes: ''
+            }));
+            return {
+              ...o,
+              items: [...existingItems, ...newItems]
+            };
+          }
+          return o;
+        });
+
+        setOrders(updatedOrders);
+        await setCache('orders', updatedOrders);
+
+        alert('Modo Offline: Pedido salvo localmente e será enviado quando restabelecer conexão!');
+      }
+
+      setPendingItems([]);
       setIsPrintModalOpen(false);
+      setActiveContext(null);
+    } catch (err: any) {
+      alert('Erro ao lançar itens: ' + (err.message || 'Erro de conexão'));
+    } finally {
       setIsPrinting(false);
-    }, 1500);
+    }
   };
 
   return (
-    <Layout title="Lançamento Rápido">
+    <Layout title="Lançamento Garçom">
       <div className="max-w-2xl mx-auto pb-24">
         
-        {!activeContext ? (
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-400 text-sm flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              <span>{error}</span>
+            </div>
+            <button onClick={() => setError(null)} className="text-xs font-bold underline">Fechar</button>
+          </div>
+        )}
+
+        {loading && !activeContext ? (
+          <div className="flex flex-col items-center justify-center h-64 text-slate-500 gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+            <span className="text-sm font-bold font-mono">Carregando mesas e comandas...</span>
+          </div>
+        ) : !activeContext ? (
+          /* LISTA DE MESAS */
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-              <h3 className="text-xl font-bold text-white mb-6">Procurar Comanda Aberta</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Mesa ou Comanda Ativa</h3>
               <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <input 
                   type="text" 
-                  placeholder="Mesa ou comanda... (ex: 12)" 
+                  placeholder="Buscar mesa por número..." 
                   value={tableSearch}
                   onChange={e => setTableSearch(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-lg"
                 />
               </div>
 
-              {tableSearch && (
-                <div className="grid grid-cols-2 gap-3">
-                  {ACTIVE_TABLES.filter(t => t.mesa.includes(tableSearch) || t.comanda.includes(tableSearch)).map(t => (
-                    <button 
-                      key={t.comanda} 
-                      onClick={() => handleOpenComanda(t.mesa, t.comanda)}
-                      className="p-4 rounded-2xl border border-slate-700 bg-slate-950 hover:border-amber-500 hover:bg-amber-500/10 transition-all text-left"
-                    >
-                      <p className="text-white font-bold text-lg">Mesa {t.mesa}</p>
-                      <p className="text-slate-400 text-sm">Cmd: {t.comanda}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="h-px bg-slate-800 flex-1"></div>
-              <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">OU ABRIR NOVA</span>
-              <div className="h-px bg-slate-800 flex-1"></div>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Número da Mesa</label>
-                <input 
-                  type="number" 
-                  value={newTable}
-                  onChange={e => setNewTable(e.target.value)}
-                  placeholder="Ex: 22"
-                  className="w-full bg-slate-950 border border-slate-700 text-white text-lg rounded-2xl px-4 py-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all"
-                />
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {tables
+                  .filter(t => !tableSearch || String(t.number).includes(tableSearch))
+                  .map(t => {
+                    const activeOrder = orders.find(o => o.table_id === t.id);
+                    const statusColor = t.status === 'busy' ? 'border-red-500 bg-red-500/5' : 
+                                      t.status === 'closing' ? 'border-amber-500 bg-amber-500/5' : 
+                                      'border-slate-800 bg-slate-950 hover:border-emerald-500';
+                    return (
+                      <button 
+                        key={t.id} 
+                        onClick={() => handleSelectTable(t)}
+                        className={`p-5 rounded-2xl border transition-all text-left flex flex-col justify-between h-28 ${statusColor}`}
+                      >
+                        <div>
+                          <p className="text-white font-black text-xl">Mesa {t.number}</p>
+                          {activeOrder && (
+                            <p className="text-slate-400 text-xs mt-1 font-mono">Cmd: #{activeOrder.id.slice(0, 4)}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${t.status === 'busy' ? 'bg-red-500' : t.status === 'closing' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">
+                            {t.status === 'busy' ? 'Ocupada' : t.status === 'closing' ? 'Fechando' : 'Livre'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Número da Comanda</label>
-                <input 
-                  type="text" 
-                  value={newComanda}
-                  onChange={e => setNewComanda(e.target.value)}
-                  placeholder="Ex: 5001"
-                  className="w-full bg-slate-950 border border-slate-700 text-white text-lg rounded-2xl px-4 py-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all"
-                />
-              </div>
-              <button 
-                onClick={() => handleOpenComanda(newTable, newComanda)}
-                disabled={!newTable || !newComanda}
-                className="w-full mt-4 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold rounded-2xl py-4 transition-all"
-              >
-                Abrir Nova Comanda
-              </button>
             </div>
           </motion.div>
         ) : (
+          /* DETALHES DA MESA SELECIONADA */
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
             {/* Header da Comanda */}
             <div className="bg-slate-950 p-6 flex items-center justify-between border-b border-slate-800">
               <div>
-                <h3 className="text-2xl font-black text-white">Mesa {activeContext.mesa}</h3>
-                <p className="text-amber-500 font-bold text-sm">Comanda #{activeContext.comanda}</p>
+                <h3 className="text-2xl font-black text-white">Mesa {activeContext.table.number}</h3>
+                <p className="text-amber-500 font-bold text-sm">
+                  {activeContext.order ? `Comanda Ativa: #${activeContext.order.id.slice(0, 8)}` : 'Sem comanda aberta'}
+                </p>
               </div>
               <button onClick={() => setActiveContext(null)} className="p-2 text-slate-400 hover:text-white bg-slate-900 rounded-xl transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Area de Pedidos */}
             <div className="p-6">
-              <button 
-                onClick={() => setIsMenuOpen(true)}
-                className="w-full bg-indigo-500/10 border-2 border-dashed border-indigo-500/50 hover:bg-indigo-500/20 hover:border-indigo-500 text-indigo-400 font-bold rounded-2xl py-6 flex flex-col items-center justify-center gap-2 transition-all mb-8"
-              >
-                <Plus className="w-8 h-8" />
-                <span>Adicionar Produto</span>
-              </button>
-
-              <div className="space-y-4 mb-6">
-                {order.length === 0 ? (
-                  <p className="text-center text-slate-500 py-4">Nenhum item adicionado ainda.</p>
-                ) : (
-                  order.map(o => (
-                    <div key={o.item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 gap-4">
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium">{o.item.name}</h4>
-                        <p className="text-amber-500 font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.item.price * o.quantity)}</p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between sm:justify-end gap-4">
-                        <div className="flex items-center gap-3 bg-slate-900 rounded-xl p-1 border border-slate-700">
-                          <button onClick={() => updateQuantity(o.item.id, -1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Minus className="w-4 h-4" /></button>
-                          <span className="font-bold text-white w-6 text-center">{o.quantity}</span>
-                          <button onClick={() => updateQuantity(o.item.id, 1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
-                        </div>
-                        <button onClick={() => removeItem(o.item.id)} className="p-3 text-slate-500 hover:text-red-400 bg-slate-900 rounded-xl transition-colors">
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+              {/* Se a comanda não está aberta, mostra botão para abrir */}
+              {!activeContext.order ? (
+                <div className="text-center py-12 space-y-4">
+                  <p className="text-slate-400">Esta mesa está livre no momento. Abra uma comanda para começar a lançar pedidos.</p>
+                  <button 
+                    onClick={handleOpenNewComanda}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-lg py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/10 transition-all active:scale-98"
+                  >
+                    Abrir Comanda
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Produtos já lançados */}
+                  {activeContext.order.items.length > 0 && (
+                    <div className="mb-6 bg-slate-950/40 p-4 rounded-2xl border border-slate-800/80">
+                      <h4 className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3">Itens Lançados</h4>
+                      <div className="space-y-2">
+                        {activeContext.order.items.map((it, idx) => (
+                          <div key={idx} className="flex justify-between items-center text-xs text-slate-400">
+                            <span>{it.quantity}x {it.product_name}</span>
+                            <span className="font-mono">R$ {(it.price * it.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
+                  )}
 
-            {/* Footer Fixo */}
-            {order.length > 0 && (
-              <div className="bg-slate-950 p-6 border-t border-slate-800">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-slate-400">Total a Enviar</span>
-                  <span className="text-3xl font-black text-amber-500">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}</span>
-                </div>
-                <button 
-                  onClick={handleOpenPrintModal}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg rounded-2xl py-4 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
-                >
-                  <Send className="w-6 h-6" /> Lançar Pedido
-                </button>
-              </div>
-            )}
+                  {/* Lançamento de Novos Itens */}
+                  <h4 className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-3">Lançar Novos Itens</h4>
+                  <button 
+                    onClick={() => setIsMenuOpen(true)}
+                    className="w-full bg-indigo-500/10 border-2 border-dashed border-indigo-500/50 hover:bg-indigo-500/20 hover:border-indigo-500 text-indigo-400 font-bold rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all mb-6"
+                  >
+                    <Plus className="w-8 h-8" />
+                    <span>Adicionar Produto</span>
+                  </button>
+
+                  <div className="space-y-4 mb-6">
+                    {pendingItems.map(o => (
+                      <div key={o.product.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 gap-4">
+                        <div className="flex-1">
+                          <h4 className="text-white font-medium">{o.product.name}</h4>
+                          <p className="text-amber-500 font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.product.price * o.quantity)}</p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between sm:justify-end gap-4">
+                          <div className="flex items-center gap-3 bg-slate-900 rounded-xl p-1 border border-slate-700">
+                            <button onClick={() => updateQuantity(o.product.id, -1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Minus className="w-4 h-4" /></button>
+                            <span className="font-bold text-white w-6 text-center">{o.quantity}</span>
+                            <button onClick={() => updateQuantity(o.product.id, 1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
+                          </div>
+                          <button onClick={() => removePendingItem(o.product.id)} className="p-3 text-slate-500 hover:text-red-400 bg-slate-900 rounded-xl transition-colors">
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {pendingItems.length > 0 && (
+                    <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-slate-400">Total a Enviar</span>
+                        <span className="text-3xl font-black text-amber-500">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}</span>
+                      </div>
+                      <button 
+                        onClick={handleOpenPrintModal}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-lg rounded-2xl py-4 shadow-lg shadow-emerald-500/10 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Send className="w-5 h-5" /> Enviar para Cozinha/Bar
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </motion.div>
         )}
       </div>
@@ -254,7 +499,7 @@ export const WaiterDashboard = () => {
                   <input 
                     type="text" 
                     autoFocus
-                    placeholder="Buscar produto por nome..." 
+                    placeholder="Buscar produto..." 
                     value={menuSearch}
                     onChange={e => setMenuSearch(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-lg"
@@ -265,42 +510,88 @@ export const WaiterDashboard = () => {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
-                {filteredMenu.map(item => {
-                  const qty = order.find(o => o.item.id === item.id)?.quantity || 0;
-                  return (
-                    <div key={item.id} className="flex justify-between items-center p-4 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-2xl transition-all">
-                      <div>
-                        <h4 className="text-white font-bold text-lg">{item.name}</h4>
-                        <p className="text-amber-500 font-medium">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}</p>
-                      </div>
-                      
-                      {qty > 0 ? (
-                        <div className="flex items-center gap-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-1">
-                          <button onClick={() => updateQuantity(item.id, -1)} className="p-2 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors"><Minus className="w-5 h-5" /></button>
-                          <span className="font-bold text-indigo-400 w-6 text-center">{qty}</span>
-                          <button onClick={() => addItem(item)} className="p-2 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors"><Plus className="w-5 h-5" /></button>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => addItem(item)}
-                          className="bg-slate-800 hover:bg-indigo-500 text-white p-3 rounded-xl transition-all"
-                        >
-                          <Plus className="w-6 h-6" />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+              {/* Category Carousel (Filtro Rápido) */}
+              <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 overflow-x-auto flex gap-2 scrollbar-none select-none">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                      selectedCategory === cat
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-[1.02]'
+                        : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
 
-              {order.length > 0 && (
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+                {filteredMenu.length === 0 ? (
+                  <div className="text-center py-12 text-slate-500">Nenhum produto encontrado nesta categoria.</div>
+                ) : (
+                  filteredMenu.map(item => {
+                    const qty = pendingItems.find(o => o.product.id === item.id)?.quantity || 0;
+                    const emoji = getEmoji(item.name, item.category_name || 'Outros');
+                    return (
+                      <div key={item.id} className="flex justify-between items-center p-3.5 bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-2xl shadow-inner select-none">
+                            {emoji}
+                          </div>
+                          <div>
+                            <h4 className="text-white font-bold text-base leading-tight">{item.name}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-amber-500 font-bold text-sm">
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
+                              </span>
+                              {item.category_name && (
+                                <span className="bg-slate-900 text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-slate-800">
+                                  {item.category_name}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {qty > 0 ? (
+                          <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-1 shrink-0">
+                            <button 
+                              onClick={() => updateQuantity(item.id, -1)} 
+                              className="p-1.5 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="font-bold text-indigo-400 w-5 text-center text-sm">{qty}</span>
+                            <button 
+                              onClick={() => addPendingItem(item)} 
+                              className="p-1.5 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => addPendingItem(item)}
+                            className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
+                          >
+                            <Plus className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {pendingItems.length > 0 && (
                 <div className="p-4 bg-slate-950 border-t border-slate-800">
                   <button 
                     onClick={() => setIsMenuOpen(false)}
                     className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-lg rounded-2xl py-4 transition-all"
                   >
-                    Ver Pedido ({order.reduce((acc, curr) => acc + curr.quantity, 0)} itens)
+                    Ver Pedido ({pendingItems.reduce((acc, curr) => acc + curr.quantity, 0)} itens)
                   </button>
                 </div>
               )}
@@ -326,58 +617,24 @@ export const WaiterDashboard = () => {
             >
               <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Confirmar Impressão</h3>
-                  <p className="text-slate-400 text-sm">Mesa {activeContext?.mesa} • Comanda #{activeContext?.comanda}</p>
+                  <h3 className="text-xl font-bold text-white">Confirmar Pedido</h3>
+                  <p className="text-slate-400 text-sm">Mesa {activeContext?.table.number} • Comanda #{activeContext?.order?.id.slice(0, 8)}</p>
                 </div>
                 <button onClick={() => !isPrinting && setIsPrintModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-900 grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* TICKET COZINHA */}
-                <div className="bg-amber-50 rounded-lg p-4 shadow-inner relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwb2x5Z29uIHBvaW50cz0iMCwwIDgsMCA0LDgiIGZpbGw9IiNmOGZhZmMiLz48L3N2Zz4=')] bg-repeat-x"></div>
-                  <div className="text-center border-b border-dashed border-slate-400 pb-3 pt-2 mb-3">
-                    <h4 className="font-black text-slate-800 uppercase tracking-widest text-lg">Cozinha</h4>
-                    <p className="text-xs text-slate-600 font-mono">MESA {activeContext?.mesa}</p>
-                  </div>
-                  <ul className="space-y-2 font-mono text-sm text-slate-800 min-h-[150px]">
-                    {kitchenItems.length === 0 ? (
-                      <li className="text-center text-slate-400 py-4 italic">Nenhum item</li>
-                    ) : (
-                      kitchenItems.map(o => (
-                        <li key={o.item.id} className="flex justify-between border-b border-slate-200/50 pb-1">
-                          <span>{o.quantity}x {o.item.name}</span>
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                  <div className="absolute bottom-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwb2x5Z29uIHBvaW50cz0iMCw4IDgsOCA0LDAiIGZpbGw9IiNmOGZhZmMiLz48L3N2Zz4=')] bg-repeat-x"></div>
+              <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-900 flex flex-col gap-6">
+                <p className="text-slate-300 text-sm">Confirmar e enviar os itens selecionados para a produção?</p>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                  {pendingItems.map(o => (
+                    <div key={o.product.id} className="flex justify-between text-sm text-slate-400">
+                      <span>{o.quantity}x {o.product.name}</span>
+                      <span>R$ {(o.product.price * o.quantity).toFixed(2)}</span>
+                    </div>
+                  ))}
                 </div>
-
-                {/* TICKET BAR */}
-                <div className="bg-sky-50 rounded-lg p-4 shadow-inner relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwb2x5Z29uIHBvaW50cz0iMCwwIDgsMCA0LDgiIGZpbGw9IiNmOGZhZmMiLz48L3N2Zz4=')] bg-repeat-x"></div>
-                  <div className="text-center border-b border-dashed border-slate-400 pb-3 pt-2 mb-3">
-                    <h4 className="font-black text-slate-800 uppercase tracking-widest text-lg">Bar</h4>
-                    <p className="text-xs text-slate-600 font-mono">MESA {activeContext?.mesa}</p>
-                  </div>
-                  <ul className="space-y-2 font-mono text-sm text-slate-800 min-h-[150px]">
-                    {barItems.length === 0 ? (
-                      <li className="text-center text-slate-400 py-4 italic">Nenhum item</li>
-                    ) : (
-                      barItems.map(o => (
-                        <li key={o.item.id} className="flex justify-between border-b border-slate-200/50 pb-1">
-                          <span>{o.quantity}x {o.item.name}</span>
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                  <div className="absolute bottom-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxwb2x5Z29uIHBvaW50cz0iMCw4IDgsOCA0LDAiIGZpbGw9IiNmOGZhZmMiLz48L3N2Zz4=')] bg-repeat-x"></div>
-                </div>
-
               </div>
 
               <div className="p-6 bg-slate-950 border-t border-slate-800 flex gap-4">
@@ -394,7 +651,7 @@ export const WaiterDashboard = () => {
                   className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-80 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2"
                 >
                   {isPrinting ? (
-                    <>Imprimindo...</>
+                    <>Enviando...</>
                   ) : (
                     <><Printer className="w-5 h-5" /> Imprimir e Lançar</>
                   )}

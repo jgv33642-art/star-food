@@ -2,7 +2,14 @@ import { pool } from '../config/db';
 
 export class UserRepository {
   async findByEmail(email: string) {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await pool.query(
+      `SELECT u.*, r.name as role, c.plan as company_plan
+       FROM users u 
+       LEFT JOIN roles r ON u.role_id = r.id 
+       LEFT JOIN companies c ON u.company_id = c.id
+       WHERE u.email = $1`,
+      [email]
+    );
     return result.rows[0];
   }
 
@@ -11,10 +18,10 @@ export class UserRepository {
     return result.rows[0];
   }
 
-  async createCompany(name: string) {
+  async createCompany(name: string, plan: string = 'start') {
     const result = await pool.query(
-      'INSERT INTO companies (name) VALUES ($1) RETURNING id',
-      [name]
+      'INSERT INTO companies (name, plan) VALUES ($1, $2) RETURNING id',
+      [name, plan]
     );
     return result.rows[0];
   }

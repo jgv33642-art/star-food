@@ -17,12 +17,18 @@ import { Inventory } from './pages/Inventory';
 import { Delivery } from './pages/Delivery';
 import { DigitalMenu } from './pages/DigitalMenu';
 import { Settings } from './pages/Settings';
+import { DeliverySettings } from './pages/admin/DeliverySettings';
 import { SuperAdmin } from './pages/SuperAdmin';
 import { Checkout } from './pages/Checkout';
 import { VirtualStore } from './pages/VirtualStore';
 import { DevPanel } from './pages/DevPanel';
+import { Users } from './pages/Users';
+import { AccessDenied } from './pages/AccessDenied';
+import { StockImport } from './pages/StockImport';
+import { Team } from './pages/Team';
+import { PaymentCheckout } from './pages/PaymentCheckout';
 
-const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
+const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: React.ReactNode, allowedRoles?: string[], allowedPlans?: string[] }) => {
   const { user } = useAuth();
   
   if (!user) {
@@ -30,10 +36,22 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
   }
   
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Se o usuário não tem a role permitida, manda para o hub principal da role dele
-    if (user.role === 'gerencia') return <Navigate to="/admin" replace />;
-    if (user.role === 'caixa') return <Navigate to="/caixa" replace />;
-    return <Navigate to="/mesas" replace />;
+    return <AccessDenied />;
+  }
+
+  if (allowedPlans) {
+    const plan = (user.plan || 'start').toLowerCase();
+    const normalizedAllowed = allowedPlans.map(p => p.toLowerCase());
+    
+    // Convert generic basic/pro to handle annual/start
+    let hasAccess = false;
+    if (normalizedAllowed.includes('pro') && (plan === 'pro' || plan === 'annual')) hasAccess = true;
+    if (normalizedAllowed.includes('basic') && (plan === 'basic' || plan === 'pro' || plan === 'annual')) hasAccess = true;
+    if (normalizedAllowed.includes('start')) hasAccess = true; // start allows everything to fall through if start is allowed
+
+    if (!hasAccess) {
+      return <AccessDenied />; // Or redirect to a specific paywall page
+    }
   }
 
   return <>{children}</>;
@@ -77,7 +95,7 @@ const AppRoutes = () => {
       <Route 
         path="/mesas" 
         element={
-          <ProtectedRoute allowedRoles={['garcom', 'caixa', 'gerencia']}>
+          <ProtectedRoute allowedRoles={['garcom', 'caixa', 'gerencia']} allowedPlans={['basic', 'pro']}>
             <Tables />
           </ProtectedRoute>
         } 
@@ -97,6 +115,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['caixa', 'gerencia']}>
             <CashierDashboard />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/caixa/pagamento/:orderId" 
+        element={
+          <ProtectedRoute allowedRoles={['caixa', 'gerencia']}>
+            <PaymentCheckout />
           </ProtectedRoute>
         } 
       />
@@ -131,7 +158,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/produtos" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia', 'caixa']}>
             <Products />
           </ProtectedRoute>
         } 
@@ -147,8 +174,16 @@ const AppRoutes = () => {
       <Route 
         path="/admin/estoque" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Inventory />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/estoque/importar" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
+            <StockImport />
           </ProtectedRoute>
         } 
       />
@@ -157,6 +192,30 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['gerencia']}>
             <Settings />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/delivery-settings" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['pro']}>
+            <DeliverySettings />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/equipe" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
+            <Team />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/usuarios" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
+            <Users />
           </ProtectedRoute>
         } 
       />

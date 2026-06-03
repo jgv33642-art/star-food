@@ -1,23 +1,71 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, ArrowLeft, CreditCard, ShoppingCart, Download, Laptop, Smartphone, CheckCircle } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ShieldCheck, ArrowLeft, CreditCard, ShoppingCart, Download, Laptop, Smartphone, CheckCircle, User, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+
+const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: string, priceAnnual: string }> = {
+  start: {
+    title: 'Plano Start',
+    desc: 'Atendimento de balcão e relatórios simplificados.',
+    priceMonthly: '149,90',
+    priceAnnual: '1.618,80',
+  },
+  basic: {
+    title: 'Plano Básico',
+    desc: 'Gestão completa com mesas, PDV e estoque.',
+    priceMonthly: '299,90',
+    priceAnnual: '3.238,92',
+  },
+  pro: {
+    title: 'Plano Pro (SaaS)',
+    desc: 'Acesso completo com Delivery White Label.',
+    priceMonthly: '399,90',
+    priceAnnual: '4.318,92',
+  }
+};
 
 export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  
+  // Form state
+  const [companyName, setCompanyName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { register } = useAuth();
+
+  const planKey = searchParams.get('plan') || 'basic';
+  const billingCycle = searchParams.get('billing') || 'monthly';
+  
+  const planInfo = PLAN_DETAILS[planKey] || PLAN_DETAILS.basic;
+  const isAnnual = billingCycle === 'annual';
+  const finalPrice = isAnnual ? planInfo.priceAnnual : planInfo.priceMonthly;
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!companyName || !userName || !email || !password) {
+      setError('Por favor, preencha todos os campos da conta.');
+      return;
+    }
+    
+    setError('');
     setLoading(true);
-    // Simula chamada para a API de pagamento
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      // Chama o contexto de Auth, que agora aceita o planKey
+      await register(companyName, userName, email, password, planKey);
       setIsSuccess(true);
-      // Cria a conta master (Gerente) mas não redireciona imediatamente
-      // Account created via register flow — user can now login at /login
-    }, 2000);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao processar o pagamento e criar conta.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInstallPWA = () => {
@@ -92,25 +140,25 @@ export const Checkout = () => {
           <div className="w-12 h-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-6">
             <ShoppingCart className="text-white w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Plano Pro (SaaS)</h2>
-          <p className="text-slate-400 text-sm mb-6">Acesso completo ao sistema para a sua Lanchonete.</p>
+          <h2 className="text-xl font-bold text-white mb-2">{planInfo.title}</h2>
+          <p className="text-slate-400 text-sm mb-6">{planInfo.desc}</p>
           
           <div className="space-y-4 mb-8">
             <div className="flex items-center gap-3 text-sm text-slate-300">
-              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Multi-usuários (Caixa, Garçom)
+              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Cobrança {isAnnual ? 'Anual' : 'Mensal'}
             </div>
             <div className="flex items-center gap-3 text-sm text-slate-300">
-              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Cardápio Digital QR Code
+              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Cancelamento Flexível
             </div>
             <div className="flex items-center gap-3 text-sm text-slate-300">
-              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Integração Delivery & PDV
+              <ShieldCheck className="w-5 h-5 text-emerald-500" /> Configuração Imediata
             </div>
           </div>
 
           <div className="pt-6 border-t border-slate-800">
             <div className="flex justify-between items-center text-white mb-2">
-              <span>Mensalidade</span>
-              <span className="font-bold">R$ 149,90</span>
+              <span>Total {isAnnual ? 'Anual' : 'Mensal'}</span>
+              <span className="font-bold">R$ {finalPrice}</span>
             </div>
             <div className="flex justify-between items-center text-slate-500 text-sm">
               <span>Setup Inicial</span>
@@ -124,14 +172,36 @@ export const Checkout = () => {
           <h2 className="text-2xl font-black text-white mb-6">Criar Conta e Assinar</h2>
           
           <form onSubmit={handleSubscribe} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+                {error}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">Nome do Restaurante</label>
-                <input type="text" required className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Minha Lanchonete" />
+                <input type="text" required value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Minha Lanchonete" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-400 mb-2">Seu E-mail Administrativo</label>
-                <input type="email" required className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="admin@email.com" />
+                <label className="block text-sm font-medium text-slate-400 mb-2">Seu Nome Completo</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                  <input type="text" required value={userName} onChange={e => setUserName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="João Silva" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">E-mail de Acesso</label>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="admin@email.com" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Senha de Acesso</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                  <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="********" />
+                </div>
               </div>
             </div>
 

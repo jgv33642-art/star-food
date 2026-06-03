@@ -3,6 +3,9 @@ import { env } from './env';
 
 export let pool = new Pool({
   connectionString: env.DATABASE_URL,
+  max: 20, // limite máximo de 20 conexões simultâneas
+  idleTimeoutMillis: 30000, // encerra conexões ociosas após 30 segundos
+  connectionTimeoutMillis: 2000, // limite de 2 segundos para estabelecer conexão
 });
 
 export function updatePool(connectionString: string) {
@@ -13,6 +16,9 @@ export function updatePool(connectionString: string) {
   }
   pool = new Pool({
     connectionString,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
   });
 }
 

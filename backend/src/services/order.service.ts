@@ -1,7 +1,9 @@
 import { OrderRepository } from '../repositories/order.repository';
+import { ProductRepository } from '../repositories/product.repository';
 
 export class OrderService {
   private orderRepository = new OrderRepository();
+  private productRepository = new ProductRepository();
 
   async getAll(companyId: string) {
     return this.orderRepository.findAll(companyId);
@@ -29,6 +31,16 @@ export class OrderService {
     if (!order) {
       throw { status: 404, message: 'Order not found' };
     }
+
+    // Verify product is active
+    const product = await this.productRepository.findById(companyId, data.productId);
+    if (!product) {
+      throw { status: 404, message: 'Product not found' };
+    }
+    if (product.active === false) {
+      throw { status: 400, message: 'Produto esgotado' };
+    }
+
     return this.orderRepository.addItem(orderId, data);
   }
 
@@ -46,6 +58,14 @@ export class OrderService {
 
   async close(companyId: string, id: string) {
     const order = await this.orderRepository.close(companyId, id);
+    if (!order) {
+      throw { status: 404, message: 'Order not found' };
+    }
+    return order;
+  }
+
+  async updateStatus(companyId: string, id: string, status: string) {
+    const order = await this.orderRepository.updateStatus(companyId, id, status);
     if (!order) {
       throw { status: 404, message: 'Order not found' };
     }

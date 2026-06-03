@@ -10,6 +10,7 @@ export const createProductSchema = z.object({
     stockQuantity: z.number().min(0).optional(),
     minimumStock: z.number().min(0).optional(),
     active: z.boolean().optional(),
+    sku: z.string().optional().nullable(),
   }),
 });
 
@@ -26,5 +27,6 @@ export const updateProductSchema = z.object({
     stockQuantity: z.number().min(0).optional(),
     minimumStock: z.number().min(0).optional(),
     active: z.boolean().optional(),
+    sku: z.string().optional().nullable(),
   }),
 });

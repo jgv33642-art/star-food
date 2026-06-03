@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { TrendingUp, DollarSign, Activity, Users, ArrowUpRight, MoreHorizontal, Loader2 } from 'lucide-react';
+import { TrendingUp, DollarSign, Activity, Users, ArrowUpRight, MoreHorizontal, Loader2, Package } from 'lucide-react';
 import { api } from '../lib/api';
+import { useLowStock } from '../hooks/useLowStock';
 
 const dataFaturamento = [
   { name: 'Seg', atual: 4000, altura: 'h-[40%]' },
@@ -45,6 +46,7 @@ function formatBRL(value: number | undefined): string {
 export const AdminDashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { items: lowStockItems } = useLowStock();
 
   useEffect(() => {
     api.get<DashboardStats>('/dashboard/stats')
@@ -94,6 +96,39 @@ export const AdminDashboard = () => {
 
   return (
     <Layout title="Dashboard Gerencial">
+
+      {/* Critical Stock Alert Banner */}
+      {lowStockItems.length > 0 && (
+        <div className="mb-8 bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-red-500/20 rounded-xl text-red-400 shrink-0">
+              <Package className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-lg">Alerta: Itens com Estoque Crítico!</h4>
+              <p className="text-sm text-slate-400 mt-1">Existem {lowStockItems.length} produto(s) com quantidade igual ou abaixo do estoque mínimo.</p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {lowStockItems.slice(0, 5).map(item => (
+                  <span key={item.id} className="bg-red-500/20 border border-red-500/30 text-white text-xs px-2.5 py-1 rounded-lg">
+                    {item.name} ({item.stock_quantity}/{item.minimum_stock})
+                  </span>
+                ))}
+                {lowStockItems.length > 5 && (
+                  <span className="bg-slate-800 text-slate-400 text-xs px-2.5 py-1 rounded-lg">
+                    e mais {lowStockItems.length - 5}...
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <a
+            href="/admin/estoque"
+            className="shrink-0 bg-red-500 hover:bg-red-600 text-slate-950 font-black text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-red-500/25 transition-all text-center"
+          >
+            Gerenciar Estoque
+          </a>
+        </div>
+      )}
 
       {/* Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

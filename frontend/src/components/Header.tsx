@@ -1,9 +1,11 @@
 
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Settings, User, Bell, ChevronDown, Moon, Menu } from 'lucide-react';
+import { LogOut, Settings, User, Bell, ChevronDown, Moon, Menu, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
 
 export const Header = ({ onOpenMenu }: { onOpenMenu: () => void }) => {
   const { user, logout } = useAuth();
+  const { isOnline, queueLength, isSyncing, syncQueue } = useOfflineQueue();
 
   return (
     <header className="h-20 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 w-full">
@@ -18,6 +20,28 @@ export const Header = ({ onOpenMenu }: { onOpenMenu: () => void }) => {
       </div>
 
       <div className="flex items-center gap-6">
+        {/* Offline & Sync Indicator */}
+        {!isOnline ? (
+          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+            <WifiOff className="w-4 h-4" />
+            <span>Sem Conexão</span>
+          </div>
+        ) : queueLength > 0 ? (
+          <button 
+            onClick={syncQueue}
+            disabled={isSyncing}
+            className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 hover:border-amber-500/50 text-amber-500 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
+          >
+            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>Pendente ({queueLength})</span>
+          </button>
+        ) : (
+          <div className="hidden md:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+            <Wifi className="w-4 h-4" />
+            <span>Online</span>
+          </div>
+        )}
+
         <button className="text-slate-400 hover:text-white transition-colors relative">
           <Bell className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full"></span>

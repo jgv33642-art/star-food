@@ -9,12 +9,13 @@ export interface User {
   email: string;
   role: Role;
   companyId: string;
+  plan: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (companyName: string, userName: string, email: string, password: string) => Promise<void>;
+  register: (companyName: string, userName: string, email: string, password: string, plan?: string) => Promise<void>;
   loginWithToken: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -27,6 +28,7 @@ interface BackendUser {
   role?: string;
   companyId?: string;
   company_id?: string;
+  plan?: string;
 }
 
 interface LoginResponse {
@@ -50,6 +52,7 @@ function buildUser(backendUser: BackendUser, defaultRole: Role = 'gerencia'): Us
     email: backendUser.email,
     role: backendUser.role ? mapBackendRole(backendUser) : defaultRole,
     companyId: backendUser.companyId || backendUser.company_id || '',
+    plan: backendUser.plan || 'basic',
   };
 }
 
@@ -90,8 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     persistUser(mappedUser, res.token);
   };
 
-  const register = async (companyName: string, userName: string, email: string, password: string): Promise<void> => {
-    const res = await api.post<LoginResponse>('/auth/register', { companyName, userName, email, password });
+  const register = async (companyName: string, userName: string, email: string, password: string, plan?: string): Promise<void> => {
+    const res = await api.post<LoginResponse>('/auth/register', { companyName, userName, email, password, plan });
     // registrants are always admins/gerencia
     const mappedUser = buildUser(res.user, 'gerencia');
     persistUser(mappedUser, res.token);
