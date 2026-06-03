@@ -21,7 +21,8 @@ router.get('/:companyId/public', async (req, res) => {
 // Salvar/Atualizar configurações (Apenas ADMIN via Painel) - Exige Plano PRO
 router.post('/save', authMiddleware, requirePlan('pro'), async (req, res) => {
   try {
-    const companyId = req.user.companyId; // Garantia de Tenant via Middleware JWT
+    const companyId = req.user?.companyId;
+    if (!companyId) return res.status(401).json({ error: 'Unauthorized' });
     const data = req.body;
 
     const result = await pool.query(`
