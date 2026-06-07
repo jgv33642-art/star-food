@@ -34,7 +34,7 @@ async function request<T>(method: string, path: string, body?: any): Promise<T> 
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: 'Erro desconhecido' }));
-    throw new Error(err.message || `HTTP ${res.status}`);
+    throw new Error(err.error || err.message || `HTTP ${res.status}`);
   }
 
   return res.json();
