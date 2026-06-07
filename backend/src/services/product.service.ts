@@ -34,4 +34,20 @@ export class ProductService {
     }
     return { message: 'Product deleted successfully' };
   }
+
+  async getProductIngredients(companyId: string, productId: string) {
+    return this.productRepository.getIngredients(companyId, productId);
+  }
+
+  async addProductIngredient(companyId: string, productId: string, data: any) {
+    return this.productRepository.addIngredient(companyId, productId, data);
+  }
+
+  async removeProductIngredient(companyId: string, productId: string, ingredientId: string) {
+    const deleted = await this.productRepository.removeIngredient(companyId, productId, ingredientId);
+    if (!deleted) {
+      throw { status: 404, message: 'Ingredient not found in product' };
+    }
+    return { message: 'Ingredient removed from product' };
+  }
 }

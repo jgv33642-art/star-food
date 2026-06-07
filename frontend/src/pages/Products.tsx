@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { Plus, Search, Edit2, Trash2, Filter, X, Save, Image as ImageIcon, PackageOpen, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
+import { RecipeModal } from '../components/RecipeModal';
 
 interface Category {
   id: string;
@@ -42,6 +43,10 @@ export const Products = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  // Recipe Modal State
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
+  const [selectedProductRecipe, setSelectedProductRecipe] = useState<ProductDisplay | null>(null);
 
   // New/Edit Product Form State
   const [newName, setNewName] = useState('');
@@ -118,7 +123,7 @@ export const Products = () => {
     try {
       const payload = {
         name: newName,
-        categoryId: newCategoryId,
+        categoryId: newCategoryId || null,
         price: parseFloat(newPrice),
         active: newStatus === 'Ativo',
         sku: newSku.trim() || null,
@@ -271,7 +276,10 @@ export const Products = () => {
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="p-2 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors" title="Ficha Técnica (Estoque)">
+                          <button 
+                            onClick={() => { setSelectedProductRecipe(prod); setRecipeModalOpen(true); }}
+                            className="p-2 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors" 
+                            title="Ficha Técnica (Estoque)">
                             <PackageOpen className="w-4 h-4" />
                           </button>
                           <button onClick={() => openEditModal(prod)} className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors">
@@ -416,6 +424,13 @@ export const Products = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <RecipeModal
+        isOpen={recipeModalOpen}
+        onClose={() => setRecipeModalOpen(false)}
+        productId={selectedProductRecipe?.id || ''}
+        productName={selectedProductRecipe?.name || ''}
+      />
     </Layout>
   );
 };

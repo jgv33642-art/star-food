@@ -53,4 +53,34 @@ export class ProductController {
       next(error);
     }
   };
+
+  getIngredients = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const ingredients = await this.productService.getProductIngredients(companyId, req.params.id);
+      res.json(ingredients);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  addIngredient = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const result = await this.productService.addProductIngredient(companyId, req.params.id, req.body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  removeIngredient = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const result = await this.productService.removeProductIngredient(companyId, req.params.id, req.params.ingredientId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

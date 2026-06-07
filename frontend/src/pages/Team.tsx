@@ -366,7 +366,7 @@ export const Team = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 60 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
+              className="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950/30">
@@ -384,7 +384,7 @@ export const Team = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleCreateStaff} className="p-6 space-y-5">
+              <form onSubmit={handleCreateStaff} className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
 
                 {/* Name */}
                 <div>

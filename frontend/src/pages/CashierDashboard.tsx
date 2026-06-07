@@ -229,6 +229,44 @@ export const CashierDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Se estiver em input, ignora atalhos globais, exceto ESC
+      if (document.activeElement?.tagName === 'INPUT') {
+        if (e.key === 'Escape') (document.activeElement as HTMLElement).blur();
+        return;
+      }
+
+      if (step === 2 && selectedOrder) {
+        switch (e.key) {
+          case 'F2':
+            e.preventDefault();
+            setPaymentMethod('cartao');
+            break;
+          case 'F3':
+            e.preventDefault();
+            setPaymentMethod('pix');
+            break;
+          case 'F4':
+            e.preventDefault();
+            setPaymentMethod('dinheiro');
+            break;
+          case 'Enter':
+            e.preventDefault();
+            if (paymentMethod && !actionLoading) handlePayment();
+            break;
+          case 'Escape':
+            e.preventDefault();
+            prevStep();
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, selectedOrder, paymentMethod, actionLoading]);
+
   const prevStep = () => {
     setStep(1);
     setPaymentMethod(null);
@@ -458,8 +496,9 @@ export const CashierDashboard = () => {
                     {/* Resumo da Comanda */}
                     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
                       <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-800">
-                        <button onClick={prevStep} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-white transition-colors">
+                        <button onClick={prevStep} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-white transition-colors relative group">
                           <ArrowLeft className="w-5 h-5" />
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Esc</span>
                         </button>
                         <div>
                           <h3 className="text-xl font-bold text-white">Resumo da Comanda</h3>
@@ -502,10 +541,11 @@ export const CashierDashboard = () => {
                           }`}
                         >
                           <CreditCard className={`w-8 h-8 ${paymentMethod === 'cartao' ? 'text-amber-500' : 'text-slate-500'}`} />
-                          <div className="text-left">
+                          <div className="text-left flex-1">
                             <span className="block font-bold text-lg text-white">Cartão de Crédito/Débito</span>
                             <span className="text-sm opacity-80">Maquininha</span>
                           </div>
+                          <span className="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">[F2]</span>
                         </button>
 
                         <button
@@ -517,10 +557,11 @@ export const CashierDashboard = () => {
                           }`}
                         >
                           <QrCode className={`w-8 h-8 ${paymentMethod === 'pix' ? 'text-amber-500' : 'text-slate-500'}`} />
-                          <div className="text-left">
+                          <div className="text-left flex-1">
                             <span className="block font-bold text-lg text-white">PIX</span>
                             <span className="text-sm opacity-80">QR Code</span>
                           </div>
+                          <span className="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">[F3]</span>
                         </button>
 
                         <button
@@ -532,23 +573,25 @@ export const CashierDashboard = () => {
                           }`}
                         >
                           <Banknote className={`w-8 h-8 ${paymentMethod === 'dinheiro' ? 'text-amber-500' : 'text-slate-500'}`} />
-                          <div className="text-left">
+                          <div className="text-left flex-1">
                             <span className="block font-bold text-lg text-white">Dinheiro</span>
                             <span className="text-sm opacity-80">Espécie</span>
                           </div>
+                          <span className="text-[10px] text-slate-500 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">[F4]</span>
                         </button>
                       </div>
 
                       <button 
                         onClick={handlePayment}
                         disabled={!paymentMethod || actionLoading}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg rounded-2xl py-5 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg rounded-2xl py-5 shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 flex-col"
                       >
                         {actionLoading ? (
                           <RefreshCw className="w-6 h-6 animate-spin" />
                         ) : (
                           <>
-                            <CheckCircle2 className="w-6 h-6" /> Finalizar Pagamento
+                            <div className="flex items-center gap-2"><CheckCircle2 className="w-6 h-6" /> Finalizar Pagamento</div>
+                            <span className="text-[10px] font-normal opacity-70 mt-1 font-mono">[Enter]</span>
                           </>
                         )}
                       </button>

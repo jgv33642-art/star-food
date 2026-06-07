@@ -51,4 +51,34 @@ export class ProductRepository {
     const result = await queryWithRLS(companyId, 'DELETE FROM products WHERE id = $1 RETURNING id', [id]);
     return result.rowCount ? result.rowCount > 0 : false;
   }
+
+  async getIngredients(companyId: string, productId: string) {
+    const query = `
+      SELECT pi.id, pi.ingredient_id, pi.quantity, i.name, i.unit 
+      FROM product_ingredients pi
+      JOIN ingredients i ON pi.ingredient_id = i.id
+      WHERE pi.product_id = $1 AND i.company_id = $2
+    `;
+    const result = await queryWithRLS(companyId, query, [productId, companyId]);
+    return result.rows;
+  }
+
+  async addIngredient(companyId: string, productId: string, data: any) {
+    const { ingredientId, quantity } = data;
+    const query = `
+      INSERT INTO product_ingredients (product_id, ingredient_id, quantity)
+      VALUES ($1, $2, $3) RETURNING *
+    `;
+    const result = await queryWithRLS(companyId, query, [productId, ingredientId, quantity]);
+    return result.rows[0];
+  }
+
+  async removeIngredient(companyId: string, productId: string, ingredientId: string) {
+    const result = await queryWithRLS(
+      companyId, 
+      'DELETE FROM product_ingredients WHERE product_id = $1 AND ingredient_id = $2 RETURNING id', 
+      [productId, ingredientId]
+    );
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
 }

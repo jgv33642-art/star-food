@@ -1,14 +1,17 @@
 export class WhatsAppService {
-  /**
-   * Generates a wa.me link for WhatsApp Web/App integration.
-   * This is a simple client-side integration (Opção A).
-   */
-  static generateWaMeLink(phone: string, message: string): string {
-    // Clean the phone number (remove non-digits)
-    const cleanPhone = phone.replace(/\D/g, '');
-    const encodedMessage = encodeURIComponent(message);
-    return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+  async sendDeliveryNotification(customerPhone: string, customerName: string | null, orderId: string) {
+    if (!customerPhone) return;
+    
+    const name = customerName || 'Cliente';
+    const message = `Olá ${name}! O seu pedido #${orderId.substring(0, 8)} saiu para entrega e está a caminho! 🛵`;
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    console.log('\n======================================================');
+    console.log('📱 [WHATSAPP MOCK] MENSAGEM ENVIADA');
+    console.log(`Para: ${customerPhone}`);
+    console.log(`Mensagem: ${message}`);
+    console.log('======================================================\n');
   }
-
-  // TODO: Implement actual API integration (Opção B) in the future using libraries like whatsapp-web.js
 }

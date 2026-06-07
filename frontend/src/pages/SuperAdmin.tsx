@@ -8,10 +8,10 @@ const INITIAL_PLANS = [
 ];
 
 export const SuperAdmin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [password, setPassword] = useState('');
   
-  const [activeTab, setActiveTab] = useState<'overview' | 'planos' | 'gateway'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'planos' | 'gateway' | 'teste'>('overview');
   const [gatewayKey, setGatewayKey] = useState('');
   
   const [plans, setPlans] = useState(INITIAL_PLANS);
@@ -123,13 +123,23 @@ export const SuperAdmin = () => {
         >
           <CreditCard className="w-5 h-5" /> Gateway & Receitas
         </button>
+
+        <button 
+          onClick={() => setActiveTab('teste')}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === 'teste' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          }`}
+        >
+          <Building className="w-5 h-5" /> Ambiente de Teste
+        </button>
       </div>
 
       {/* Área Principal */}
       <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
         <h1 className="text-3xl font-black text-white mb-8">
           {activeTab === 'overview' ? 'Gestão de Assinantes (Tenants)' : 
-           activeTab === 'planos' ? 'Configuração de Planos SaaS' : 'Gateway de Assinaturas'}
+           activeTab === 'planos' ? 'Configuração de Planos SaaS' : 
+           activeTab === 'teste' ? 'Laboratório de Testes' : 'Gateway de Assinaturas'}
         </h1>
 
         {activeTab === 'overview' && (
@@ -266,6 +276,28 @@ export const SuperAdmin = () => {
               <div className="mt-8">
                 <button className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
                   <Save className="w-5 h-5" /> Atualizar Configuração de Cobrança
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'teste' && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+              <div className="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mb-6">
+                <Building className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-black text-white mb-2">Ambiente de Testes</h2>
+              <p className="text-slate-400 mb-8">
+                Utilize esta área para validar e testar as novas ferramentas, integrações e atualizações que você está desenvolvendo para os restaurantes antes de liberá-las.
+              </p>
+              
+              <div className="p-6 border border-dashed border-slate-700 rounded-2xl bg-slate-950 flex flex-col items-center justify-center text-center">
+                <p className="text-slate-500 mb-4">Adicione aqui seus componentes de teste, painéis de debug ou botões para disparar eventos simulados.</p>
+                <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">
+                  <Plus className="w-4 h-4 inline mr-2" />
+                  Adicionar Novo Teste
                 </button>
               </div>
             </div>

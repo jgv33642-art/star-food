@@ -20,10 +20,16 @@ async function request<T>(method: string, path: string, body?: any): Promise<T> 
   });
 
   if (res.status === 401) {
-    localStorage.removeItem('@Lanchonete:token');
-    localStorage.removeItem('@Lanchonete:user');
-    window.location.href = '/login';
-    throw new Error('Unauthorized');
+    // Se for um token de desenvolvedor gerado pelo PAINEL_DEV_L9, ignoramos o logout automático.
+    // Assim o usuário pode ver a tela mesmo se as rotas da API falharem por falta de token válido no backend.
+    if (token && token.startsWith('dev-token')) {
+      throw new Error('Unauthorized (Dev Token Bypassed Redirect)');
+    } else {
+      localStorage.removeItem('@Lanchonete:token');
+      localStorage.removeItem('@Lanchonete:user');
+      window.location.href = '/login';
+      throw new Error('Unauthorized');
+    }
   }
 
   if (!res.ok) {

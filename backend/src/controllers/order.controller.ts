@@ -103,4 +103,22 @@ export class OrderController {
       next(error);
     }
   };
+
+  assignCourier = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const { courierId, deliveryFee } = req.body;
+      const order = await this.orderService.assignCourier(companyId, req.params.id, courierId, deliveryFee);
+      res.json(order);
+
+      emitToCompany(companyId, 'order_courier_assigned', {
+        id: req.params.id,
+        courierId,
+        deliveryFee,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

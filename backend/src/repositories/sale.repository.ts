@@ -89,6 +89,26 @@ export class SaleRepository {
           `INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)`,
           [sale.id, item.productId, item.quantity, item.price]
         );
+        
+        // Baixa automática no estoque de produtos (opcional)
+        await client.query(
+          `UPDATE products SET stock_quantity = stock_quantity - $1 WHERE id = $2 AND company_id = $3`,
+          [item.quantity, item.productId, companyId]
+        );
+
+        // Baixa automática na Ficha Técnica (Ingredientes)
+        const ingredientsRes = await client.query(
+          `SELECT ingredient_id, quantity FROM product_ingredients WHERE product_id = $1`,
+          [item.productId]
+        );
+        
+        for (const ing of ingredientsRes.rows) {
+          const totalDeduction = ing.quantity * item.quantity;
+          await client.query(
+            `UPDATE ingredients SET stock_quantity = stock_quantity - $1 WHERE id = $2 AND company_id = $3`,
+            [totalDeduction, ing.ingredient_id, companyId]
+          );
+        }
       }
 
       // Insert payment record
@@ -96,6 +116,27 @@ export class SaleRepository {
         `INSERT INTO payments (sale_id, method, amount) VALUES ($1, $2, $3)`,
         [sale.id, paymentMethod || 'dinheiro', finalAmount]
       );
+
+      // Loyalty Program Logic
+      if (orderId) {
+        const orderRes = await client.query('SELECT customer_name, customer_phone FROM orders WHERE id = $1', [orderId]);
+        if (orderRes.rows.length > 0) {
+          const { customer_name, customer_phone } = orderRes.rows[0];
+          if (customer_phone) {
+            // Points: 1 point per Real
+            const pointsToadd = Math.floor(finalAmount);
+            
+            // Upsert customer by phone
+            await client.query(`
+              INSERT INTO customers (company_id, name, phone, loyalty_points)
+              VALUES ($1, $2, $3, $4)
+              ON CONFLICT (company_id, phone) DO UPDATE
+              SET loyalty_points = customers.loyalty_points + EXCLUDED.loyalty_points,
+                  name = COALESCE(EXCLUDED.name, customers.name)
+            `, [companyId, customer_name || 'Cliente', customer_phone, pointsToadd]);
+          }
+        }
+      }
 
       await client.query('COMMIT');
       return sale;

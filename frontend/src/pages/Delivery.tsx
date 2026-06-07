@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { ShoppingBag, CheckCircle, XCircle, Clock, Bike, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
+import { DispatchModal } from '../components/DispatchModal';
 
 type OrderStatus = 'pendente' | 'preparando' | 'saiu' | 'entregue' | 'cancelado';
 
@@ -22,6 +23,10 @@ export const Delivery = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isReceiving, setIsReceiving] = useState(true);
+
+  // Dispatch Modal state
+  const [dispatchModalOpen, setDispatchModalOpen] = useState(false);
+  const [selectedOrderToDispatch, setSelectedOrderToDispatch] = useState<{ id: string; customer: string } | null>(null);
 
   // Map database status to frontend delivery status
   const mapDbStatusToDelivery = (dbStatus: string): OrderStatus => {
@@ -97,6 +102,18 @@ export const Delivery = () => {
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
     } catch (err: any) {
       alert('Erro ao atualizar status do pedido: ' + (err.message || 'Erro de conexão'));
+    }
+  };
+
+  const handleDispatch = async (orderId: string, courierId: string | null, fee: number) => {
+    try {
+      if (courierId || fee > 0) {
+        await api.put(`/orders/${orderId}/courier`, { courierId, deliveryFee: fee });
+      }
+      await updateStatus(orderId, 'saiu');
+    } catch (error) {
+      alert('Erro ao despachar pedido');
+      throw error;
     }
   };
 
@@ -209,7 +226,10 @@ export const Delivery = () => {
                       <span className="font-bold text-slate-300 font-mono text-xs">#{order.id.slice(0, 4)}</span>
                     </div>
                     <p className="font-bold text-white mb-2">{order.customer}</p>
-                    <button onClick={() => updateStatus(order.id, 'saiu')} className="w-full mt-2 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold flex justify-center items-center gap-2 transition-colors">
+                    <button onClick={() => {
+                        setSelectedOrderToDispatch({ id: order.id, customer: order.customer });
+                        setDispatchModalOpen(true);
+                      }} className="w-full mt-2 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold flex justify-center items-center gap-2 transition-colors">
                       <Bike className="w-4 h-4" /> Despachar
                     </button>
                   </motion.div>
@@ -251,6 +271,16 @@ export const Delivery = () => {
           </div>
 
         </div>
+      )}
+
+      {selectedOrderToDispatch && (
+        <DispatchModal
+          isOpen={dispatchModalOpen}
+          onClose={() => setDispatchModalOpen(false)}
+          orderId={selectedOrderToDispatch.id}
+          customerName={selectedOrderToDispatch.customer}
+          onDispatch={handleDispatch}
+        />
       )}
     </Layout>
   );

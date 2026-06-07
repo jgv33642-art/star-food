@@ -3,9 +3,10 @@ import { env } from './env';
 
 export let pool = new Pool({
   connectionString: env.DATABASE_URL,
-  max: 20, // limite máximo de 20 conexões simultâneas
-  idleTimeoutMillis: 30000, // encerra conexões ociosas após 30 segundos
-  connectionTimeoutMillis: 2000, // limite de 2 segundos para estabelecer conexão
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+  ssl: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production' || env.DATABASE_URL.includes('supabase') ? { rejectUnauthorized: false } : undefined
 });
 
 export function updatePool(connectionString: string) {
@@ -19,6 +20,7 @@ export function updatePool(connectionString: string) {
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
+    ssl: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production' || connectionString.includes('supabase') ? { rejectUnauthorized: false } : undefined
   });
 }
 

@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { AppearanceTab } from './AppearanceTab';
 import { WorkingHoursTab } from './WorkingHoursTab';
 import { DeliveryPaymentTab } from './DeliveryPaymentTab';
+import { Layout } from '../../../components/Layout';
 
 export const DeliverySettings = () => {
   const { user } = useAuth();
@@ -38,7 +39,8 @@ export const DeliverySettings = () => {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto text-white">
+    <Layout title="Delivery Próprio">
+      <div className="p-4 md:p-8 max-w-7xl mx-auto text-white">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
           <h1 className="text-3xl font-black tracking-tight">Delivery Próprio</h1>
@@ -84,6 +86,7 @@ export const DeliverySettings = () => {
         {activeTab === 'hours' && <WorkingHoursTab initialSettings={settings} />}
         {activeTab === 'delivery' && <DeliveryPaymentTab initialSettings={settings} />}
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 };

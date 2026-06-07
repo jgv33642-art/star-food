@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import { QRCodeSVG } from 'qrcode.react';
 
 type TableStatus = 'livre' | 'ocupada' | 'fechando';
 
@@ -55,6 +56,7 @@ export const Tables = () => {
   const [addingTable, setAddingTable] = useState(false);
   const [newTableNumber, setNewTableNumber] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showQrCode, setShowQrCode] = useState(false);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -252,7 +254,7 @@ export const Tables = () => {
               <div className="absolute top-8 right-8 text-slate-500 font-black text-2xl uppercase tracking-[0.5em] opacity-10">Caixa</div>
               <div className="absolute bottom-8 right-8 text-slate-500 font-black text-2xl uppercase tracking-[0.5em] opacity-10">Cozinha</div>
 
-              <div className="grid grid-cols-5 gap-8 h-full">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 h-full">
                 {tables.map((table) => (
                   <div
                     key={table.id}
@@ -350,7 +352,7 @@ export const Tables = () => {
                         Abrir Comanda
                       </button>
                       <button
-                        onClick={() => window.open(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + '/cardapio/' + selectedTable.number)}`, '_blank')}
+                        onClick={() => setShowQrCode(true)}
                         className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-slate-800/20 flex items-center justify-center gap-2"
                       >
                         Gerar QR Code (Cardápio)
@@ -478,6 +480,51 @@ export const Tables = () => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQrCode && selectedTable && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col items-center p-8 relative"
+            >
+              <button 
+                onClick={() => setShowQrCode(false)} 
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <h3 className="text-2xl font-black text-slate-900 mb-1">Mesa {selectedTable.number}</h3>
+              <p className="text-sm font-medium text-slate-500 mb-6 uppercase tracking-wider">Escaneie para pedir</p>
+
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <QRCodeSVG 
+                  value={`${window.location.origin}/cardapio/${selectedTable.number}`}
+                  size={200}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+
+              <button
+                onClick={() => window.print()}
+                className="mt-8 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                Imprimir QR Code
+              </button>
             </motion.div>
           </motion.div>
         )}

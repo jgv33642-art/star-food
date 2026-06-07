@@ -16,6 +16,8 @@ import stockRoutes from './stock.routes';
 import reportsRoutes from './reports.routes';
 import settingsRoutes from './settings.routes';
 import paymentRoutes from './payment.routes';
+import courierRoutes from './courier.routes';
+import customerRoutes from './customer.routes';
 
 const router = Router();
 
@@ -36,5 +38,7 @@ router.use('/stock', stockRoutes);
 router.use('/reports', reportsRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/couriers', courierRoutes);
+router.use('/customers', customerRoutes);
 
 export default router;

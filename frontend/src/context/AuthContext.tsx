@@ -45,21 +45,24 @@ function mapBackendRole(backendUser: BackendUser): Role {
   return 'gerencia';
 }
 
-function buildUser(backendUser: BackendUser, defaultRole: Role = 'gerencia'): User {
+function buildUser(backendUser: BackendUser): User {
   return {
     id: backendUser.id,
     name: backendUser.name,
     email: backendUser.email,
-    role: backendUser.role ? mapBackendRole(backendUser) : defaultRole,
+    role: mapBackendRole(backendUser),
     companyId: backendUser.companyId || backendUser.company_id || '',
-    plan: backendUser.plan || 'basic',
+    plan: backendUser.plan || 'pro', // Default to pro if undefined so features work for admins
   };
 }
 
 function loadUserFromStorage(): User | null {
   try {
     const savedUser = localStorage.getItem('@Lanchonete:user');
-    if (savedUser) return JSON.parse(savedUser);
+    if (savedUser) {
+      const u = JSON.parse(savedUser);
+      return u;
+    }
   } catch {
     // ignore parse errors
   }
@@ -89,14 +92,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<void> => {
     const res = await api.post<LoginResponse>('/auth/login', { email, password });
-    const mappedUser = buildUser(res.user, 'gerencia');
+    const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
   };
 
   const register = async (companyName: string, userName: string, email: string, password: string, plan?: string): Promise<void> => {
     const res = await api.post<LoginResponse>('/auth/register', { companyName, userName, email, password, plan });
     // registrants are always admins/gerencia
-    const mappedUser = buildUser(res.user, 'gerencia');
+    const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
   };
 

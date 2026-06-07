@@ -148,4 +148,9 @@ router.put('/:id', requireRole('admin', 'manager', 'gerencia', 'cashier', 'caixa
  */
 router.delete('/:id', requireRole('admin', 'manager', 'gerencia', 'cashier', 'caixa'), productController.delete);
 
+// Rotas de Ficha Técnica (product_ingredients)
+router.get('/:id/ingredients', productController.getIngredients);
+router.post('/:id/ingredients', requireRole('admin', 'manager', 'gerencia'), productController.addIngredient);
+router.delete('/:id/ingredients/:ingredientId', requireRole('admin', 'manager', 'gerencia'), productController.removeIngredient);
+
 export default router;

@@ -5,7 +5,7 @@ import {
   ShoppingCart, LayoutGrid, Receipt, 
   Package, Tags, Database, Coffee, 
   Users, Heart, Smartphone,
-  ShieldCheck, Settings, UserCog, X, FileText, Lock
+  ShieldCheck, Settings, UserCog, X, FileText, Lock, Bike
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePWA } from '../hooks/usePWA';
@@ -54,6 +54,7 @@ const menuGroups = [
     items: [
       { icon: Users, label: 'Equipe / PIN', path: '/admin/equipe', minPlan: 'basic' },
       { icon: UserCog, label: 'Usuários', path: '/admin/usuarios', minPlan: 'basic' },
+      { icon: Bike, label: 'Motoboys', path: '/admin/motoboys' },
       { icon: ShieldCheck, label: 'Permissões', path: '/admin/permissoes' },
       { icon: Settings, label: 'Configurações', path: '/admin/configuracoes' },
       { icon: Smartphone, label: 'Site Delivery', path: '/admin/delivery-settings', minPlan: 'pro' },

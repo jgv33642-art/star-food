@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, ShoppingCart, Download, Laptop, Smartphone, CheckCircle, User, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: string, priceAnnual: string }> = {
   start: {
@@ -62,22 +63,7 @@ export const Checkout = () => {
       await register(companyName, userName, email, password, planKey);
       
       // 2. Chama nossa nova rota de pagamentos passando o plano
-      const token = localStorage.getItem('token');
-      // @ts-ignore
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ plan: planKey })
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Falha ao gerar link de pagamento');
-      }
+      const data = await api.post<any>('/payments/checkout', { plan: planKey });
 
       if (data.initPoint) {
         // 3. Redireciona o usuário para a tela segura do Mercado Pago

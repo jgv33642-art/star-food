@@ -1,5 +1,6 @@
 import { OrderRepository } from '../repositories/order.repository';
 import { ProductRepository } from '../repositories/product.repository';
+import { WhatsAppService } from './whatsapp.service';
 
 export class OrderService {
   private orderRepository = new OrderRepository();
@@ -66,6 +67,21 @@ export class OrderService {
 
   async updateStatus(companyId: string, id: string, status: string) {
     const order = await this.orderRepository.updateStatus(companyId, id, status);
+    if (!order) {
+      throw { status: 404, message: 'Order not found' };
+    }
+
+    // Trigger WhatsApp if status changes to 'saiu'
+    if (status === 'saiu' && order.customer_phone) {
+      const whatsappService = new WhatsAppService();
+      whatsappService.sendDeliveryNotification(order.customer_phone, order.customer_name, order.id).catch(console.error);
+    }
+
+    return order;
+  }
+
+  async assignCourier(companyId: string, id: string, courierId: string | null, deliveryFee: number) {
+    const order = await this.orderRepository.assignCourier(companyId, id, courierId, deliveryFee);
     if (!order) {
       throw { status: 404, message: 'Order not found' };
     }

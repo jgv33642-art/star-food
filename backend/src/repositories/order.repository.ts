@@ -107,4 +107,13 @@ export class OrderRepository {
     );
     return result.rows[0];
   }
+
+  async assignCourier(companyId: string, id: string, courierId: string | null, deliveryFee: number) {
+    const result = await pool.query(
+      `UPDATE orders SET courier_id = $1, delivery_fee = $2, updated_at = now()
+       WHERE id = $3 AND company_id = $4 RETURNING *`,
+      [courierId, deliveryFee, id, companyId]
+    );
+    return result.rows[0];
+  }
 }

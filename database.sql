@@ -127,6 +127,18 @@ CREATE TABLE customers (
   birth_date DATE,
   loyalty_points INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now(),
+  CONSTRAINT unique_company_phone UNIQUE (company_id, phone)
+);
+
+CREATE TABLE couriers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
+  vehicle VARCHAR(100),
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
 
@@ -135,10 +147,12 @@ CREATE TABLE orders (
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
   table_id UUID REFERENCES tables(id),
   waiter_id UUID REFERENCES users(id),
+  courier_id UUID REFERENCES couriers(id) ON DELETE SET NULL,
   status VARCHAR(50) DEFAULT 'open',
   customer_name VARCHAR(255),
   customer_phone VARCHAR(20),
   delivery_address TEXT,
+  delivery_fee NUMERIC(10,2) DEFAULT 0,
   opened_at TIMESTAMP DEFAULT now(),
   closed_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT now(),

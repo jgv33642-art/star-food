@@ -17,6 +17,7 @@ router.post('/:id/items', orderController.addItem);
 router.delete('/:id/items/:itemId', orderController.removeItem);
 router.put('/:id/close', orderController.close);
 router.put('/:id/status', orderController.updateStatus);
+router.put('/:id/courier', orderController.assignCourier);
 
 // Módulo 3: Checkout Unificado
 router.get('/:id/payment-summary', paymentController.summary);

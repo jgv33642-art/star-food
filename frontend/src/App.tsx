@@ -12,12 +12,17 @@ import { Tables } from './pages/Tables';
 
 import { Finance } from './pages/Finance';
 import { Products } from './pages/Products';
+import { Categories } from './pages/Categories';
+import { Ingredients } from './pages/Ingredients';
 import { Reports } from './pages/Reports';
 import { Inventory } from './pages/Inventory';
 import { Delivery } from './pages/Delivery';
 import { DigitalMenu } from './pages/DigitalMenu';
 import { Settings } from './pages/Settings';
 import { DeliverySettings } from './pages/admin/DeliverySettings';
+import { Integrations } from './pages/admin/Integrations';
+import { Couriers } from './pages/admin/Couriers';
+import { Loyalty } from './pages/admin/Loyalty';
 import { SuperAdmin } from './pages/SuperAdmin';
 import { Checkout } from './pages/Checkout';
 import { VirtualStore } from './pages/VirtualStore';
@@ -164,6 +169,46 @@ const AppRoutes = () => {
         } 
       />
       <Route 
+        path="/admin/categorias" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia', 'caixa']}>
+            <Categories />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/motoboys" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']}>
+            <Couriers />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/fidelidade" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']}>
+            <Loyalty />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/crm" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']}>
+            <Loyalty />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/integracoes" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']}>
+            <Integrations />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
         path="/admin/relatorios" 
         element={
           <ProtectedRoute allowedRoles={['gerencia']}>
@@ -176,6 +221,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Inventory />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/ingredientes" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
+            <Ingredients />
           </ProtectedRoute>
         } 
       />
