@@ -7,23 +7,31 @@ const format = winston.format.combine(
   )
 );
 
-const transports = [
+const transports: winston.transport[] = [
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize({ all: true }),
       format
     )
-  }),
-  new winston.transports.File({
-    filename: 'logs/error.log',
-    level: 'error',
-    format
-  }),
-  new winston.transports.File({ 
-    filename: 'logs/all.log',
-    format
-  }),
+  })
 ];
+
+// Só usa arquivos de log se não estiver na Vercel
+if (!process.env.VERCEL) {
+  transports.push(
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      format
+    })
+  );
+  transports.push(
+    new winston.transports.File({ 
+      filename: 'logs/all.log',
+      format
+    })
+  );
+}
 
 export const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
