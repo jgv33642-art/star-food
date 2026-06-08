@@ -216,6 +216,16 @@ export class DevController {
     }
   };
 
+  clearDatabase = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await pool.query('DELETE FROM users');
+      await pool.query('DELETE FROM companies');
+      res.json({ success: true, message: 'Contas apagadas com sucesso' });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  };
+
   updateCompany = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id, plan, active } = req.body;
