@@ -10,8 +10,8 @@ const envSchema = z.object({
   POSTGRES_URL_NON_POOLING: z.string().optional(),
   JWT_SECRET: z.string().optional().default('star-food-secret-jwt-token-fallback'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  MERCADO_PAGO_ACCESS_TOKEN: z.string().optional(),
-  MERCADO_PAGO_PUBLIC_KEY: z.string().optional(),
+  MERCADO_PAGO_ACCESS_TOKEN: z.string().optional().default('APP_USR-2727821531199974-052815-b2193866b97800eb640a747a99f326f2-3432268245'),
+  MERCADO_PAGO_PUBLIC_KEY: z.string().optional().default('APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b'),
 });
 
 const _env = envSchema.safeParse(process.env);
