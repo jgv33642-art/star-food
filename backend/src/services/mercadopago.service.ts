@@ -1,17 +1,17 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import { env } from '../config/env';
 
-// Configurar o SDK do Mercado Pago
-let client: MercadoPagoConfig;
+// O cliente será inicializado sob demanda para evitar problemas de escopo/env
+let client: MercadoPagoConfig | null = null;
 
-if (env.MERCADO_PAGO_ACCESS_TOKEN) {
-  client = new MercadoPagoConfig({
-    accessToken: env.MERCADO_PAGO_ACCESS_TOKEN,
-    options: {
-      timeout: 5000,
-      idempotencyKey: 'abc' // Opcional
-    }
-  });
+function getClient() {
+  if (!client && env.MERCADO_PAGO_ACCESS_TOKEN) {
+    client = new MercadoPagoConfig({
+      accessToken: env.MERCADO_PAGO_ACCESS_TOKEN,
+      options: { timeout: 5000 }
+    });
+  }
+  return client;
 }
 
 export class MercadoPagoService {
@@ -19,12 +19,12 @@ export class MercadoPagoService {
    * Cria uma preferência de pagamento (Link de Checkout Pro) para assinatura de um plano
    */
   async createSubscriptionPreference(companyId: string, companyName: string, plan: string, price: number): Promise<string> {
-    if (!client) {
-      console.warn('Aviso: Mercado Pago não configurado. Simulando sucesso para testes.');
-      return ''; // Retornando vazio faz o frontend ativar o fallback de sucesso
+    const mpClient = getClient();
+    if (!mpClient) {
+      throw new Error('Aviso: Token do Mercado Pago não configurado no backend.');
     }
 
-    const preference = new Preference(client);
+    const preference = new Preference(mpClient);
 
     try {
       // Cria a preferência de checkout com as informações do plano
@@ -63,11 +63,12 @@ export class MercadoPagoService {
    * Busca as informações reais de um pagamento diretamente no servidor do Mercado Pago (Validação Reversa)
    */
   async verifyPayment(paymentId: string | number) {
-    if (!client) {
+    const mpClient = getClient();
+    if (!mpClient) {
       throw new Error('Mercado Pago Access Token não configurado no backend.');
     }
 
-    const payment = new Payment(client);
+    const payment = new Payment(mpClient);
 
     try {
       const response = await payment.get({ id: paymentId });
