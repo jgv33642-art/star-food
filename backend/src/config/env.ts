@@ -26,7 +26,6 @@ const rawDbUrl = _env.data.DATABASE_URL || _env.data.POSTGRES_URL || _env.data.P
 
 if (!rawDbUrl) {
   console.error('❌ Database connection string not found. Please provide DATABASE_URL or POSTGRES_URL.');
-  throw new Error('Missing database connection string');
 }
 
 export const env = {
