@@ -3,8 +3,11 @@ import { env } from './env';
 
 const isLocal = (env.DATABASE_URL || '').includes('localhost') || (env.DATABASE_URL || '').includes('127.0.0.1');
 
+const rawConnectionString = env.DATABASE_URL || '';
+const cleanConnectionString = rawConnectionString.split('?')[0];
+
 export let pool = new Pool({
-  connectionString: env.DATABASE_URL,
+  connectionString: cleanConnectionString,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
@@ -18,8 +21,9 @@ export function updatePool(connectionString: string) {
     console.error('Erro ao tentar fechar o pool:', err);
   }
   const isStringLocal = (connectionString || '').includes('localhost') || (connectionString || '').includes('127.0.0.1');
+  const cleanString = (connectionString || '').split('?')[0];
   pool = new Pool({
-    connectionString,
+    connectionString: cleanString,
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
