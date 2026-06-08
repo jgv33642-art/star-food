@@ -1,12 +1,14 @@
 import { Pool } from 'pg';
 import { env } from './env';
 
+const isLocal = (env.DATABASE_URL || '').includes('localhost') || (env.DATABASE_URL || '').includes('127.0.0.1');
+
 export let pool = new Pool({
   connectionString: env.DATABASE_URL,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-  ssl: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production' || (env.DATABASE_URL || '').includes('supabase') ? { rejectUnauthorized: false } : undefined
+  ssl: isLocal ? undefined : { rejectUnauthorized: false }
 });
 
 export function updatePool(connectionString: string) {
@@ -15,12 +17,13 @@ export function updatePool(connectionString: string) {
   } catch (err) {
     console.error('Erro ao tentar fechar o pool:', err);
   }
+  const isStringLocal = (connectionString || '').includes('localhost') || (connectionString || '').includes('127.0.0.1');
   pool = new Pool({
     connectionString,
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
-    ssl: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production' || (connectionString || '').includes('supabase') ? { rejectUnauthorized: false } : undefined
+    ssl: isStringLocal ? undefined : { rejectUnauthorized: false }
   });
 }
 
