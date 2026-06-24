@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layout } from '../components/Layout';
+import { useQuery } from '@tanstack/react-query';
+import { useCartStore } from '../store/cartStore';
 import { 
   Search, 
   Plus, 
@@ -43,79 +45,94 @@ interface MenuItem {
 export const PDV = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [search, setSearch] = useState('');
-  const [cart, setCart] = useState<{item: MenuItem, quantity: number}[]>([]);
+  
+  // Zustand Store para Carrinho
+  const { cart, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCartStore();
+  const total = getCartTotal();
+
   const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'pix' | 'dinheiro'>('cartao');
   
-  // API and State
-  const [categories, setCategories] = useState<string[]>(['Todos']);
-  const [products, setProducts] = useState<MenuItem[]>([]);
-  const [cashier, setCashier] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  // States para Divisão e Pagamento Parcial
+  const [showSplitModal, setShowSplitModal] = useState(false);
+  const [splitCount, setSplitCount] = useState(2);
+  const [useTenPercent, setUseTenPercent] = useState(true);
+  
+  // Pagamentos Adicionados na Venda Atual
+  const [partialPayments, setPartialPayments] = useState<{method: string, amount: number}[]>([]);
+  const partialTotal = partialPayments.reduce((acc, curr) => acc + curr.amount, 0);
+
+  const [selectedPartialMethod, setSelectedPartialMethod] = useState<'cartao' | 'pix' | 'dinheiro'>('dinheiro');
+  const [partialAmountInput, setPartialAmountInput] = useState('');
+
+  const currentRemaining = Math.max(0, total - partialTotal);
+
+  const handleAddPartialPayment = () => {
+    const amount = parseFloat(partialAmountInput);
+    if (isNaN(amount) || amount <= 0) return;
+    if (amount > currentRemaining + 0.01) {
+      alert('Valor excede o restante!');
+      return;
+    }
+    setPartialPayments(prev => [...prev, { method: selectedPartialMethod, amount }]);
+    setPartialAmountInput((Math.max(0, currentRemaining - amount)).toFixed(2));
+  };
+
+  // APIs state
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // States para Divisão de Conta
-  const [showSplitModal, setShowSplitModal] = useState(false);
-  const [splitCount, setSplitCount] = useState(2);
-  const [useTenPercent, setUseTenPercent] = useState(true);
-
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const loadData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  // React Query para buscar dados com cache
+  const { data: categories = ['Todos'], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const data = await api.get<any[]>('/categories');
+      return ['Todos', ...data.map(c => c.name)];
+    }
+  });
+
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
       const [categoriesData, productsData] = await Promise.all([
         api.get<any[]>('/categories'),
         api.get<any[]>('/products'),
       ]);
-
       const catMap: Record<string, string> = {};
-      categoriesData.forEach(c => {
-        catMap[c.id] = c.name;
-      });
-
-      setCategories(['Todos', ...categoriesData.map(c => c.name)]);
-
-      const mappedProducts = productsData
-        .map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          price: parseFloat(p.price),
-          category: catMap[p.category_id] || 'Outros',
-          img: getEmoji(p.name, catMap[p.category_id] || 'Outros'),
-          active: p.active
-        }))
-        .filter(p => p.active);
-
-      setProducts(mappedProducts);
-
-      // Fetch current cashier
-      try {
-        const currentCashier = await api.get<any>('/cashier/current');
-        setCashier(currentCashier);
-      } catch (cErr) {
-        setCashier(null);
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError('Erro ao carregar dados do PDV. Certifique-se de configurar a DATABASE_URL no Painel do Desenvolvedor.');
-    } finally {
-      setLoading(false);
+      categoriesData.forEach(c => { catMap[c.id] = c.name; });
+      return productsData.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        price: parseFloat(p.price),
+        category: catMap[p.category_id] || 'Outros',
+        img: getEmoji(p.name, catMap[p.category_id] || 'Outros'),
+        active: p.active
+      })).filter(p => p.active);
     }
-  };
+  });
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const { data: cashier } = useQuery({
+    queryKey: ['currentCashier'],
+    queryFn: async () => {
+      return await api.get<any>('/cashier/current');
+    },
+    retry: false
+  });
 
-  const total = cart.reduce((acc, curr) => acc + (curr.item.price * curr.quantity), 0);
+  const loading = isLoadingCategories || isLoadingProducts;
 
   const handleCobrar = async () => {
     if (cart.length === 0) return;
     if (!cashier) {
       setError('O caixa está FECHADO. Por favor, abra o caixa na tela de "Caixa" antes de realizar vendas.');
+      return;
+    }
+
+    // Se há pagamentos parciais, eles devem cobrir o total
+    if (partialPayments.length > 0 && partialTotal < total - 0.01) {
+      setError('O valor dos pagamentos parciais não cobre o total da venda.');
       return;
     }
 
@@ -141,34 +158,45 @@ export const PDV = () => {
       await api.put(`/orders/${order.id}/close`);
 
       // 4. Create Sale
-      const methodMapping = {
-        cartao: 'cartao',
-        pix: 'pix',
-        dinheiro: 'dinheiro'
-      };
-
-      await api.post('/sales', {
+      const payload = {
         orderId: order.id,
         cashRegisterId: cashier.id,
         totalAmount: total,
         discount: 0,
         finalAmount: total,
-        paymentMethod: methodMapping[paymentMethod],
+        payments: partialPayments.length > 0 
+          ? partialPayments 
+          : [{ method: paymentMethod, amount: total }],
         items: cart.map(cartItem => ({
           productId: cartItem.item.id,
           quantity: cartItem.quantity,
           price: cartItem.item.price
         }))
-      });
+      };
 
-      setSuccessMessage(`Venda registrada com sucesso! Total de R$ ${total.toFixed(2)} recebido.`);
-      setCart([]);
-      setTimeout(() => setSuccessMessage(null), 5000);
+      await api.post('/sales', payload);
+
+      setSuccessMessage('Venda realizada com sucesso!');
+      clearCart();
+      setPartialPayments([]);
+      setTimeout(() => setSuccessMessage(null), 3000);
+      setShowSplitModal(false);
     } catch (err: any) {
       console.error(err);
-      setError('Erro ao registrar venda: ' + (err.message || 'Erro desconhecido'));
+      setError('Erro ao processar venda: ' + (err.response?.data?.message || err.message));
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const formatMethodLabel = (method: string) => {
+    switch (method) {
+      case 'dinheiro': return 'Dinheiro 💵';
+      case 'pix': return 'PIX 📲';
+      case 'cartao': return 'Cartão 💳';
+      case 'credit': return 'Crédito 💳';
+      case 'debit': return 'Débito 💳';
+      default: return method;
     }
   };
 
@@ -213,29 +241,7 @@ export const PDV = () => {
     return matchesCat && matchesSearch;
   });
 
-  const addToCart = (item: MenuItem) => {
-    setCart(prev => {
-      const exists = prev.find(i => i.item.id === item.id);
-      if (exists) {
-        return prev.map(i => i.item.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-      }
-      return [...prev, { item, quantity: 1 }];
-    });
-  };
 
-  const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(i => i.item.id !== id));
-  };
-
-  const updateQuantity = (id: string, delta: number) => {
-    setCart(prev => prev.map(i => {
-      if (i.item.id === id) {
-        const newQ = i.quantity + delta;
-        return newQ > 0 ? { ...i, quantity: newQ } : i;
-      }
-      return i;
-    }));
-  };
 
   return (
     <Layout title="Frente de Caixa (PDV)">
@@ -556,12 +562,60 @@ export const PDV = () => {
                 </div>
               </div>
 
+              {/* Multiple / Partial Payments Section */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6 mx-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-white font-bold text-sm uppercase tracking-wider">Pagamentos Múltiplos</h4>
+                  <span className="text-xs text-slate-400">Restante: <span className="font-mono text-amber-500 font-bold">R$ {currentRemaining.toFixed(2)}</span></span>
+                </div>
+                
+                {currentRemaining > 0 && (
+                  <div className="flex gap-2 mb-4">
+                    <select
+                      value={selectedPartialMethod}
+                      onChange={(e: any) => setSelectedPartialMethod(e.target.value)}
+                      className="bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 w-32"
+                    >
+                      <option value="dinheiro">Dinheiro</option>
+                      <option value="pix">PIX</option>
+                      <option value="cartao">Cartão</option>
+                    </select>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={partialAmountInput}
+                      onChange={e => setPartialAmountInput(e.target.value)}
+                      placeholder="Valor"
+                      className="flex-1 bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-mono"
+                    />
+                    <button
+                      onClick={handleAddPartialPayment}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-xl font-bold transition-colors text-sm"
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+
+                {partialPayments.length > 0 && (
+                  <div className="space-y-2 mt-4">
+                    {partialPayments.map((p, idx) => (
+                      <div key={idx} className="flex justify-between text-xs bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span className="text-slate-300 font-bold uppercase">{p.method}</span>
+                        <span className="text-emerald-400 font-mono font-bold">R$ {p.amount.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="p-6 border-t border-slate-800 bg-slate-900/50 rounded-b-3xl">
                 <button 
-                  onClick={() => setShowSplitModal(false)}
-                  className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all"
+                  onClick={handleCobrar}
+                  disabled={submitting || (partialPayments.length > 0 && currentRemaining > 0.01)}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-black py-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all text-lg"
                 >
-                  Concluir Divisão e Voltar
+                  {submitting ? 'Processando...' : 'Finalizar Venda'}
                 </button>
               </div>
             </motion.div>

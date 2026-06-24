@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { QRCodeSVG } from 'qrcode.react';
+import { useSocket } from '../hooks/useSocket';
 
 type TableStatus = 'livre' | 'ocupada' | 'fechando';
 
@@ -60,6 +61,7 @@ export const Tables = () => {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const socket = useSocket();
 
   const isCaixaOrAdmin = user?.role === 'caixa' || user?.role === 'gerencia';
 
@@ -80,6 +82,26 @@ export const Tables = () => {
   useEffect(() => {
     fetchTables();
   }, []);
+
+  // WebSocket Integration
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      console.log('🔄 Socket event received: refreshing tables list');
+      fetchTables();
+    };
+
+    socket.on('new_order', handleUpdate);
+    socket.on('order_closed', handleUpdate);
+    socket.on('order_status_changed', handleUpdate);
+
+    return () => {
+      socket.off('new_order', handleUpdate);
+      socket.off('order_closed', handleUpdate);
+      socket.off('order_status_changed', handleUpdate);
+    };
+  }, [socket]);
 
   const handleAddTable = async (e: React.FormEvent) => {
     e.preventDefault();

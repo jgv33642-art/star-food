@@ -12,6 +12,8 @@ const envSchema = z.object({
   NODE_ENV: z.string().optional().default('development'),
   MERCADO_PAGO_ACCESS_TOKEN: z.string().optional().default('APP_USR-2727821531199974-052815-b2193866b97800eb640a747a99f326f2-3432268245'),
   MERCADO_PAGO_PUBLIC_KEY: z.string().optional().default('APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b'),
+  FRONTEND_URL: z.string().optional().default('http://localhost:5174'),
+  WEBHOOK_URL: z.string().optional().default('https://seusite.com/api/payments/webhook'),
 }).passthrough();
 
 const _env = envSchema.safeParse(process.env);
@@ -37,5 +39,7 @@ export const env = {
   JWT_SECRET: envData.JWT_SECRET || 'star-food-secret-jwt-token-fallback',
   MERCADO_PAGO_ACCESS_TOKEN: envData.MERCADO_PAGO_ACCESS_TOKEN || 'APP_USR-2727821531199974-052815-b2193866b97800eb640a747a99f326f2-3432268245',
   MERCADO_PAGO_PUBLIC_KEY: envData.MERCADO_PAGO_PUBLIC_KEY || 'APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b',
+  FRONTEND_URL: envData.FRONTEND_URL || 'http://localhost:5174',
+  WEBHOOK_URL: envData.WEBHOOK_URL || 'https://seusite.com/api/payments/webhook',
 };
 export type EnvType = typeof env;

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { useOfflineQueue } from '../hooks/useOfflineQueue';
+import { useSocket } from '../hooks/useSocket';
 
 const getEmoji = (productName: string, categoryName: string) => {
   const name = productName.toLowerCase();
@@ -51,6 +52,7 @@ interface Order {
 export const WaiterDashboard = () => {
   const { user } = useAuth();
   const { queueAction, setCache, getCache } = useOfflineQueue();
+  const socket = useSocket();
 
   const [tables, setTables] = useState<Table[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -159,6 +161,28 @@ export const WaiterDashboard = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // WebSocket Integration
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      if (navigator.onLine) {
+        console.log('🔄 Socket event received: refreshing waiter data');
+        fetchData(false);
+      }
+    };
+
+    socket.on('order_item_added', handleUpdate);
+    socket.on('order_status_changed', handleUpdate);
+    socket.on('order_closed', handleUpdate);
+
+    return () => {
+      socket.off('order_item_added', handleUpdate);
+      socket.off('order_status_changed', handleUpdate);
+      socket.off('order_closed', handleUpdate);
+    };
+  }, [socket]);
 
   const filteredMenu = products.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(menuSearch.toLowerCase());

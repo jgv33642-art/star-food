@@ -73,7 +73,11 @@ export const Checkout = () => {
         setIsSuccess(true);
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao processar o pagamento e criar conta.');
+      let errorMessage = err.message || 'Erro ao processar o pagamento e criar conta.';
+      if (errorMessage.includes('users_email_key')) {
+        errorMessage = 'Este e-mail já está cadastrado. Por favor, tente fazer login ou use outro e-mail.';
+      }
+      setError(errorMessage);
       setLoading(false);
     }
   };

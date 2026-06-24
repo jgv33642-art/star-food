@@ -68,6 +68,7 @@ export class SaleRepository {
       discount: number;
       finalAmount: number;
       paymentMethod?: string;
+      payments?: { method: string; amount: number; receivedAmount?: number }[];
       items: { productId: string; quantity: number; price: number }[];
     }
   ) {
@@ -75,7 +76,7 @@ export class SaleRepository {
     try {
       await client.query('BEGIN');
 
-      const { orderId, cashRegisterId, customerId, totalAmount, discount, finalAmount, paymentMethod, items } = data;
+      const { orderId, cashRegisterId, customerId, totalAmount, discount, finalAmount, paymentMethod, payments, items } = data;
 
       const saleResult = await client.query(
         `INSERT INTO sales (company_id, order_id, cash_register_id, customer_id, total_amount, discount, final_amount, status)
@@ -112,10 +113,22 @@ export class SaleRepository {
       }
 
       // Insert payment record
-      await client.query(
-        `INSERT INTO payments (sale_id, method, amount) VALUES ($1, $2, $3)`,
-        [sale.id, paymentMethod || 'dinheiro', finalAmount]
-      );
+      if (payments && payments.length > 0) {
+        for (const pmt of payments) {
+          const changeAmount = pmt.method === 'cash' && pmt.receivedAmount
+            ? Math.max(0, pmt.receivedAmount - pmt.amount)
+            : 0;
+          await client.query(
+            `INSERT INTO payments (sale_id, method, amount, change_amount) VALUES ($1, $2, $3, $4)`,
+            [sale.id, pmt.method, pmt.amount, changeAmount]
+          );
+        }
+      } else {
+        await client.query(
+          `INSERT INTO payments (sale_id, method, amount) VALUES ($1, $2, $3)`,
+          [sale.id, paymentMethod || 'dinheiro', finalAmount]
+        );
+      }
 
       // Loyalty Program Logic
       if (orderId) {

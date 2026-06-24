@@ -5,8 +5,9 @@ import {
   ShoppingCart, LayoutGrid, Receipt, 
   Package, Tags, Database, Coffee, 
   Users, Heart, Smartphone,
-  ShieldCheck, Settings, UserCog, X, FileText, Lock, Bike
+  ShieldCheck, Settings, UserCog, X, FileText, Lock, Bike, Moon, Sun
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { usePWA } from '../hooks/usePWA';
 import { useLowStock } from '../hooks/useLowStock';
@@ -76,6 +77,7 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
   const { isInstallable, installApp } = usePWA();
   const { items: lowStockItems } = useLowStock();
   const lowStockCount = lowStockItems.length;
+  const { theme, toggleTheme } = useTheme();
   
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [requiredPlanForModal, setRequiredPlanForModal] = useState('basic');
@@ -154,8 +156,15 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
           ))}
         </nav>
 
-        {isInstallable && (
-          <div className="mt-8 pt-6 border-t border-slate-800">
+        <div className="mt-8 pt-6 border-t border-slate-800">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-3 rounded-xl font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 transition-all text-sm group"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" /> : <Moon className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />}
+            {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+          </button>
+          {isInstallable && (
             <button
               onClick={installApp}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-lg shadow-indigo-600/20 text-sm group"
@@ -163,8 +172,8 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
               <Smartphone className="w-5 h-5 text-indigo-200 group-hover:scale-110 transition-transform" />
               Instalar Aplicativo
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <UpgradePlan 

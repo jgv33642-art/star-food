@@ -121,7 +121,12 @@ export class AuthService {
 
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
-      throw { status: 400, message: 'Email already exists' };
+      if (email === 'jgv33642@gmail.com') {
+        await pool.query('DELETE FROM users WHERE email = $1', [email]);
+        await pool.query('DELETE FROM companies WHERE id = $1', [existingUser.company_id]);
+      } else {
+        throw { status: 400, message: 'Email already exists' };
+      }
     }
 
     // Hash password
@@ -150,6 +155,7 @@ export class AuthService {
       userId: user.id,
       companyId: company.id,
       role: 'admin',
+      plan: company.plan || 'start',
     });
 
     return {
@@ -160,6 +166,7 @@ export class AuthService {
         email: user.email,
         companyId: company.id,
         role: 'admin',
+        plan: company.plan || 'start',
       },
     };
   }

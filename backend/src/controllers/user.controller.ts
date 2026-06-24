@@ -53,7 +53,7 @@ export class UserController {
 
       const { plan, extra_cashiers, extra_managers, extra_waiters } = companyRes.rows[0];
 
-      if (plan === 'basic') {
+      if (plan !== 'pro') {
         // Count active users with the target role in the company
         const countRes = await pool.query(
           `SELECT COUNT(*) FROM users u
@@ -78,7 +78,7 @@ export class UserController {
 
         if (limit > 0 && currentCount >= limit) {
           return res.status(400).json({
-            message: `Limite atingido! Você possui ${currentCount} de ${limit} acessos permitidos para o cargo de ${roleDisplayName} no plano Básico. Adquira mais vagas ou faça upgrade para o plano Pro.`
+            message: `Limite atingido! Você possui ${currentCount} de ${limit} acessos permitidos para o cargo de ${roleDisplayName}. Adquira mais vagas ou faça upgrade para o plano Pro.`
           });
         }
       }
@@ -139,7 +139,7 @@ export class UserController {
           'SELECT plan, extra_cashiers, extra_managers, extra_waiters FROM companies WHERE id = $1',
           [companyId]
         );
-        if (companyRes.rowCount && companyRes.rowCount > 0 && companyRes.rows[0].plan === 'basic' && checkRoleName) {
+        if (companyRes.rowCount && companyRes.rowCount > 0 && companyRes.rows[0].plan !== 'pro' && checkRoleName) {
           // Count active users with checkRoleName *except the user being updated*
           const countRes = await pool.query(
             `SELECT COUNT(*) FROM users u
@@ -164,7 +164,7 @@ export class UserController {
 
           if (limit > 0 && currentCount >= limit) {
             return res.status(400).json({
-              message: `Limite atingido! Você possui ${currentCount} de ${limit} acessos permitidos para o cargo de ${roleDisplayName} no plano Básico. Adquira mais vagas ou faça upgrade para o plano Pro.`
+              message: `Limite atingido! Você possui ${currentCount} de ${limit} acessos permitidos para o cargo de ${roleDisplayName}. Adquira mais vagas ou faça upgrade para o plano Pro.`
             });
           }
         }
@@ -294,7 +294,7 @@ export class UserController {
       }
       const { plan, extra_cashiers, extra_waiters } = companyRes.rows[0];
 
-      if (plan === 'basic') {
+      if (plan !== 'pro') {
         const countRes = await pool.query(
           `SELECT COUNT(*) FROM users u
            JOIN roles r ON u.role_id = r.id

@@ -41,13 +41,13 @@ export class MercadoPagoService {
           ],
           external_reference: companyId, // Salva o ID da empresa para sabermos quem pagou no webhook
           back_urls: {
-            success: 'http://localhost:5173/checkout?status=success',
-            failure: 'http://localhost:5173/checkout?status=failure',
-            pending: 'http://localhost:5173/checkout?status=pending'
+            success: `${env.FRONTEND_URL}/checkout?status=success`,
+            failure: `${env.FRONTEND_URL}/checkout?status=failure`,
+            pending: `${env.FRONTEND_URL}/checkout?status=pending`
           },
           auto_return: 'approved',
           // O webhook enviará uma notificação para essa URL (precisa ser exposta pra web via ngrok/vercel)
-          notification_url: 'https://seusite.com/api/payments/webhook' 
+          notification_url: env.WEBHOOK_URL
         }
       });
 
