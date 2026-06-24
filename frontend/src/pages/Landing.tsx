@@ -33,7 +33,7 @@ export const Landing = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-clip relative">
       {/* Background Gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px]" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-600/20 rounded-full blur-[120px]" />

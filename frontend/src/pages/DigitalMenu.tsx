@@ -233,7 +233,7 @@ export const DigitalMenu = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 font-sans relative ">
       {/* Header Fixo */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-md z-40 px-4 py-4 border-b border-slate-200 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">

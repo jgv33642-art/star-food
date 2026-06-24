@@ -138,7 +138,7 @@ export const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center items-center p-4 relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 flex justify-center items-center p-4 relative ">
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px]" />
       
       <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors z-10 font-medium">
