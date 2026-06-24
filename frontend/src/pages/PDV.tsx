@@ -34,13 +34,7 @@ const getEmoji = (productName: string, categoryName: string) => {
   return '🍽️';
 };
 
-interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  img: string;
-}
+
 
 export const PDV = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
@@ -189,16 +183,7 @@ export const PDV = () => {
     }
   };
 
-  const formatMethodLabel = (method: string) => {
-    switch (method) {
-      case 'dinheiro': return 'Dinheiro 💵';
-      case 'pix': return 'PIX 📲';
-      case 'cartao': return 'Cartão 💳';
-      case 'credit': return 'Crédito 💳';
-      case 'debit': return 'Débito 💳';
-      default: return method;
-    }
-  };
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -226,7 +211,7 @@ export const PDV = () => {
           break;
         case 'Escape':
           e.preventDefault();
-          setCart([]);
+          clearCart();
           break;
       }
     };
@@ -451,7 +436,7 @@ export const PDV = () => {
               </div>
 
               <div className="flex gap-2">
-                <button onClick={() => setCart([])} className="px-4 py-3 bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl transition-colors relative group">
+                <button onClick={() => clearCart()} className="px-4 py-3 bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl transition-colors relative group">
                   <Trash2 className="w-5 h-5" />
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Esc</span>
                 </button>
