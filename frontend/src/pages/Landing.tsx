@@ -33,10 +33,12 @@ export const Landing = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-clip relative">
+    <div className="min-h-screen bg-slate-950 text-white relative">
       {/* Background Gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-600/20 rounded-full blur-[120px]" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-600/20 rounded-full blur-[120px]" />
+      </div>
 
       {/* Header */}
       <header className="relative z-10 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
