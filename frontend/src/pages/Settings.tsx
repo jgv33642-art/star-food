@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { Printer, CreditCard, Save, RefreshCw, CheckCircle2, Shield, AlertCircle, Terminal, Smartphone, MessageCircle, QrCode, Power } from 'lucide-react';
+import { Printer, CreditCard, Save, RefreshCw, CheckCircle2, Shield, AlertCircle, Terminal, Smartphone, MessageCircle, QrCode, Power, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useStoreConfig } from '../hooks/useStoreConfig';
 
 export const Settings = () => {
-  const [activeTab, setActiveTab] = useState<'hardware' | 'pagamentos' | 'whatsapp'>('whatsapp');
+  const [activeTab, setActiveTab] = useState<'operacao' | 'hardware' | 'pagamentos' | 'whatsapp'>('operacao');
+  const { mode, updateMode } = useStoreConfig();
   
   // Payment States
   const [gateway, setGateway] = useState<'mercadopago' | 'stone' | 'pagseguro'>('mercadopago');
@@ -114,6 +116,17 @@ export const Settings = () => {
         {/* Menu Lateral de Configurações */}
         <div className="w-full lg:w-64 flex flex-col gap-2 shrink-0">
           <button 
+            onClick={() => setActiveTab('operacao')}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${
+              activeTab === 'operacao' 
+              ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
+              : 'bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800'
+            }`}
+          >
+            <Store className="w-5 h-5" /> Modo de Operação
+          </button>
+
+          <button 
             onClick={() => setActiveTab('pagamentos')}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${
               activeTab === 'pagamentos' 
@@ -150,6 +163,58 @@ export const Settings = () => {
         {/* Área de Conteúdo */}
         <div className="flex-1 bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm">
           
+          {activeTab === 'operacao' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+              <div>
+                <h2 className="text-xl font-black text-white flex items-center gap-2 mb-2">
+                  <Store className="w-5 h-5 text-amber-500" /> Preferências de Operação
+                </h2>
+                <p className="text-slate-400 text-sm">
+                  Personalize como o sistema chama os atendimentos no salão (Mesa ou Comanda) em todos os dispositivos.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl">
+                <button
+                  onClick={() => updateMode('mesa')}
+                  className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${
+                    mode === 'mesa'
+                      ? 'border-amber-500 bg-amber-500/10'
+                      : 'border-slate-800 bg-slate-950 hover:border-slate-700'
+                  }`}
+                >
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${
+                    mode === 'mesa' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-900 text-slate-500'
+                  }`}>
+                    🪑
+                  </div>
+                  <div className="text-center">
+                    <h3 className={`font-bold text-lg ${mode === 'mesa' ? 'text-amber-500' : 'text-white'}`}>Por Mesa</h3>
+                    <p className="text-xs text-slate-500 mt-1">O sistema utilizará o termo "Mesa" para identificar clientes no salão.</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updateMode('comanda')}
+                  className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${
+                    mode === 'comanda'
+                      ? 'border-amber-500 bg-amber-500/10'
+                      : 'border-slate-800 bg-slate-950 hover:border-slate-700'
+                  }`}
+                >
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${
+                    mode === 'comanda' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-900 text-slate-500'
+                  }`}>
+                    🧾
+                  </div>
+                  <div className="text-center">
+                    <h3 className={`font-bold text-lg ${mode === 'comanda' ? 'text-amber-500' : 'text-white'}`}>Por Comanda</h3>
+                    <p className="text-xs text-slate-500 mt-1">O sistema utilizará o termo "Comanda" (ficha numerada) para identificar pedidos.</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          )}
           {activeTab === 'pagamentos' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
               <div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -40,6 +40,7 @@ import { PaymentCheckout } from './pages/PaymentCheckout';
 
 const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: React.ReactNode, allowedRoles?: string[], allowedPlans?: string[] }) => {
   const { user } = useAuth();
+  const location = useLocation();
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -62,6 +63,12 @@ const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: Re
     if (!hasAccess) {
       return <AccessDenied />; // Or redirect to a specific paywall page
     }
+  }
+
+  // Onboarding Guard: se for Admin e não tem staff, forçar ir para equipe
+  // (a menos que já esteja na rota de equipe)
+  if (user.role === 'gerencia' && user.hasStaff === false && location.pathname !== '/admin/equipe') {
+    return <Navigate to="/admin/equipe" replace />;
   }
 
   return <>{children}</>;

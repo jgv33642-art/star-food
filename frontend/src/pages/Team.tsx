@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, UserPlus, Hash, Trash2,
   Edit2, CheckCircle2, X, Loader2, ShieldCheck,
-  Eye, EyeOff, RefreshCw, UserCheck, AlertTriangle
-} from 'lucide-react';
+import { Eye, EyeOff, RefreshCw, UserCheck, AlertTriangle, LogOut } from 'lucide-react';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface StaffMember {
   id: string;
@@ -58,6 +59,9 @@ const PinDots = ({ length, filled }: { length: number; filled: number }) => (
 );
 
 export const Team = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -146,7 +150,14 @@ export const Team = () => {
       });
       setIsCreateOpen(false);
       resetCreateForm();
-      await fetchStaff();
+      
+      if (user?.hasStaff === false) {
+        // Redireciona para login PIN na primeira criação
+        logout();
+        navigate('/login');
+      } else {
+        await fetchStaff();
+      }
     } catch (err: any) {
       setFormError(err.message || 'Erro ao cadastrar funcionário.');
     } finally {
@@ -227,6 +238,24 @@ export const Team = () => {
             <UserPlus className="w-5 h-5" /> Adicionar Funcionário
           </button>
         </div>
+
+        {/* Onboarding Alert */}
+        {user?.hasStaff === false && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+          >
+            <div>
+              <h3 className="text-orange-400 font-bold text-lg flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5" /> Passo Obrigatório
+              </h3>
+              <p className="text-orange-300/80 text-sm mt-1">
+                Para começar a usar o sistema, cadastre seu primeiro funcionário (ou você mesmo como Gerente).<br />
+                Após criar, você será redirecionado para a tela de Login por PIN.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Info Card */}
         <div className="bg-indigo-500/5 border border-indigo-500/15 rounded-2xl p-4 flex gap-3 items-start">
@@ -402,32 +431,32 @@ export const Team = () => {
                 {/* Role */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Função / Cargo</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {[
-                      { value: 'cashier', label: 'Caixa / Operador', icon: '💳', color: 'emerald' },
-                      { value: 'waiter', label: 'Garçom / Lançador', icon: '🍽️', color: 'amber' }
+                      { value: 'manager', label: 'Gerente / Dono', icon: '👑', color: 'indigo' },
+                      { value: 'cashier', label: 'Caixa', icon: '💳', color: 'emerald' },
+                      { value: 'waiter', label: 'Garçom', icon: '🍽️', color: 'amber' }
                     ].map(opt => (
                       <button
                         type="button"
                         key={opt.value}
-                        onClick={() => setFormRole(opt.value as 'cashier' | 'waiter')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                        onClick={() => setFormRole(opt.value as any)}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all cursor-pointer ${
                           formRole === opt.value
                             ? opt.color === 'emerald'
                               ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-amber-500 bg-amber-500/10'
+                              : opt.color === 'amber'
+                                ? 'border-amber-500 bg-amber-500/10'
+                                : 'border-indigo-500 bg-indigo-500/10'
                             : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
                         }`}
                       >
                         <span className="text-2xl">{opt.icon}</span>
-                        <span className={`text-xs font-bold ${
+                        <span className={`text-xs font-bold text-center leading-tight ${
                           formRole === opt.value
-                            ? opt.color === 'emerald' ? 'text-emerald-400' : 'text-amber-400'
+                            ? opt.color === 'emerald' ? 'text-emerald-400' : opt.color === 'amber' ? 'text-amber-400' : 'text-indigo-400'
                             : 'text-slate-400'
                         }`}>{opt.label}</span>
-                        {formRole === opt.value && (
-                          <CheckCircle2 className={`w-4 h-4 ${opt.color === 'emerald' ? 'text-emerald-400' : 'text-amber-400'}`} />
-                        )}
                       </button>
                     ))}
                   </div>

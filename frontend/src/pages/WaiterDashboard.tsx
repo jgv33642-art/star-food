@@ -6,6 +6,7 @@ import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { useOfflineQueue } from '../hooks/useOfflineQueue';
 import { useSocket } from '../hooks/useSocket';
+import { useStoreConfig } from '../hooks/useStoreConfig';
 
 const getEmoji = (productName: string, categoryName: string) => {
   const name = productName.toLowerCase();
@@ -53,6 +54,7 @@ export const WaiterDashboard = () => {
   const { user } = useAuth();
   const { queueAction, setCache, getCache } = useOfflineQueue();
   const socket = useSocket();
+  const { label, labelPlural, mode } = useStoreConfig();
 
   const [tables, setTables] = useState<Table[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -63,6 +65,7 @@ export const WaiterDashboard = () => {
   // Active Context (Selected table/order)
   const [activeContext, setActiveContext] = useState<{ table: Table, order: Order | null } | null>(null);
   const [tableSearch, setTableSearch] = useState('');
+  const [fastNumber, setFastNumber] = useState('');
   
   // Launch state (new items being added in this session)
   const [pendingItems, setPendingItems] = useState<{ product: Product, quantity: number }[]>([]);
@@ -273,6 +276,68 @@ export const WaiterDashboard = () => {
     }
   };
 
+  const handleFastOpen = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const num = parseInt(fastNumber, 10);
+    if (isNaN(num) || num <= 0) return;
+    
+    setLoading(true);
+    try {
+      // 1. Encontrar ou criar mesa/comanda
+      let targetTable = tables.find(t => t.number === num);
+      if (!targetTable) {
+        if (navigator.onLine) {
+          targetTable = await api.post<Table>('/tables', { number: num, status: 'busy' });
+        } else {
+          throw new Error(`Você está offline. Não é possível criar uma nova ${label} no momento.`);
+        }
+      }
+      
+      // 2. Encontrar pedido aberto ou abrir novo
+      let targetOrder = orders.find(o => o.table_id === targetTable!.id && o.status === 'open');
+      if (!targetOrder) {
+        if (navigator.onLine) {
+          targetOrder = await api.post<Order>('/orders', {
+            tableId: targetTable.id,
+            waiterId: user?.id
+          });
+          await api.put(`/tables/${targetTable.id}`, {
+            status: 'busy',
+            number: targetTable.number
+          });
+        } else {
+          const tempOrderId = 'temp-' + Date.now();
+          targetOrder = {
+            id: tempOrderId,
+            table_id: targetTable.id,
+            table_number: targetTable.number,
+            status: 'open',
+            items: []
+          };
+          await queueAction('create_order', {
+            tempOrderId,
+            tableId: targetTable.id,
+            waiterId: user?.id,
+            tableNumber: targetTable.number
+          });
+        }
+      }
+      
+      if (navigator.onLine) {
+        await fetchData(false);
+      }
+      
+      setActiveContext({ table: targetTable, order: targetOrder });
+      setPendingItems([]);
+      setFastNumber('');
+      setIsMenuOpen(true); // Joga direto na aba de produtos!
+    } catch (err: any) {
+      setError('Erro no Lançamento Rápido: ' + (err.message || 'Falha de conexão'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOpenPrintModal = () => {
     if (pendingItems.length === 0) return;
     setIsPrintModalOpen(true);
@@ -358,18 +423,47 @@ export const WaiterDashboard = () => {
         {loading && !activeContext ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-500 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-            <span className="text-sm font-bold font-mono">Carregando mesas e comandas...</span>
+            <span className="text-sm font-bold font-mono">Carregando {labelPlural.toLowerCase()} e pedidos...</span>
           </div>
         ) : !activeContext ? (
           /* LISTA DE MESAS */
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            
+            {/* HEADER FAST OPEN */}
+            <div className="bg-indigo-600 rounded-3xl p-6 shadow-xl">
+              <h2 className="text-white font-black text-xl mb-4 text-center sm:text-left">
+                Lançamento Rápido
+              </h2>
+              <form onSubmit={handleFastOpen} className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 font-bold text-lg">
+                    #
+                  </span>
+                  <input
+                    type="number"
+                    placeholder={`Número da ${label}...`}
+                    value={fastNumber}
+                    onChange={e => setFastNumber(e.target.value)}
+                    className="w-full bg-white text-slate-900 rounded-2xl py-4 pl-10 pr-4 font-black text-xl focus:ring-4 focus:ring-indigo-400 outline-none transition-all"
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  disabled={!fastNumber}
+                  className="bg-emerald-400 hover:bg-emerald-500 disabled:opacity-50 text-slate-900 font-black py-4 px-8 rounded-2xl transition-all whitespace-nowrap text-lg shadow-lg cursor-pointer"
+                >
+                  OK / Abrir
+                </button>
+              </form>
+            </div>
+
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-              <h3 className="text-xl font-bold text-white mb-4">Mesa ou Comanda Ativa</h3>
+              <h3 className="text-xl font-bold text-white mb-4">{label} Ativa</h3>
               <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <input 
                   type="text" 
-                  placeholder="Buscar mesa por número..." 
+                  placeholder={`Buscar ${label.toLowerCase()} por número...`} 
                   value={tableSearch}
                   onChange={e => setTableSearch(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-lg"
@@ -388,10 +482,10 @@ export const WaiterDashboard = () => {
                       <button 
                         key={t.id} 
                         onClick={() => handleSelectTable(t)}
-                        className={`p-5 rounded-2xl border transition-all text-left flex flex-col justify-between h-28 ${statusColor}`}
+                        className={`p-5 rounded-2xl border transition-all text-left flex flex-col justify-between h-28 cursor-pointer ${statusColor}`}
                       >
                         <div>
-                          <p className="text-white font-black text-xl">Mesa {t.number}</p>
+                          <p className="text-white font-black text-xl">{label} {t.number}</p>
                           {activeOrder && (
                             <p className="text-slate-400 text-xs mt-1 font-mono">Cmd: #{activeOrder.id.slice(0, 4)}</p>
                           )}
@@ -414,9 +508,9 @@ export const WaiterDashboard = () => {
             {/* Header da Comanda */}
             <div className="bg-slate-950 p-6 flex items-center justify-between border-b border-slate-800">
               <div>
-                <h3 className="text-2xl font-black text-white">Mesa {activeContext.table.number}</h3>
+                <h3 className="text-2xl font-black text-white">{label} {activeContext.table.number}</h3>
                 <p className="text-amber-500 font-bold text-sm">
-                  {activeContext.order ? `Comanda Ativa: #${activeContext.order.id.slice(0, 8)}` : 'Sem comanda aberta'}
+                  {activeContext.order ? `Pedido Ativo: #${activeContext.order.id.slice(0, 8)}` : 'Sem pedido aberto'}
                 </p>
               </div>
               <button onClick={() => setActiveContext(null)} className="p-2 text-slate-400 hover:text-white bg-slate-900 rounded-xl transition-colors">
@@ -428,12 +522,12 @@ export const WaiterDashboard = () => {
               {/* Se a comanda não está aberta, mostra botão para abrir */}
               {!activeContext.order ? (
                 <div className="text-center py-12 space-y-4">
-                  <p className="text-slate-400">Esta mesa está livre no momento. Abra uma comanda para começar a lançar pedidos.</p>
+                  <p className="text-slate-400">Esta {label.toLowerCase()} está livre no momento. Abra para começar a lançar pedidos.</p>
                   <button 
                     onClick={handleOpenNewComanda}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-lg py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/10 transition-all active:scale-98"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-lg py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/10 transition-all active:scale-98 cursor-pointer"
                   >
-                    Abrir Comanda
+                    Abrir {label}
                   </button>
                 </div>
               ) : (
@@ -529,29 +623,36 @@ export const WaiterDashboard = () => {
                     className="w-full bg-slate-900 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-lg"
                   />
                 </div>
-                <button onClick={() => setIsMenuOpen(false)} className="p-4 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-300 transition-colors">
+                <button onClick={() => setIsMenuOpen(false)} className="p-4 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-300 transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              {/* Category Carousel (Filtro Rápido) */}
-              <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 overflow-x-auto flex gap-2 scrollbar-none select-none">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                      selectedCategory === cat
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-[1.02]'
-                        : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              {/* Sidebar and Main Layout */}
+              <div className="flex-1 flex flex-col md:flex-row min-h-0">
+                {/* Category Sidebar (Scroll X on Mobile, Scroll Y on Desktop) */}
+                <div className="w-full md:w-[250px] bg-slate-950 border-b md:border-b-0 md:border-r border-slate-800 flex md:flex-col overflow-x-auto md:overflow-y-auto p-4 gap-2 md:gap-3 custom-scrollbar shrink-0">
+                  <div className="hidden md:block mb-2 px-2">
+                    <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Categorias</h4>
+                  </div>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all shrink-0 md:text-left cursor-pointer whitespace-nowrap md:whitespace-normal ${
+                        selectedCategory === cat
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 md:scale-[1.02]'
+                          : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+                {/* Product List */}
+                <div className="flex-1 flex flex-col min-w-0 bg-slate-900">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
                 {filteredMenu.length === 0 ? (
                   <div className="text-center py-12 text-slate-500">Nenhum produto encontrado nesta categoria.</div>
                 ) : (
@@ -619,6 +720,8 @@ export const WaiterDashboard = () => {
                   </button>
                 </div>
               )}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -642,9 +745,9 @@ export const WaiterDashboard = () => {
               <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-bold text-white">Confirmar Pedido</h3>
-                  <p className="text-slate-400 text-sm">Mesa {activeContext?.table.number} • Comanda #{activeContext?.order?.id.slice(0, 8)}</p>
+                  <p className="text-slate-400 text-sm">{label} {activeContext?.table.number} • Pedido #{activeContext?.order?.id.slice(0, 8)}</p>
                 </div>
-                <button onClick={() => !isPrinting && setIsPrintModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <button onClick={() => !isPrinting && setIsPrintModalOpen(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>

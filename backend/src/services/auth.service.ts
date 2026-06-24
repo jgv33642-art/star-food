@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { UserRepository } from '../repositories/user.repository';
 import { generateToken } from '../utils/jwt';
 import { pool } from '../config/db';
+import { slugify } from '../utils/slug';
 
 // Schema Zod para validação do PIN
 const pinLoginSchema = z.object({
@@ -14,16 +15,23 @@ export class AuthService {
   private userRepository = new UserRepository();
 
   async login(data: any) {
-    const { email, password } = data;
+    const { companyName, password } = data;
 
-    const user = await this.userRepository.findByEmail(email);
+    if (!companyName || !password) {
+      throw { status: 400, message: 'Nome do estabelecimento e senha são obrigatórios.' };
+    }
+
+    const slug = slugify(companyName);
+    const ghostEmail = `${slug}@starfood.local`;
+
+    const user = await this.userRepository.findByEmail(ghostEmail);
     if (!user || !user.active) {
-      throw { status: 401, message: 'Invalid credentials or inactive user' };
+      throw { status: 401, message: 'Estabelecimento não encontrado ou inativo.' };
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      throw { status: 401, message: 'Invalid credentials' };
+      throw { status: 401, message: 'Senha incorreta.' };
     }
 
     const token = generateToken({
@@ -33,15 +41,24 @@ export class AuthService {
       plan: user.company_plan || 'basic',
     });
 
+    // Check if the company has any staff (other than the admin)
+    const staffQuery = await pool.query(
+      'SELECT count(*) FROM users WHERE company_id = $1 AND id != $2',
+      [user.company_id, user.id]
+    );
+    const hasStaff = parseInt(staffQuery.rows[0].count) > 0;
+
     return {
       token,
       user: {
         id: user.id,
         name: user.name,
+        companyName: companyName,
         email: user.email,
         companyId: user.company_id,
         role: user.role,
         plan: user.company_plan || 'basic',
+        hasStaff
       },
     };
   }
@@ -117,16 +134,18 @@ export class AuthService {
   }
 
   async register(data: any) {
-    const { companyName, userName, email, password, plan } = data;
+    const { companyName, password, plan } = data;
 
-    const existingUser = await this.userRepository.findByEmail(email);
+    if (!companyName || !password) {
+      throw { status: 400, message: 'Nome do estabelecimento e senha são obrigatórios.' };
+    }
+
+    const slug = slugify(companyName);
+    const ghostEmail = `${slug}@starfood.local`;
+
+    const existingUser = await this.userRepository.findByEmail(ghostEmail);
     if (existingUser) {
-      if (email === 'jgv33642@gmail.com') {
-        await pool.query('DELETE FROM users WHERE email = $1', [email]);
-        await pool.query('DELETE FROM companies WHERE id = $1', [existingUser.company_id]);
-      } else {
-        throw { status: 400, message: 'Email already exists' };
-      }
+      throw { status: 400, message: 'Já existe um estabelecimento com este nome.' };
     }
 
     // Hash password
@@ -146,8 +165,8 @@ export class AuthService {
     const user = await this.userRepository.createUser({
       companyId: company.id,
       roleId: role.id,
-      name: userName,
-      email,
+      name: companyName, // Use companyName as the user name for the Admin
+      email: ghostEmail,
       password: hashedPassword,
     });
 
@@ -163,10 +182,12 @@ export class AuthService {
       user: {
         id: user.id,
         name: user.name,
+        companyName: companyName,
         email: user.email,
         companyId: company.id,
         role: 'admin',
         plan: company.plan || 'start',
+        hasStaff: false
       },
     };
   }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Utensils, Mail, Lock, ArrowLeft, Smartphone, Hash, ChevronRight, X } from 'lucide-react';
+import { Utensils, Mail, Lock, ArrowLeft, Smartphone, Hash, ChevronRight, X, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePWA } from '../hooks/usePWA';
@@ -57,8 +57,8 @@ export const Login = () => {
   // Tab: 'email' | 'pin'
   const [mode, setMode] = useState<'email' | 'pin'>('email');
 
-  // Email/Password mode
-  const [email, setEmail] = useState('');
+  // Company Name / Password mode
+  const [companyName, setCompanyName] = useState('');
   const [password, setPassword] = useState('');
 
   // PIN mode
@@ -128,17 +128,17 @@ export const Login = () => {
     }
   };
 
-  // Handle email/password login
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  // Handle Company Name / password login
+  const handleCompanyLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!companyName || !password) return;
     setLoading(true);
     setError('');
     try {
-      await login(email, password);
+      await login(companyName, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'E-mail ou senha inválidos. Tente novamente.');
+      setError(err.message || 'Nome do estabelecimento ou senha inválidos.');
     } finally {
       setLoading(false);
     }
@@ -238,7 +238,7 @@ export const Login = () => {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Mail className="w-4 h-4" /> E-mail / Senha
+            <Building2 className="w-4 h-4" /> Conta do Estabelecimento
           </button>
           <button
             onClick={() => { setMode('pin'); setError(''); setSelectedStaff(null); setPin(''); }}
@@ -273,14 +273,14 @@ export const Login = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleEmailLogin} className="space-y-5">
+                <form onSubmit={handleCompanyLogin} className="space-y-5">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="E-mail corporativo"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
+                      placeholder="Nome do estabelecimento"
+                      value={companyName}
+                      onChange={e => setCompanyName(e.target.value)}
                       className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                       required
                       disabled={loading}
@@ -354,7 +354,7 @@ export const Login = () => {
                       <div className="text-center py-10 text-slate-500 text-sm">
                         <Hash className="w-10 h-10 mx-auto mb-3 opacity-30" />
                         <p className="font-semibold">Nenhum funcionário cadastrado.</p>
-                        <p className="text-xs mt-1">Use o login por e-mail acima ou peça ao gerente para cadastrar a equipe.</p>
+                        <p className="text-xs mt-1">Use o login de Estabelecimento acima para cadastrar a equipe.</p>
                       </div>
                     ) : (
                       <div className="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">

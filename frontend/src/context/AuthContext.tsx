@@ -6,16 +6,18 @@ export type Role = 'gerencia' | 'caixa' | 'garcom';
 export interface User {
   id: string;
   name: string;
+  companyName?: string;
   email: string;
   role: Role;
   companyId: string;
   plan: string;
+  hasStaff?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (companyName: string, userName: string, email: string, password: string, plan?: string) => Promise<void>;
+  login: (companyName: string, password: string) => Promise<void>;
+  register: (companyName: string, password: string, plan?: string) => Promise<void>;
   loginWithToken: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -23,12 +25,14 @@ interface AuthContextType {
 interface BackendUser {
   id: string;
   name: string;
+  companyName?: string;
   email: string;
   role_id?: string;
   role?: string;
   companyId?: string;
   company_id?: string;
   plan?: string;
+  hasStaff?: boolean;
 }
 
 interface LoginResponse {
@@ -49,11 +53,25 @@ function buildUser(backendUser: BackendUser): User {
   return {
     id: backendUser.id,
     name: backendUser.name,
+    companyName: backendUser.companyName,
     email: backendUser.email,
     role: mapBackendRole(backendUser),
     companyId: backendUser.companyId || backendUser.company_id || '',
     plan: backendUser.plan || 'pro', // Default to pro if undefined so features work for admins
+    hasStaff: backendUser.hasStaff,
   };
+}
+
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
 }
 
 function loadUserFromStorage(): User | null {
@@ -90,17 +108,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(u);
   };
 
-  const login = async (email: string, password: string): Promise<void> => {
-    const res = await api.post<LoginResponse>('/auth/login', { email, password });
+  const login = async (companyName: string, password: string): Promise<void> => {
+    const res = await api.post<LoginResponse>('/auth/login', { companyName, password });
     const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
+    localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
   };
 
-  const register = async (companyName: string, userName: string, email: string, password: string, plan?: string): Promise<void> => {
-    const res = await api.post<LoginResponse>('/auth/register', { companyName, userName, email, password, plan });
+  const register = async (companyName: string, password: string, plan?: string): Promise<void> => {
+    const res = await api.post<LoginResponse>('/auth/register', { companyName, password, plan });
     // registrants are always admins/gerencia
     const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
+    localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
   };
 
   const loginWithToken = (token: string, u: User) => {
