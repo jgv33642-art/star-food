@@ -11,20 +11,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // Forçar atualização do Service Worker (Cache Buster de Emergência)
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-          }
-          if (registrations.length > 0) {
-            // Se tinha algum SW, recarrega a página pra pegar a versão limpa
-            window.location.reload();
-          }
-        });
-      }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
