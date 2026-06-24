@@ -4,8 +4,13 @@ export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
+    // Detect iOS
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(ios);
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -21,12 +26,15 @@ export const usePWA = () => {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Verfica se já está em modo standalone (instalado)
     if (
       window.matchMedia('(display-mode: standalone)').matches || 
       (window.navigator as any).standalone === true
     ) {
       setIsInstalled(true);
+      setIsInstallable(false);
+    } else if (ios) {
+      // On iOS, if not installed, show custom install prompt
+      setIsInstallable(true);
     }
 
     return () => {
@@ -36,8 +44,12 @@ export const usePWA = () => {
   }, []);
 
   const installApp = async () => {
+    if (isIOS) {
+      alert("Para instalar no iPhone/iPad: Toque no botão 'Compartilhar' (o ícone com uma seta para cima) na barra do Safari, e depois escolha 'Adicionar à Tela de Início'.");
+      return false;
+    }
     if (!deferredPrompt) {
-      console.warn('Nenhum prompt de instalação diferido disponível.');
+      console.warn('Nenhum prompt de instalação disponível.');
       return false;
     }
     deferredPrompt.prompt();
@@ -50,5 +62,5 @@ export const usePWA = () => {
     return false;
   };
 
-  return { isInstallable, isInstalled, installApp };
+  return { isInstallable, isInstalled, installApp, isIOS };
 };
