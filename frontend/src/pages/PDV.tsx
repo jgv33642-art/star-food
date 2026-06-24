@@ -273,7 +273,7 @@ export const PDV = () => {
           <span className="text-sm font-bold font-mono">Carregando itens de PDV...</span>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)]">
+        <div className="flex flex-col lg:flex-row gap-6">
           
           {/* Esquerda: Produtos */}
           <div className="flex-1 flex flex-col bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-sm">
@@ -317,7 +317,7 @@ export const PDV = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+            <div className="flex-1 p-4">
               {products.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6 gap-3">
                   <ShoppingCart className="w-12 h-12 opacity-25 text-indigo-400" />
@@ -367,7 +367,7 @@ export const PDV = () => {
               <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-lg text-xs font-medium">Mesa Avulsa</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+            <div className="flex-1 p-6">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-500">
                   <ShoppingCart className="w-12 h-12 mb-4 opacity-20" />
