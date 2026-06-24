@@ -147,6 +147,37 @@ export function runAutoMigration(): Promise<void> {
           cost_price NUMERIC(10,2) NOT NULL
         );
       `);
+
+      console.log('[AUTO-MIGRATION] Creating Complements tables if missing...');
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS complement_categories (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+          name VARCHAR(255) NOT NULL,
+          is_required BOOLEAN DEFAULT false,
+          min_options INTEGER DEFAULT 0,
+          max_options INTEGER DEFAULT 1,
+          created_at TIMESTAMP DEFAULT now(),
+          updated_at TIMESTAMP DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS complements (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          complement_category_id UUID REFERENCES complement_categories(id) ON DELETE CASCADE,
+          name VARCHAR(255) NOT NULL,
+          price NUMERIC(10,2) DEFAULT 0,
+          created_at TIMESTAMP DEFAULT now(),
+          updated_at TIMESTAMP DEFAULT now()
+        );
+
+        CREATE TABLE IF NOT EXISTS product_complement_categories (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+          complement_category_id UUID REFERENCES complement_categories(id) ON DELETE CASCADE
+        );
+
+        ALTER TABLE order_items ADD COLUMN IF NOT EXISTS complements JSONB DEFAULT '[]'::jsonb;
+      `);
       
       console.log('[AUTO-MIGRATION] Incremental schema updates completed.');
 

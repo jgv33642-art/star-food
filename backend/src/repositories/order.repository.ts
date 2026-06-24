@@ -15,7 +15,8 @@ export class OrderRepository {
               'product_name', p.name,
               'quantity', oi.quantity,
               'price', oi.price,
-              'notes', oi.notes
+              'notes', oi.notes,
+              'complements', oi.complements
             )
           ) FILTER (WHERE oi.id IS NOT NULL),
           '[]'
@@ -46,7 +47,8 @@ export class OrderRepository {
               'product_name', p.name,
               'quantity', oi.quantity,
               'price', oi.price,
-              'notes', oi.notes
+              'notes', oi.notes,
+              'complements', oi.complements
             )
           ) FILTER (WHERE oi.id IS NOT NULL),
           '[]'
@@ -72,12 +74,12 @@ export class OrderRepository {
     return result.rows[0];
   }
 
-  async addItem(orderId: string, data: { productId: string; quantity: number; price: number; notes?: string }) {
-    const { productId, quantity, price, notes } = data;
+  async addItem(orderId: string, data: { productId: string; quantity: number; price: number; notes?: string; complements?: any[] }) {
+    const { productId, quantity, price, notes, complements } = data;
     const result = await pool.query(
-      `INSERT INTO order_items (order_id, product_id, quantity, price, notes)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [orderId, productId, quantity, price, notes || null]
+      `INSERT INTO order_items (order_id, product_id, quantity, price, notes, complements)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb) RETURNING *`,
+      [orderId, productId, quantity, price, notes || null, JSON.stringify(complements || [])]
     );
     return result.rows[0];
   }

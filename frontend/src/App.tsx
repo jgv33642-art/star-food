@@ -35,6 +35,7 @@ import { DevPanel } from './pages/DevPanel';
 import { Users } from './pages/Users';
 import { AccessDenied } from './pages/AccessDenied';
 import { StockImport } from './pages/StockImport';
+import { Complements } from './pages/Complements';
 import { Team } from './pages/Team';
 import { PaymentCheckout } from './pages/PaymentCheckout';
 
@@ -185,6 +186,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['gerencia', 'caixa']}>
             <Categories />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/complementos" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia', 'caixa']}>
+            <Complements />
           </ProtectedRoute>
         } 
       />

@@ -150,14 +150,7 @@ export const Team = () => {
       });
       setIsCreateOpen(false);
       resetCreateForm();
-      
-      if (user?.hasStaff === false) {
-        // Redireciona para login PIN na primeira criação
-        logout();
-        navigate('/login');
-      } else {
-        await fetchStaff();
-      }
+      await fetchStaff();
     } catch (err: any) {
       setFormError(err.message || 'Erro ao cadastrar funcionário.');
     } finally {
@@ -383,6 +376,27 @@ export const Team = () => {
             )}
           </>
         )}
+
+        {/* Bottom Actions */}
+        <div className="pt-8 pb-12 flex justify-center sm:justify-end border-t border-slate-800/50 mt-8">
+          <button 
+            onClick={() => {
+              if (user?.hasStaff === false && staff.length > 0) {
+                // Se estava no onboarding e já cadastrou alguém
+                logout();
+                navigate('/login');
+              } else if (user?.hasStaff === false && staff.length === 0) {
+                alert('Cadastre ao menos um funcionário operacional ou gerente para continuar.');
+              } else {
+                alert('Sua equipe está salva e atualizada com sucesso!');
+              }
+            }}
+            className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-4 px-10 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-lg cursor-pointer"
+          >
+            <CheckCircle2 className="w-6 h-6" />
+            {user?.hasStaff === false ? 'Concluir Equipe e Acessar o Sistema' : 'Salvar Alterações'}
+          </button>
+        </div>
 
       </div>
 

@@ -54,7 +54,14 @@
     @apply border-border;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    height: 100dvh;
+    overscroll-behavior-y: none;
+    overflow: hidden; /* Force layout to handle scroll */
+  }
+
+  #root {
+    height: 100%;
   }
 }

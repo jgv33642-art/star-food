@@ -18,6 +18,7 @@ import settingsRoutes from './settings.routes';
 import paymentRoutes from './payment.routes';
 import courierRoutes from './courier.routes';
 import customerRoutes from './customer.routes';
+import complementRoutes from './complement.routes';
 
 const router = Router();
 
@@ -40,5 +41,6 @@ router.use('/settings', settingsRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/couriers', courierRoutes);
 router.use('/customers', customerRoutes);
+router.use('/complements', complementRoutes);
 
 export default router;

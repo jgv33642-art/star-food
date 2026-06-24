@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOfflineQueue } from '../hooks/useOfflineQueue';
 import { useSocket } from '../hooks/useSocket';
 import { useStoreConfig } from '../hooks/useStoreConfig';
+import { SelectComplementsModal } from '../components/SelectComplementsModal';
 
 const getEmoji = (productName: string, categoryName: string) => {
   const name = productName.toLowerCase();
@@ -68,7 +69,14 @@ export const WaiterDashboard = () => {
   const [fastNumber, setFastNumber] = useState('');
   
   // Launch state (new items being added in this session)
-  const [pendingItems, setPendingItems] = useState<{ product: Product, quantity: number }[]>([]);
+  const [pendingItems, setPendingItems] = useState<{ 
+    cartId: string, 
+    product: Product, 
+    quantity: number, 
+    price: number,
+    complements?: any[] 
+  }[]>([]);
+  const [productForComplements, setProductForComplements] = useState<Product | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuSearch, setMenuSearch] = useState('');
   const [categories, setCategories] = useState<string[]>(['Todos', 'Bebidas', 'Drinks', 'Porções', 'Lanches', 'Combos', 'Sobremesas', 'Adicionais']);
@@ -194,18 +202,31 @@ export const WaiterDashboard = () => {
   });
 
   const addPendingItem = (product: Product) => {
-    setPendingItems(prev => {
-      const existing = prev.find(o => o.product.id === product.id);
-      if (existing) {
-        return prev.map(o => o.product.id === product.id ? { ...o, quantity: o.quantity + 1 } : o);
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
+    setProductForComplements(product);
   };
 
-  const updateQuantity = (id: string, delta: number) => {
+  const handleConfirmComplements = (complements: any[], additionalPrice: number) => {
+    if (!productForComplements) return;
+    const finalPrice = productForComplements.price + additionalPrice;
+    const cartId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    
+    setPendingItems(prev => {
+      // Check if there is an exact same item already (same product, same complements)
+      // This is a bit complex for JSON equality, so for simplicity we just add as new line or group by strict equality of the complements array if we stringify.
+      const compStr = JSON.stringify(complements);
+      const existing = prev.find(o => o.product.id === productForComplements.id && JSON.stringify(o.complements || []) === compStr);
+      
+      if (existing) {
+        return prev.map(o => o.cartId === existing.cartId ? { ...o, quantity: o.quantity + 1 } : o);
+      }
+      return [...prev, { cartId, product: productForComplements, quantity: 1, price: finalPrice, complements }];
+    });
+    setProductForComplements(null);
+  };
+
+  const updateQuantity = (cartId: string, delta: number) => {
     setPendingItems(prev => prev.map(o => {
-      if (o.product.id === id) {
+      if (o.cartId === cartId) {
         const next = o.quantity + delta;
         return next > 0 ? { ...o, quantity: next } : o;
       }
@@ -213,11 +234,11 @@ export const WaiterDashboard = () => {
     }));
   };
 
-  const removePendingItem = (id: string) => {
-    setPendingItems(prev => prev.filter(o => o.product.id !== id));
+  const removePendingItem = (cartId: string) => {
+    setPendingItems(prev => prev.filter(o => o.cartId !== cartId));
   };
 
-  const total = pendingItems.reduce((sum, { product, quantity }) => sum + (product.price * quantity), 0);
+  const total = pendingItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleSelectTable = (table: Table) => {
     const activeOrder = orders.find(o => o.table_id === table.id) || null;
@@ -352,8 +373,9 @@ export const WaiterDashboard = () => {
         productId: item.product.id,
         product_name: item.product.name,
         quantity: item.quantity,
-        price: item.product.price,
-        notes: ''
+        price: item.price,
+        notes: '',
+        complements: item.complements
       }));
 
       if (navigator.onLine) {
@@ -362,7 +384,8 @@ export const WaiterDashboard = () => {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
-            notes: ''
+            notes: '',
+            complements: item.complements
           });
         }
         await fetchData(false);
@@ -380,7 +403,8 @@ export const WaiterDashboard = () => {
               product_name: item.product_name,
               quantity: item.quantity,
               price: item.price,
-              notes: ''
+              notes: '',
+              complements: item.complements
             }));
             return {
               ...o,
@@ -559,19 +583,28 @@ export const WaiterDashboard = () => {
 
                   <div className="space-y-4 mb-6">
                     {pendingItems.map(o => (
-                      <div key={o.product.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 gap-4">
+                      <div key={o.cartId} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 gap-4">
                         <div className="flex-1">
                           <h4 className="text-white font-medium">{o.product.name}</h4>
-                          <p className="text-amber-500 font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.product.price * o.quantity)}</p>
+                          <p className="text-amber-500 font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.price * o.quantity)}</p>
+                          {o.complements && o.complements.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {o.complements.map((c, i) => (
+                                <span key={i} className="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded-md">
+                                  {c.optionName} {c.optionPrice > 0 && `(+R$ ${c.optionPrice.toFixed(2)})`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex items-center justify-between sm:justify-end gap-4">
                           <div className="flex items-center gap-3 bg-slate-900 rounded-xl p-1 border border-slate-700">
-                            <button onClick={() => updateQuantity(o.product.id, -1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Minus className="w-4 h-4" /></button>
+                            <button onClick={() => updateQuantity(o.cartId, -1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Minus className="w-4 h-4" /></button>
                             <span className="font-bold text-white w-6 text-center">{o.quantity}</span>
-                            <button onClick={() => updateQuantity(o.product.id, 1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
+                            <button onClick={() => updateQuantity(o.cartId, 1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
                           </div>
-                          <button onClick={() => removePendingItem(o.product.id)} className="p-3 text-slate-500 hover:text-red-400 bg-slate-900 rounded-xl transition-colors">
+                          <button onClick={() => removePendingItem(o.cartId)} className="p-3 text-slate-500 hover:text-red-400 bg-slate-900 rounded-xl transition-colors">
                             <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
@@ -657,7 +690,6 @@ export const WaiterDashboard = () => {
                   <div className="text-center py-12 text-slate-500">Nenhum produto encontrado nesta categoria.</div>
                 ) : (
                   filteredMenu.map(item => {
-                    const qty = pendingItems.find(o => o.product.id === item.id)?.quantity || 0;
                     const emoji = getEmoji(item.name, item.category_name || 'Outros');
                     return (
                       <div key={item.id} className="flex justify-between items-center p-3.5 bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
@@ -680,30 +712,12 @@ export const WaiterDashboard = () => {
                           </div>
                         </div>
                         
-                        {qty > 0 ? (
-                          <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-1 shrink-0">
-                            <button 
-                              onClick={() => updateQuantity(item.id, -1)} 
-                              className="p-1.5 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors cursor-pointer"
-                            >
-                              <Minus className="w-4 h-4" />
-                            </button>
-                            <span className="font-bold text-indigo-400 w-5 text-center text-sm">{qty}</span>
-                            <button 
-                              onClick={() => addPendingItem(item)} 
-                              className="p-1.5 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg transition-colors cursor-pointer"
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ) : (
-                          <button 
-                            onClick={() => addPendingItem(item)}
-                            className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
-                          >
-                            <Plus className="w-5 h-5" />
-                          </button>
-                        )}
+                        <button 
+                          onClick={() => addPendingItem(item)}
+                          className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
+                        >
+                          <Plus className="w-5 h-5" />
+                        </button>
                       </div>
                     );
                   })
@@ -790,6 +804,12 @@ export const WaiterDashboard = () => {
         )}
       </AnimatePresence>
 
+      <SelectComplementsModal
+        isOpen={!!productForComplements}
+        onClose={() => setProductForComplements(null)}
+        product={productForComplements}
+        onConfirm={handleConfirmComplements}
+      />
     </Layout>
   );
 };

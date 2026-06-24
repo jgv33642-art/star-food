@@ -38,6 +38,7 @@ const menuGroups = [
     items: [
       { icon: Package, label: 'Produtos', path: '/admin/produtos', roles: ['gerencia', 'caixa'] },
       { icon: Tags, label: 'Categorias', path: '/admin/categorias', roles: ['gerencia', 'caixa'] },
+      { icon: Database, label: 'Complementos', path: '/admin/complementos', roles: ['gerencia', 'caixa'] },
       { icon: Database, label: 'Estoque', path: '/admin/estoque', minPlan: 'basic' },
       { icon: FileText, label: 'Importar XML', path: '/admin/estoque/importar', minPlan: 'basic' },
       { icon: Coffee, label: 'Ingredientes', path: '/admin/ingredientes', minPlan: 'basic' },

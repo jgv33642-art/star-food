@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { Plus, Search, Edit2, Trash2, Filter, X, Save, Image as ImageIcon, PackageOpen, Loader2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, X, Save, Image as ImageIcon, PackageOpen, Loader2, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
 import { RecipeModal } from '../components/RecipeModal';
+import { ProductComplementsModal } from '../components/ProductComplementsModal';
 
 interface Category {
   id: string;
@@ -47,6 +48,9 @@ export const Products = () => {
   // Recipe Modal State
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [selectedProductRecipe, setSelectedProductRecipe] = useState<ProductDisplay | null>(null);
+  
+  // Complements Modal State
+  const [complementsModalOpen, setComplementsModalOpen] = useState(false);
 
   // New/Edit Product Form State
   const [newName, setNewName] = useState('');
@@ -282,6 +286,12 @@ export const Products = () => {
                             title="Ficha Técnica (Estoque)">
                             <PackageOpen className="w-4 h-4" />
                           </button>
+                          <button 
+                            onClick={() => { setSelectedProductRecipe(prod); setComplementsModalOpen(true); }}
+                            className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors" 
+                            title="Adicionais/Complementos">
+                            <Layers className="w-4 h-4" />
+                          </button>
                           <button onClick={() => openEditModal(prod)} className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors">
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -428,6 +438,13 @@ export const Products = () => {
       <RecipeModal
         isOpen={recipeModalOpen}
         onClose={() => setRecipeModalOpen(false)}
+        productId={selectedProductRecipe?.id || ''}
+        productName={selectedProductRecipe?.name || ''}
+      />
+
+      <ProductComplementsModal
+        isOpen={complementsModalOpen}
+        onClose={() => setComplementsModalOpen(false)}
         productId={selectedProductRecipe?.id || ''}
         productName={selectedProductRecipe?.name || ''}
       />

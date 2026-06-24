@@ -25,7 +25,7 @@ export class OrderService {
   async addItem(
     companyId: string,
     orderId: string,
-    data: { productId: string; quantity: number; price: number; notes?: string }
+    data: { productId: string; quantity: number; price: number; notes?: string; complements?: any[] }
   ) {
     // Verify order belongs to this company
     const order = await this.orderRepository.findById(companyId, orderId);
