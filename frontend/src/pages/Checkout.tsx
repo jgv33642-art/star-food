@@ -60,7 +60,7 @@ export const Checkout = () => {
 
     try {
       // 1. Cria a conta no banco (com status de plano aguardando pagamento ou criado como basic/start provisoriamente)
-      await register(companyName, userName, email, password, planKey);
+      await register(companyName, password, planKey);
       
       // 2. Chama nossa nova rota de pagamentos passando o plano
       const data = await api.post<any>('/payments/checkout', { plan: planKey });

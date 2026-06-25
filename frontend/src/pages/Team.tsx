@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, UserPlus, Hash, Trash2,
   Edit2, CheckCircle2, X, Loader2, ShieldCheck,
-import { Eye, EyeOff, RefreshCw, UserCheck, AlertTriangle, LogOut } from 'lucide-react';
+  Eye, EyeOff, RefreshCw, UserCheck, AlertTriangle
+} from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';

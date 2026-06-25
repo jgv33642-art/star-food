@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, Building2, ArrowLeft } from 'lucide-react';
+import { Lock, User, Building2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Register = () => {
   const [companyName, setCompanyName] = useState('');
-  const [userName, setUserName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

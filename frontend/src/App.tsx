@@ -84,6 +84,7 @@ const AppRoutes = () => {
         user ? (
           user.role === 'gerencia' ? <Navigate to="/admin" replace /> :
           user.role === 'caixa' ? <Navigate to="/caixa" replace /> :
+          user.role === 'garcom' ? <Navigate to="/pedidos" replace /> :
           <Navigate to="/mesas" replace />
         ) : (
           <Landing />

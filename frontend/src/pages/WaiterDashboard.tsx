@@ -55,7 +55,7 @@ export const WaiterDashboard = () => {
   const { user } = useAuth();
   const { queueAction, setCache, getCache } = useOfflineQueue();
   const socket = useSocket();
-  const { label, labelPlural, mode } = useStoreConfig();
+  const { label, labelPlural } = useStoreConfig();
 
   const [tables, setTables] = useState<Table[]>([]);
   const [products, setProducts] = useState<Product[]>([]);

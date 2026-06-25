@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
 import { 
-  Plus, Search, RefreshCw, Edit3, Trash2, X, Save, AlertTriangle, Layers, PlusCircle, Check
+  Plus, Search, RefreshCw, Edit3, Trash2, X, AlertTriangle, Layers, PlusCircle, Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';

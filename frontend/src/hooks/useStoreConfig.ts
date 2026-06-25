@@ -11,7 +11,7 @@ export function useStoreConfig() {
   const { user } = useAuth();
   
   // Create a key bound to the company to avoid conflicts if same browser used for different companies
-  const configKey = user?.companySlug ? `@Lanchonete:config_${user.companySlug}` : null;
+  const configKey = user?.companyId ? `@Lanchonete:config_${user.companyId}` : null;
 
   const [mode, setMode] = useState<OperatingMode>('mesa');
 
