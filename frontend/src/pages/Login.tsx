@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Utensils, Lock, ArrowLeft, Smartphone, Hash, ChevronRight, X, Building2, ArrowRight, ShieldCheck, User, KeyRound } from 'lucide-react';
+import { Utensils, Lock, ArrowLeft, Smartphone, Hash, ChevronRight, X, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePWA } from '../hooks/usePWA';
