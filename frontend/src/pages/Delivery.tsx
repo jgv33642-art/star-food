@@ -23,6 +23,8 @@ export const Delivery = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isReceiving, setIsReceiving] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   // Dispatch Modal state
   const [dispatchModalOpen, setDispatchModalOpen] = useState(false);
@@ -69,6 +71,8 @@ export const Delivery = () => {
         };
       });
 
+      const newPendingIds = new Set(mapped.filter(o => o.status === 'pendente').map(o => o.id));
+      setPendingIds(newPendingIds);
       setOrders(mapped);
       setError(null);
     } catch (err: any) {
@@ -94,6 +98,47 @@ export const Delivery = () => {
       if (interval) clearInterval(interval);
     };
   }, [isReceiving]);
+
+  // Audio Alert Logic
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (pendingIds.size > 0 && !isMuted) {
+      const playBeep = () => {
+        try {
+          const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+          
+          const playNote = (freq: number, startTime: number) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(0.3, startTime + 0.05);
+            gain.gain.linearRampToValueAtTime(0, startTime + 0.3);
+            osc.start(startTime);
+            osc.stop(startTime + 0.3);
+          };
+
+          const now = ctx.currentTime;
+          playNote(880, now); // A5
+          playNote(1108.73, now + 0.15); // C#6
+        } catch (e) { console.error('Audio falhou', e); }
+      };
+
+      // Play immediately and then every 3 seconds
+      playBeep();
+      interval = setInterval(playBeep, 3000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [pendingIds.size, isMuted]);
 
   const updateStatus = async (id: string, newStatus: OrderStatus) => {
     try {
@@ -134,6 +179,21 @@ export const Delivery = () => {
           >
             {isReceiving ? 'Pausar Atualização Automática' : 'Retomar Atualização Automática'}
           </button>
+          
+          {pendingIds.size > 0 && (
+            <button 
+              onClick={() => setIsMuted(!isMuted)}
+              className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all ${
+                isMuted ? 'bg-slate-800 text-slate-400' : 'bg-red-500 text-white shadow-lg shadow-red-500/20 animate-pulse'
+              }`}
+            >
+              {isMuted ? (
+                <><XCircle className="w-5 h-5" /> Som Silenciado</>
+              ) : (
+                <>🔔 Novo Pedido (Silenciar)</>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
