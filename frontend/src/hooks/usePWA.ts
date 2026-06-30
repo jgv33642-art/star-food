@@ -8,10 +8,10 @@ export const usePWA = () => {
   const [isIOS, setIsIOS] = useState(false);
 
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
+    needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(swRegistration) {
+    onRegistered(swRegistration: any) {
       if (swRegistration) {
         // Tenta checar updates de hora em hora
         setInterval(() => {
@@ -19,7 +19,7 @@ export const usePWA = () => {
         }, 60 * 60 * 1000);
       }
     },
-    onRegisterError(error) {
+    onRegisterError(error: any) {
       console.error('SW registration error', error);
     },
   });
