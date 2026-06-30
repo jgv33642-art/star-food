@@ -12,6 +12,7 @@ interface DBProduct {
   price: string | number;
   category_id: string;
   active: boolean;
+  image_url?: string;
 }
 
 interface DBCategory {
@@ -27,6 +28,7 @@ interface MenuItem {
   category_id: string;
   categoryName: string;
   img: string;
+  imageUrl?: string;
 }
 
 const getEmojiForProduct = (name: string, categoryName: string) => {
@@ -90,7 +92,8 @@ export const VirtualStore = () => {
           price: Number(p.price),
           category_id: p.category_id,
           categoryName: catMap[p.category_id] || '',
-          img: getEmojiForProduct(p.name, catMap[p.category_id] || '')
+          img: getEmojiForProduct(p.name, catMap[p.category_id] || ''),
+          imageUrl: p.image_url || undefined
         }));
       setProducts(mapped);
 
@@ -285,8 +288,12 @@ export const VirtualStore = () => {
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
                     </span>
                   </div>
-                  <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-5xl shrink-0">
-                    {item.img}
+                  <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-5xl shrink-0 overflow-hidden">
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      item.img
+                    )}
                   </div>
                 </div>
               ))

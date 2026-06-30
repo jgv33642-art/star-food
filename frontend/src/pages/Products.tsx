@@ -22,6 +22,7 @@ interface Product {
   cost?: number;
   minimum_stock?: number;
   sku?: string;
+  image_url?: string;
 }
 
 interface ProductDisplay {
@@ -33,6 +34,7 @@ interface ProductDisplay {
   stock: number;
   status: string;
   sku?: string;
+  imageUrl?: string;
 }
 
 export const Products = () => {
@@ -58,6 +60,7 @@ export const Products = () => {
   const [newPrice, setNewPrice] = useState('');
   const [newStatus, setNewStatus] = useState('Ativo');
   const [newSku, setNewSku] = useState('');
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   const fetchData = async () => {
     setLoading(true);
@@ -81,6 +84,7 @@ export const Products = () => {
         stock: p.stock_quantity,
         status: p.active ? 'Ativo' : 'Inativo',
         sku: p.sku || '',
+        imageUrl: p.image_url || '',
       }));
       setProducts(mapped);
     } catch (err: any) {
@@ -106,6 +110,7 @@ export const Products = () => {
     setNewPrice('');
     setNewStatus('Ativo');
     setNewSku('');
+    setNewImageUrl('');
     setIsModalOpen(true);
   };
 
@@ -116,7 +121,51 @@ export const Products = () => {
     setNewPrice(String(prod.price));
     setNewStatus(prod.status);
     setNewSku(prod.sku || '');
+    setNewImageUrl(prod.imageUrl || '');
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione uma imagem válida.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const max = 600;
+
+        if (width > height) {
+          if (width > max) {
+            height = Math.round((height * max) / width);
+            width = max;
+          }
+        } else {
+          if (height > max) {
+            width = Math.round((width * max) / height);
+            height = max;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setNewImageUrl(dataUrl);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -131,6 +180,7 @@ export const Products = () => {
         price: parseFloat(newPrice),
         active: newStatus === 'Ativo',
         sku: newSku.trim() || null,
+        imageUrl: newImageUrl || null,
       };
 
       if (editingProduct) {
@@ -335,9 +385,21 @@ export const Products = () => {
 
                 {/* Image Placeholder */}
                 <div className="flex justify-center">
-                  <div className="w-24 h-24 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 hover:border-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer">
-                    <ImageIcon className="w-8 h-8 mb-1" />
-                    <span className="text-xs font-medium">Foto</span>
+                  <div className="relative w-32 h-32 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 hover:border-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer overflow-hidden group">
+                    {newImageUrl ? (
+                      <>
+                        <img src={newImageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <span className="text-white text-xs font-bold">Trocar Foto</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-8 h-8 mb-1" />
+                        <span className="text-xs font-medium text-center px-2">Foto Delivery</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                   </div>
                 </div>
 

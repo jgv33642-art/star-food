@@ -119,9 +119,10 @@ export function runAutoMigration(): Promise<void> {
         ALTER TABLE companies ADD COLUMN IF NOT EXISTS extra_waiters INTEGER DEFAULT 0;
       `);
       
-      console.log('[AUTO-MIGRATION] Running incremental updates for products SKU...');
+      console.log('[AUTO-MIGRATION] Running incremental updates for products SKU and images...');
       await client.query(`
         ALTER TABLE products ADD COLUMN IF NOT EXISTS sku VARCHAR(100);
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
       `);
       
       console.log('[AUTO-MIGRATION] Creating invoice import tables if missing...');
