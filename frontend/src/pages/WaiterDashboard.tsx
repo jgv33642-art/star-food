@@ -74,6 +74,7 @@ export const WaiterDashboard = () => {
     product: Product, 
     quantity: number, 
     price: number,
+    notes?: string,
     complements?: any[] 
   }[]>([]);
   const [productForComplements, setProductForComplements] = useState<Product | null>(null);
@@ -238,6 +239,10 @@ export const WaiterDashboard = () => {
     setPendingItems(prev => prev.filter(o => o.cartId !== cartId));
   };
 
+  const updatePendingNote = (cartId: string, note: string) => {
+    setPendingItems(prev => prev.map(o => o.cartId === cartId ? { ...o, notes: note } : o));
+  };
+
   const pendingTotal = pendingItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const currentOrderTotal = activeContext?.order?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
   const tableTotal = currentOrderTotal + pendingTotal;
@@ -378,7 +383,7 @@ export const WaiterDashboard = () => {
         product_name: item.product.name,
         quantity: item.quantity,
         price: item.price,
-        notes: '',
+        notes: item.notes || '',
         complements: item.complements
       }));
 
@@ -388,7 +393,7 @@ export const WaiterDashboard = () => {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
-            notes: '',
+            notes: item.notes || '',
             complements: item.complements
           });
         }
@@ -407,7 +412,7 @@ export const WaiterDashboard = () => {
               product_name: item.product_name,
               quantity: item.quantity,
               price: item.price,
-              notes: '',
+              notes: item.notes || '',
               complements: item.complements
             }));
             return {
@@ -702,33 +707,70 @@ export const WaiterDashboard = () => {
                 ) : (
                   filteredMenu.map(item => {
                     const emoji = getEmoji(item.name, item.category_name || 'Outros');
+                    const itemPending = pendingItems.filter(p => p.product.id === item.id);
+                    const pendingCount = itemPending.reduce((sum, p) => sum + p.quantity, 0);
+
                     return (
-                      <div key={item.id} className="flex justify-between items-center p-3.5 bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-2xl shadow-inner select-none">
-                            {emoji}
-                          </div>
-                          <div>
-                            <h4 className="text-white font-bold text-base leading-tight">{item.name}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-amber-500 font-bold text-sm">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
-                              </span>
-                              {item.category_name && (
-                                <span className="bg-slate-900 text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-slate-800">
-                                  {item.category_name}
+                      <div key={item.id} className="flex flex-col p-3.5 bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-2xl shadow-inner select-none">
+                              {emoji}
+                            </div>
+                            <div>
+                              <h4 className="text-white font-bold text-base leading-tight">{item.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-amber-500 font-bold text-sm">
+                                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
                                 </span>
-                              )}
+                                {item.category_name && (
+                                  <span className="bg-slate-900 text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-slate-800">
+                                    {item.category_name}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
+                          
+                          {pendingCount > 0 ? (
+                            <div className="flex items-center gap-3 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2 py-1">
+                              <button onClick={() => {
+                                const lastItem = itemPending[itemPending.length - 1];
+                                if (lastItem) updateQuantity(lastItem.cartId, -1);
+                              }} className="w-8 h-8 flex items-center justify-center bg-slate-900 rounded-full text-slate-300 shadow-sm cursor-pointer"><Minus className="w-4 h-4" /></button>
+                              <span className="font-bold text-sm w-4 text-center text-indigo-400">{pendingCount}</span>
+                              <button onClick={() => addPendingItem(item)} className="w-8 h-8 flex items-center justify-center bg-indigo-500 rounded-full text-white shadow-sm cursor-pointer"><Plus className="w-4 h-4" /></button>
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={() => addPendingItem(item)}
+                              className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
+                            >
+                              <Plus className="w-5 h-5" />
+                            </button>
+                          )}
                         </div>
-                        
-                        <button 
-                          onClick={() => addPendingItem(item)}
-                          className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
-                        >
-                          <Plus className="w-5 h-5" />
-                        </button>
+
+                        {pendingCount > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-800/50 flex items-center justify-between">
+                            <button 
+                              onClick={() => {
+                                const lastItem = itemPending[itemPending.length - 1];
+                                if (lastItem) {
+                                  const note = window.prompt(`Observação para ${item.name}:`, lastItem.notes || '');
+                                  if (note !== null) updatePendingNote(lastItem.cartId, note);
+                                }
+                              }}
+                              className="text-xs font-medium transition-colors cursor-pointer text-left"
+                            >
+                              {itemPending[itemPending.length - 1]?.notes ? (
+                                <span className="text-indigo-400 line-clamp-1">Obs: {itemPending[itemPending.length - 1]?.notes}</span>
+                              ) : (
+                                <span className="text-slate-400 hover:text-indigo-400 underline decoration-dashed underline-offset-2">+ adicionar observação</span>
+                              )}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })
