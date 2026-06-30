@@ -178,7 +178,11 @@ export const Delivery = () => {
           <h4>Ref: #${order.id.slice(0, 4).toUpperCase()}</h4>
           <p>Cliente: <strong>${order.customer}</strong></p>
           ${order.phone ? `<p>Tel: ${order.phone}</p>` : ''}
-          ${order.address ? `<p>Endereço: ${order.address}</p>` : ''}
+          
+          <div style="border: 2px solid #000; padding: 10px; margin: 10px 0; text-align: center;">
+            <h3 style="margin: 0 0 5px 0;">ENTREGAR EM:</h3>
+            <p style="font-size: 1.2em; font-weight: bold; margin: 0;">${order.address}</p>
+          </div>
           
           <div class="divider"></div>
           <h3>ITENS</h3>
