@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, MapPin, Bike, Search, Plus, Minus, CreditCard, ChevronLeft, Sparkles, MessageCircle, Loader2, AlertCircle, Smartphone } from 'lucide-react';
@@ -31,6 +31,13 @@ interface MenuItem {
   imageUrl?: string;
 }
 
+interface CartItem {
+  cartItemId: string;
+  item: MenuItem;
+  quantity: number;
+  notes?: string;
+}
+
 const getEmojiForProduct = (name: string, categoryName: string) => {
   const n = name.toLowerCase();
   const c = (categoryName || '').toLowerCase();
@@ -55,7 +62,7 @@ export const VirtualStore = () => {
   const [search, setSearch] = useState('');
   
   // Checkout & Cart States
-  const [cart, setCart] = useState<{item: MenuItem, quantity: number}[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'address' | 'payment' | 'success' | 'loading' | 'error'>('loading');
   const [address, setAddress] = useState('');
@@ -63,6 +70,11 @@ export const VirtualStore = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'dinheiro' | 'pix' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Product Modal States
+  const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+  const [productQuantity, setProductQuantity] = useState(1);
+  const [productNotes, setProductNotes] = useState('');
 
   // Loads menu data dynamically
   const loadMenuData = async (showLoading = false) => {
@@ -91,7 +103,7 @@ export const VirtualStore = () => {
           description: p.description || '',
           price: Number(p.price),
           category_id: p.category_id,
-          categoryName: catMap[p.category_id] || '',
+          categoryName: catMap[p.category_id] || 'Outros',
           img: getEmojiForProduct(p.name, catMap[p.category_id] || ''),
           imageUrl: p.image_url || undefined
         }));
@@ -107,29 +119,35 @@ export const VirtualStore = () => {
     }
   };
 
-  // Setup Initial load and Polling (Updates products, stock and prices in background every 10s)
   useEffect(() => {
     loadMenuData(true);
-
     const interval = setInterval(() => {
       loadMenuData(false);
-    }, 10000); // 10s auto update
-
+    }, 10000); 
     return () => clearInterval(interval);
   }, [tenantId]);
 
-  const addToCart = (item: MenuItem) => {
-    setCart(prev => {
-      const exists = prev.find(i => i.item.id === item.id);
-      if (exists) return prev.map(i => i.item.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-      return [...prev, { item, quantity: 1 }];
-    });
-    setIsCartOpen(true);
-  };
+  // Derived Data
+  const filteredProducts = useMemo(() => {
+    return products.filter(prod =>
+      prod.name.toLowerCase().includes(search.toLowerCase()) ||
+      prod.categoryName.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [products, search]);
 
-  const updateQuantity = (id: string, delta: number) => {
+  const groupedProducts = useMemo(() => {
+    return products.reduce((acc, prod) => {
+      if (!acc[prod.categoryName]) acc[prod.categoryName] = [];
+      acc[prod.categoryName].push(prod);
+      return acc;
+    }, {} as Record<string, MenuItem[]>);
+  }, [products]);
+
+  const categoriesList = useMemo(() => Object.keys(groupedProducts).sort(), [groupedProducts]);
+
+  const updateQuantity = (cartItemId: string, delta: number) => {
     setCart(prev => {
-      const newCart = prev.map(i => i.item.id === id ? { ...i, quantity: i.quantity + delta } : i).filter(i => i.quantity > 0);
+      const newCart = prev.map(i => i.cartItemId === cartItemId ? { ...i, quantity: i.quantity + delta } : i).filter(i => i.quantity > 0);
       if (newCart.length === 0) setIsCartOpen(false);
       return newCart;
     });
@@ -138,24 +156,20 @@ export const VirtualStore = () => {
   const total = cart.reduce((acc, curr) => acc + (curr.item.price * curr.quantity), 0);
   const totalItems = cart.reduce((acc, curr) => acc + curr.quantity, 0);
 
-  // IA de Upsell: Verifica se comprou lanche/combo mas não tem bebida
   const hasLanche = cart.some(c => c.item.categoryName.toLowerCase().includes('lanche') || c.item.categoryName.toLowerCase().includes('combo') || c.item.name.toLowerCase().includes('burger'));
   const hasBebida = cart.some(c => c.item.categoryName.toLowerCase().includes('bebida') || c.item.name.toLowerCase().includes('coca') || c.item.name.toLowerCase().includes('suco'));
   const showUpsell = hasLanche && !hasBebida;
-  
-  // Recomenda bebida (primeiro produto da categoria Bebida)
   const recommendedItem = products.find(p => p.categoryName.toLowerCase().includes('bebida') || p.name.toLowerCase().includes('coca'));
 
   const handleFinish = async () => {
     if (!tenantId || cart.length === 0) return;
     
-    // Set view to success immediately or handle backend response
     try {
       const orderItems = cart.map(c => ({
         productId: c.item.id,
         quantity: c.quantity,
         price: c.item.price,
-        notes: `Delivery - Nome: ${customerName} | Contato: ${customerPhone}`
+        notes: `Delivery - Nome: ${customerName} | Contato: ${customerPhone}${c.notes ? ` | Obs: ${c.notes}` : ''}`
       }));
 
       await api.post(`/public/order/${tenantId}`, {
@@ -179,11 +193,6 @@ export const VirtualStore = () => {
       alert('Erro ao enviar o seu pedido: ' + (err.message || 'Erro desconhecido'));
     }
   };
-
-  const filteredProducts = products.filter(prod =>
-    prod.name.toLowerCase().includes(search.toLowerCase()) ||
-    prod.categoryName.toLowerCase().includes(search.toLowerCase())
-  );
 
   if (checkoutStep === 'loading') {
     return (
@@ -215,92 +224,202 @@ export const VirtualStore = () => {
     );
   }
 
+  const ProductCardComponent = ({ item }: { item: MenuItem }) => (
+    <div 
+      className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between gap-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.99]" 
+      onClick={() => setSelectedProduct(item)}
+    >
+      <div className="flex-1 flex flex-col">
+        <h3 className="font-bold text-slate-800">{item.name}</h3>
+        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>
+        <span className="font-black text-emerald-600 mt-auto pt-2 block">
+          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
+        </span>
+      </div>
+      <div className="w-28 h-28 bg-slate-50 rounded-xl flex items-center justify-center text-5xl shrink-0 overflow-hidden border border-slate-100">
+        {item.imageUrl ? (
+          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+        ) : (
+          item.img
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24">
-      {/* Header Branco e Clean */}
-      <header className="bg-white px-4 py-4 sticky top-0 z-30 shadow-sm flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md">
+      {/* Header Premium (Capa + Logo) */}
+      <header className="bg-white sticky top-0 z-30 shadow-sm border-b border-slate-100">
+        <div className="h-32 bg-red-600 relative w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        </div>
+        
+        <div className="px-4 pb-4 relative mt-[-2.5rem]">
+          <div className="flex justify-between items-start">
+            <div className="w-20 h-20 bg-white rounded-full shadow-lg border-2 border-white flex items-center justify-center text-4xl overflow-hidden relative z-10">
               ⭐
             </div>
-            <div>
-              <h1 className="font-black text-lg leading-tight">{company?.name || 'Star Food'}</h1>
-              <div className="flex items-center gap-1 text-xs text-slate-500 font-medium mt-0.5">
-                <span className="flex items-center gap-1 text-amber-500"><Bike className="w-3 h-3" /> 30-45 min</span>
-                <span>•</span>
-                <span>Entrega R$ 5,00</span>
-              </div>
+            
+            <div className="mt-12 flex items-center gap-2">
+              {isInstallable && (
+                <button
+                  onClick={installApp}
+                  className="bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1 shadow-md hover:bg-red-600 transition-colors"
+                >
+                  <Smartphone className="w-3.5 h-3.5" /> App
+                </button>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {isInstallable && (
-              <button
-                onClick={installApp}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1 transition-all shadow-md shadow-red-500/20 animate-pulse"
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                Instalar App
-              </button>
-            )}
-            <div className="bg-red-500/10 text-red-600 border border-red-500/20 px-3 py-1 rounded-full text-xs font-bold animate-pulse flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-              Online
+          
+          <div className="mt-2">
+            <h1 className="font-black text-2xl text-slate-800 leading-tight">{company?.name || 'Star Food'}</h1>
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mt-1.5">
+              <span className="flex items-center gap-1 text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                <Bike className="w-3 h-3" /> 30-45 min
+              </span>
+              <span>•</span>
+              <span className="font-bold">Entrega R$ 5,00</span>
             </div>
+          </div>
+
+          {/* Busca */}
+          <div className="relative mt-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Buscar em todo o cardápio..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-slate-100 text-slate-700 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-red-500 border-none font-medium placeholder-slate-400 transition-shadow"
+            />
           </div>
         </div>
 
-        {/* Busca */}
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Buscar no cardápio..." 
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full bg-slate-100 text-slate-700 rounded-2xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-red-500 transition-shadow border-none"
-          />
-        </div>
+        {/* Categorias Navegação (Scroll Horizontal) */}
+        {!search && categoriesList.length > 0 && (
+          <div className="flex overflow-x-auto gap-2 px-4 pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style>{`
+              .flex.overflow-x-auto::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            {categoriesList.map(cat => (
+              <button 
+                key={cat}
+                onClick={() => {
+                  const element = document.getElementById(`category-${cat}`);
+                  if (element) {
+                    const headerOffset = 250;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                  }
+                }}
+                className="whitespace-nowrap px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-sm font-bold transition-colors"
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Categorias e Produtos */}
-      <main className="p-4 space-y-8">
-        <section>
-          <h2 className="font-black text-xl mb-4 text-slate-800">Cardápio Delivery</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProducts.length === 0 ? (
-              <div className="col-span-full bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
-                Nenhum produto correspondente disponível.
-              </div>
-            ) : (
-              filteredProducts.map(item => (
-                <div 
-                  key={item.id} 
-                  className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.99]" 
-                  onClick={() => addToCart(item)}
-                >
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-bold text-slate-800">{item.name}</h3>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>
-                    </div>
-                    <span className="font-black text-emerald-600 mt-3 block">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
-                    </span>
-                  </div>
-                  <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-5xl shrink-0 overflow-hidden">
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      item.img
-                    )}
-                  </div>
+      <main className="p-4 space-y-8 max-w-4xl mx-auto">
+        {search ? (
+          <section>
+            <h2 className="font-black text-xl mb-4 text-slate-800">Resultados da Busca</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredProducts.length === 0 ? (
+                <div className="col-span-full bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 font-medium">
+                  Nenhum produto encontrado para "{search}".
                 </div>
-              ))
-            )}
-          </div>
-        </section>
+              ) : (
+                filteredProducts.map(item => <ProductCardComponent key={item.id} item={item} />)
+              )}
+            </div>
+          </section>
+        ) : (
+          categoriesList.map(cat => (
+            <section key={cat} id={`category-${cat}`}>
+              <h2 className="font-black text-xl mb-4 text-slate-800">{cat}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {groupedProducts[cat].map(item => <ProductCardComponent key={item.id} item={item} />)}
+              </div>
+            </section>
+          ))
+        )}
       </main>
+
+      {/* Product Details Modal */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <div className="fixed inset-0 z-50 flex flex-col justify-end">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedProduct(null)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full bg-slate-50 rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] md:max-w-xl md:mx-auto overflow-hidden">
+              
+              <div className="relative w-full h-56 bg-slate-100 flex justify-center items-center text-8xl shrink-0">
+                 {selectedProduct.imageUrl ? (
+                    <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                 ) : (
+                    selectedProduct.img
+                 )}
+                 <button onClick={() => setSelectedProduct(null)} className="absolute top-4 left-4 bg-white/90 p-2 rounded-full shadow-lg text-slate-700 hover:bg-white transition-colors">
+                   <ChevronLeft className="w-6 h-6" />
+                 </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">{selectedProduct.name}</h2>
+                  <p className="text-slate-500 text-sm mt-2 leading-relaxed">{selectedProduct.description}</p>
+                  <p className="text-xl font-black text-emerald-600 mt-4">
+                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedProduct.price)}
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <h3 className="font-bold text-slate-800">Alguma observação?</h3>
+                    <span className="text-xs font-bold bg-slate-200 text-slate-500 px-2 py-0.5 rounded-md">Opcional</span>
+                  </div>
+                  <textarea 
+                    value={productNotes}
+                    onChange={e => setProductNotes(e.target.value)}
+                    placeholder="Ex: Tirar cebola, maionese à parte..."
+                    className="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-red-500 text-sm resize-none h-20 transition-shadow"
+                  />
+                </div>
+              </div>
+
+              <div className="p-4 bg-white border-t border-slate-100 flex items-center gap-4">
+                <div className="flex items-center gap-3 bg-slate-50 rounded-xl px-2 py-3 border border-slate-200">
+                  <button onClick={() => setProductQuantity(Math.max(1, productQuantity - 1))} className="w-8 h-8 flex items-center justify-center text-slate-600 active:bg-slate-200 rounded-full transition-colors"><Minus className="w-5 h-5" /></button>
+                  <span className="font-bold w-6 text-center text-slate-800">{productQuantity}</span>
+                  <button onClick={() => setProductQuantity(productQuantity + 1)} className="w-8 h-8 flex items-center justify-center text-red-500 active:bg-red-50 rounded-full transition-colors"><Plus className="w-5 h-5" /></button>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    const cartItemId = Math.random().toString(36).substring(2, 9);
+                    setCart(prev => [...prev, { item: selectedProduct, quantity: productQuantity, notes: productNotes, cartItemId }]);
+                    setSelectedProduct(null);
+                    setProductQuantity(1);
+                    setProductNotes('');
+                  }}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl flex items-center justify-between px-6 shadow-lg shadow-red-500/30 transition-all active:scale-[0.98]"
+                >
+                  <span>Adicionar</span>
+                  <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedProduct.price * productQuantity)}</span>
+                </button>
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Cart Button */}
       <AnimatePresence>
@@ -311,7 +430,7 @@ export const VirtualStore = () => {
                 setCheckoutStep('cart');
                 setIsCartOpen(true);
               }}
-              className="w-full bg-red-500 text-white rounded-full p-4 flex items-center justify-between shadow-xl shadow-red-500/30"
+              className="w-full bg-red-500 text-white rounded-full p-4 flex items-center justify-between shadow-xl shadow-red-500/30 transition-transform active:scale-[0.98]"
             >
               <div className="flex items-center gap-3">
                 <div className="bg-red-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">
@@ -331,57 +450,65 @@ export const VirtualStore = () => {
       <AnimatePresence>
         {isCartOpen && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { if (checkoutStep !== 'success') setIsCartOpen(false); }} className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { if (checkoutStep !== 'success') setIsCartOpen(false); }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             
             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full bg-white rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] md:max-w-lg md:mx-auto">
               
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-3xl sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                   {checkoutStep !== 'cart' && checkoutStep !== 'success' && (
-                    <button onClick={() => setCheckoutStep(checkoutStep === 'payment' ? 'address' : 'cart')} className="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full">
+                    <button onClick={() => setCheckoutStep(checkoutStep === 'payment' ? 'address' : 'cart')} className="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-colors rounded-full text-slate-700">
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                   )}
                   <h2 className="text-xl font-black text-slate-800">
-                    {checkoutStep === 'cart' ? 'Sua Sacola' : checkoutStep === 'address' ? 'Dados para Entrega' : checkoutStep === 'payment' ? 'Forma de Pagamento' : 'Sucesso'}
+                    {checkoutStep === 'cart' ? 'Sua Sacola' : checkoutStep === 'address' ? 'Dados para Entrega' : checkoutStep === 'payment' ? 'Forma de Pagamento' : 'Pedido Realizado'}
                   </h2>
                 </div>
                 {checkoutStep !== 'success' && (
-                  <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} className="text-slate-400 font-bold text-sm">Fechar</button>
+                  <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} className="text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors">Fechar</button>
                 )}
               </div>
 
               <div className="flex-1 overflow-y-auto p-6">
                 {checkoutStep === 'cart' && (
                   <div className="space-y-6">
-                    {cart.map(({ item, quantity }) => (
-                      <div key={item.id} className="flex items-center gap-4 border-b border-slate-100 pb-4 last:border-0">
+                    {cart.map(({ cartItemId, item, quantity, notes }) => (
+                      <div key={cartItemId} className="flex items-start gap-4 border-b border-slate-100 pb-6 last:border-0">
                         <div className="flex-1">
                           <h4 className="font-bold text-slate-800">{item.name}</h4>
-                          <p className="font-black text-emerald-600 mt-1">
+                          {notes && (
+                            <p className="text-sm text-slate-500 mt-1 italic line-clamp-2">"Obs: {notes}"</p>
+                          )}
+                          <p className="font-black text-emerald-600 mt-2">
                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * quantity)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-full px-2 py-1">
-                          <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 flex items-center justify-center text-slate-600"><Minus className="w-4 h-4" /></button>
-                          <span className="font-bold w-4 text-center">{quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 flex items-center justify-center text-red-500"><Plus className="w-4 h-4" /></button>
+                        <div className="flex flex-col items-end gap-3">
+                          <div className="w-16 h-16 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 shrink-0 flex items-center justify-center text-3xl">
+                            {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" /> : item.img}
+                          </div>
+                          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-1.5 py-1">
+                            <button onClick={() => updateQuantity(cartItemId, -1)} className="w-6 h-6 flex items-center justify-center text-slate-600 active:bg-slate-200 rounded-full"><Minus className="w-4 h-4" /></button>
+                            <span className="font-bold w-4 text-center text-sm">{quantity}</span>
+                            <button onClick={() => updateQuantity(cartItemId, 1)} className="w-6 h-6 flex items-center justify-center text-red-500 active:bg-red-50 rounded-full"><Plus className="w-4 h-4" /></button>
+                          </div>
                         </div>
                       </div>
                     ))}
                     
                     {/* Bloco de IA Upsell */}
                     {showUpsell && recommendedItem && (
-                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="mt-8 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-2 border-amber-500/20 rounded-2xl p-4 flex gap-4 items-center shadow-lg shadow-amber-500/5">
+                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="mt-8 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-2 border-amber-500/20 rounded-2xl p-4 flex gap-4 items-center shadow-lg shadow-amber-500/5 cursor-pointer hover:border-amber-500/40 transition-colors" onClick={() => setSelectedProduct(recommendedItem)}>
                         <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-white shrink-0 shadow-inner">
                           <Sparkles className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-amber-600 text-sm mb-1 flex items-center gap-1">IA Sugere</h4>
-                          <p className="text-slate-700 text-sm font-medium line-clamp-2">Quem compra lanche também leva uma bebida. Adicionar <b>{recommendedItem.name}</b>?</p>
+                          <h4 className="font-bold text-amber-600 text-sm mb-1 flex items-center gap-1">Combinar com Bebida</h4>
+                          <p className="text-slate-700 text-sm font-medium line-clamp-2">Adicionar <b>{recommendedItem.name}</b>?</p>
                           <p className="font-black text-amber-600 mt-1">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recommendedItem.price)}</p>
                         </div>
-                        <button onClick={() => addToCart(recommendedItem)} className="shrink-0 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl transition-all shadow-md">
+                        <button className="shrink-0 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl transition-all shadow-md">
                           <Plus className="w-6 h-6" />
                         </button>
                       </motion.div>
@@ -399,7 +526,7 @@ export const VirtualStore = () => {
                           value={customerName}
                           onChange={e => setCustomerName(e.target.value)}
                           placeholder="Digite seu nome completo" 
-                          className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-red-500"
+                          className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-red-500 transition-shadow"
                         />
                       </div>
                       <div>
@@ -409,12 +536,12 @@ export const VirtualStore = () => {
                           value={customerPhone}
                           onChange={e => setCustomerPhone(e.target.value)}
                           placeholder="(99) 99999-9999" 
-                          className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-red-500"
+                          className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-red-500 transition-shadow"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Endereço de Entrega</label>
-                        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3">
+                        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-red-500 transition-shadow">
                           <MapPin className="text-red-500 w-5 h-5 shrink-0" />
                           <input 
                             type="text" 
@@ -434,7 +561,7 @@ export const VirtualStore = () => {
                     <button 
                       onClick={() => setPaymentMethod('cartao')}
                       className={`w-full border-2 p-4 rounded-2xl font-bold flex items-center gap-3 transition-colors ${
-                        paymentMethod === 'cartao' ? 'border-red-500 bg-red-50 text-red-600' : 'border-slate-200 text-slate-600 hover:border-red-500'
+                        paymentMethod === 'cartao' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:border-red-500'
                       }`}
                     >
                       <CreditCard className="w-6 h-6" /> Pagar com Cartão pelo App
@@ -442,7 +569,7 @@ export const VirtualStore = () => {
                     <button 
                       onClick={() => setPaymentMethod('pix')}
                       className={`w-full border-2 p-4 rounded-2xl font-bold flex items-center gap-3 transition-colors ${
-                        paymentMethod === 'pix' ? 'border-red-500 bg-red-50 text-red-600' : 'border-slate-200 text-slate-600 hover:border-red-500'
+                        paymentMethod === 'pix' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:border-red-500'
                       }`}
                     >
                       <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current text-[#32BCA3]"><path d="M12.015 2.115l9.88 5.705-9.88 5.71-9.88-5.71 9.88-5.705zM2.135 16.185l9.88 5.7 9.88-5.7v-4.9l-9.88 5.705-9.88-5.705v4.9z"/></svg>
@@ -451,7 +578,7 @@ export const VirtualStore = () => {
                     <button 
                       onClick={() => setPaymentMethod('dinheiro')}
                       className={`w-full border-2 p-4 rounded-2xl font-bold flex items-center gap-3 transition-colors ${
-                        paymentMethod === 'dinheiro' ? 'border-red-500 bg-red-50 text-red-600' : 'border-slate-200 text-slate-600 hover:border-red-500'
+                        paymentMethod === 'dinheiro' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:border-red-500'
                       }`}
                     >
                       <ShoppingBag className="w-6 h-6 text-slate-400" /> Pagar na Entrega (Dinheiro)
@@ -464,14 +591,14 @@ export const VirtualStore = () => {
                     <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-emerald-500/40">
                       <Bike className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-2xl font-black text-slate-800 mb-2">Pedido Confirmado!</h2>
-                    <p className="text-slate-500 mb-8">A lanchonete já recebeu seu pedido e ele será preparado em breve.</p>
+                    <h2 className="text-2xl font-black text-slate-800 mb-2">Pedido Recebido!</h2>
+                    <p className="text-slate-500 mb-8 max-w-xs">A lanchonete já recebeu seu pedido e ele começará a ser preparado em breve.</p>
                     
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center gap-3 w-full text-left">
                       <div className="bg-emerald-500 text-white p-2 rounded-full"><MessageCircle className="w-5 h-5" /></div>
                       <div>
-                        <h4 className="font-bold text-emerald-700 text-sm">Notificações por WhatsApp</h4>
-                        <p className="text-emerald-600/80 text-xs">Você receberá atualizações em {company?.phone || 'seu celular'}.</p>
+                        <h4 className="font-bold text-emerald-700 text-sm">Acompanhar via WhatsApp</h4>
+                        <p className="text-emerald-600/80 text-xs">A lanchonete enviará as atualizações no número informado.</p>
                       </div>
                     </div>
                   </div>
@@ -501,9 +628,9 @@ export const VirtualStore = () => {
                       (checkoutStep === 'address' && (address.length < 5 || customerName.length < 2 || customerPhone.length < 8)) ||
                       (checkoutStep === 'payment' && !paymentMethod)
                     }
-                    className="w-full bg-red-500 disabled:bg-red-300 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 transition-all"
+                    className="w-full bg-red-500 disabled:bg-red-300 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                   >
-                    {checkoutStep === 'cart' ? 'Continuar' : checkoutStep === 'address' ? 'Ir para Pagamento' : 'Finalizar Pedido'}
+                    {checkoutStep === 'cart' ? 'Confirmar Pedido' : checkoutStep === 'address' ? 'Ir para Pagamento' : 'Finalizar Compra'}
                   </button>
                 </div>
               )}
