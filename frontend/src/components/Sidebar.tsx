@@ -5,7 +5,7 @@ import {
   ShoppingCart, LayoutGrid, Receipt, 
   Package, Tags, Database, Coffee, 
   Users, Heart, Smartphone,
-  ShieldCheck, Settings, UserCog, X, FileText, Lock, Bike, Moon, Sun
+  ShieldCheck, Settings, UserCog, X, FileText, Lock, Bike, Moon, Sun, Share2
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -89,6 +89,13 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
     setUpgradeModalOpen(true);
   };
 
+  const handleCopyDeliveryLink = () => {
+    if (!user?.companyId) return;
+    const url = `${window.location.origin}/delivery/${user.companyId}`;
+    navigator.clipboard.writeText(url);
+    alert(`Link copiado com sucesso!\n\n${url}\n\nCole na bio do Instagram ou envie aos clientes no WhatsApp.`);
+  };
+
   return (
     <aside className={`w-64 bg-slate-950 border-r border-slate-800 h-screen flex flex-col fixed left-0 top-0 overflow-y-auto custom-scrollbar z-50 transform transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-6">
@@ -165,6 +172,15 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
             {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" /> : <Moon className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />}
             {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
           </button>
+          
+          <button
+            onClick={handleCopyDeliveryLink}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg shadow-emerald-600/20 text-sm group"
+          >
+            <Share2 className="w-5 h-5 text-emerald-200 group-hover:scale-110 transition-transform" />
+            Copiar Link Delivery
+          </button>
+
           {isInstallable && (
             <button
               onClick={installApp}
