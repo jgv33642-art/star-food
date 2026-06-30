@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { ShoppingBag, CheckCircle, XCircle, Clock, Bike, Loader2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, CheckCircle, XCircle, Clock, Bike, Loader2, AlertCircle, Printer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
 import { DispatchModal } from '../components/DispatchModal';
@@ -150,6 +150,62 @@ export const Delivery = () => {
     }
   };
 
+  const printDeliveryOrder = (order: DeliveryOrder) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Por favor, permita pop-ups para imprimir o pedido.');
+      return;
+    }
+
+    const html = `
+      <html>
+        <head>
+          <title>Imprimir Pedido</title>
+          <style>
+            body { font-family: monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }
+            h2, h3, h4 { text-align: center; margin: 5px 0; }
+            .divider { border-top: 1px dashed #000; margin: 10px 0; }
+            .item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+            .total { font-weight: bold; font-size: 1.2em; text-align: right; }
+            .delivery-label { font-size: 2em; font-weight: bold; text-align: center; border: 2px solid #000; padding: 5px; margin-top: 20px; text-transform: uppercase; }
+            @media print {
+              body { width: 100%; margin: 0; padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>PEDIDO ONLINE</h2>
+          <h4>Ref: #${order.id.slice(0, 4).toUpperCase()}</h4>
+          <p>Cliente: <strong>${order.customer}</strong></p>
+          ${order.phone ? `<p>Tel: ${order.phone}</p>` : ''}
+          ${order.address ? `<p>Endereço: ${order.address}</p>` : ''}
+          
+          <div class="divider"></div>
+          <h3>ITENS</h3>
+          ${order.items.map(item => `
+            <div class="item">
+              <span>${item.quantity}x ${item.name}</span>
+            </div>
+          `).join('')}
+          <div class="divider"></div>
+          
+          <div class="total">Total: R$ ${order.total.toFixed(2)}</div>
+          
+          <div class="delivery-label">DELIVERY</div>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
   const handleDispatch = async (orderId: string, courierId: string | null, fee: number) => {
     try {
       if (courierId || fee > 0) {
@@ -250,6 +306,9 @@ export const Delivery = () => {
                     <div className="flex justify-between items-center border-t border-amber-500/20 pt-3">
                       <span className="font-black text-amber-400">R$ {order.total.toFixed(2)}</span>
                       <div className="flex gap-2">
+                        <button onClick={() => printDeliveryOrder(order)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-950 text-slate-300 hover:bg-slate-800 transition-colors" title="Imprimir Pedido">
+                          <Printer className="w-4 h-4" />
+                        </button>
                         <button onClick={() => updateStatus(order.id, 'cancelado')} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-950 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
                           <XCircle className="w-5 h-5" />
                         </button>
@@ -286,12 +345,17 @@ export const Delivery = () => {
                       <span className="font-bold text-slate-300 font-mono text-xs">#{order.id.slice(0, 4)}</span>
                     </div>
                     <p className="font-bold text-white mb-2">{order.customer}</p>
-                    <button onClick={() => {
-                        setSelectedOrderToDispatch({ id: order.id, customer: order.customer });
-                        setDispatchModalOpen(true);
-                      }} className="w-full mt-2 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold flex justify-center items-center gap-2 transition-colors">
-                      <Bike className="w-4 h-4" /> Despachar
-                    </button>
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={() => printDeliveryOrder(order)} className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold flex justify-center items-center gap-2 transition-colors">
+                        <Printer className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => {
+                          setSelectedOrderToDispatch({ id: order.id, customer: order.customer });
+                          setDispatchModalOpen(true);
+                        }} className="flex-[3] py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold flex justify-center items-center gap-2 transition-colors">
+                        <Bike className="w-4 h-4" /> Despachar
+                      </button>
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -321,9 +385,14 @@ export const Delivery = () => {
                     </div>
                     <p className="font-medium text-white text-sm mb-1">{order.customer}</p>
                     <p className="text-xs text-slate-500 mb-3">{order.address}</p>
-                    <button onClick={() => updateStatus(order.id, 'entregue')} className="w-full py-1.5 border border-emerald-500/50 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-lg text-xs font-bold transition-colors">
-                      Marcar Entregue
-                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => printDeliveryOrder(order)} className="w-10 flex items-center justify-center border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+                        <Printer className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => updateStatus(order.id, 'entregue')} className="flex-1 py-1.5 border border-emerald-500/50 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-lg text-xs font-bold transition-colors">
+                        Marcar Entregue
+                      </button>
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
