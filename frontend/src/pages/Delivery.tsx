@@ -83,7 +83,7 @@ export const Delivery = () => {
   useEffect(() => {
     fetchDeliveryOrders(true);
 
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isReceiving) {
       interval = setInterval(() => {
         fetchDeliveryOrders(false);
