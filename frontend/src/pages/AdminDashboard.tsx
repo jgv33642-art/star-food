@@ -106,7 +106,7 @@ export const AdminDashboard = () => {
             </div>
             <div>
               <h4 className="font-bold text-white text-lg">Alerta: Itens com Estoque Crítico!</h4>
-              <p className="text-sm text-slate-400 mt-1">Existem {lowStockItems.length} produto(s) com quantidade igual ou abaixo do estoque mínimo.</p>
+              <p className="text-sm text-slate-400 mt-1">Existem {lowStockItems.length} item(ns) com quantidade igual ou abaixo do estoque mínimo.</p>
               <div className="flex flex-wrap gap-2 mt-3">
                 {lowStockItems.slice(0, 5).map(item => (
                   <span key={item.id} className="bg-red-500/20 border border-red-500/30 text-white text-xs px-2.5 py-1 rounded-lg">

@@ -135,13 +135,30 @@ export class ReportsController {
           name,
           stock_quantity,
           minimum_stock,
-          (minimum_stock - stock_quantity) AS deficit
+          (minimum_stock - stock_quantity) AS deficit,
+          'product' AS type
         FROM products
         WHERE company_id  = $1
           AND active      = true
           AND minimum_stock IS NOT NULL
           AND minimum_stock > 0
           AND stock_quantity <= minimum_stock
+
+        UNION ALL
+
+        SELECT
+          id,
+          name,
+          stock_quantity,
+          minimum_stock,
+          (minimum_stock - stock_quantity) AS deficit,
+          'ingredient' AS type
+        FROM ingredients
+        WHERE company_id  = $1
+          AND minimum_stock IS NOT NULL
+          AND minimum_stock > 0
+          AND stock_quantity <= minimum_stock
+          
         ORDER BY (stock_quantity::float / NULLIF(minimum_stock,0)) ASC
       `, [companyId]);
 
