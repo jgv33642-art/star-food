@@ -117,6 +117,10 @@ export function runAutoMigration(): Promise<void> {
         ALTER TABLE companies ADD COLUMN IF NOT EXISTS extra_cashiers INTEGER DEFAULT 0;
         ALTER TABLE companies ADD COLUMN IF NOT EXISTS extra_managers INTEGER DEFAULT 0;
         ALTER TABLE companies ADD COLUMN IF NOT EXISTS extra_waiters INTEGER DEFAULT 0;
+        ALTER TABLE companies ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(20);
+        ALTER TABLE companies ADD COLUMN IF NOT EXISTS operating_hours JSONB;
+        ALTER TABLE companies ADD COLUMN IF NOT EXISTS is_delivery_open BOOLEAN DEFAULT true;
+        ALTER TABLE companies ADD COLUMN IF NOT EXISTS delivery_fee NUMERIC(10,2) DEFAULT 5.00;
       `);
       
       console.log('[AUTO-MIGRATION] Running incremental updates for products SKU and images...');
@@ -134,6 +138,16 @@ export function runAutoMigration(): Promise<void> {
           supplier_cnpj VARCHAR(14) NOT NULL,
           supplier_name VARCHAR(255) NOT NULL,
           total_value NUMERIC(10,2) NOT NULL,
+          created_at TIMESTAMP DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS coupons (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+          code VARCHAR(50) NOT NULL,
+          discount_type VARCHAR(20) DEFAULT 'PERCENTAGE',
+          discount_value NUMERIC(10,2) NOT NULL,
+          active BOOLEAN DEFAULT true,
           created_at TIMESTAMP DEFAULT now()
         );
         
@@ -185,6 +199,26 @@ export function runAutoMigration(): Promise<void> {
       console.log('[AUTO-MIGRATION] Ensuring payments table columns for checkout...');
       await client.query(`
         ALTER TABLE payments ADD COLUMN IF NOT EXISTS company_id UUID REFERENCES companies(id) ON DELETE CASCADE;
+        ALTER TABLE invoice_inputs ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id);
+      `);
+
+      console.log('[AUTO-MIGRATION] Running incremental updates for orders (tracking code)...');
+      await client.query(`
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_code VARCHAR(20);
+      `);
+
+      // Add composite unique constraint safely for coupons
+      try {
+        await client.query(`
+          ALTER TABLE coupons ADD CONSTRAINT unique_company_code UNIQUE (company_id, code);
+        `);
+      } catch (err: any) {
+        if (!err.message.includes('already exists') && !err.message.includes('já existe')) {
+          console.warn('[AUTO-MIGRATION] Warning: ' + err.message);
+        }
+      }
+      
+      await client.query(`
         ALTER TABLE payments ADD COLUMN IF NOT EXISTS order_id UUID REFERENCES orders(id) ON DELETE CASCADE;
         ALTER TABLE payments ADD COLUMN IF NOT EXISTS change_amount NUMERIC(10,2) DEFAULT 0;
       `);

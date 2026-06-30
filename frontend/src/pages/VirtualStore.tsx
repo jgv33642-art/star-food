@@ -57,19 +57,28 @@ const getEmojiForProduct = (name: string, categoryName: string) => {
 export const VirtualStore = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
   const { isInstallable, installApp } = usePWA();
-  const [company, setCompany] = useState<{ name: string; phone?: string } | null>(null);
+  const [company, setCompany] = useState<{ name: string; phone?: string; whatsapp_number?: string; is_delivery_open?: boolean; delivery_fee?: string } | null>(null);
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [search, setSearch] = useState('');
   
   // Checkout & Cart States
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'address' | 'payment' | 'success' | 'loading' | 'error'>('loading');
+  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'address' | 'payment' | 'success' | 'tracking' | 'loading' | 'error'>('loading');
   const [address, setAddress] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'dinheiro' | 'pix' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Coupon States
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{code: string; type: string; value: number} | null>(null);
+  const [couponError, setCouponError] = useState('');
+  
+  // Tracking
+  const [trackingCode, setTrackingCode] = useState('');
+  const [orderStatus, setOrderStatus] = useState('open');
 
   // Product Modal States
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
@@ -127,6 +136,18 @@ export const VirtualStore = () => {
     return () => clearInterval(interval);
   }, [tenantId]);
 
+  useEffect(() => {
+    if (checkoutStep === 'tracking' && trackingCode) {
+      const interval = setInterval(async () => {
+        try {
+          const { data } = await api.get(`/public/order-status/${tenantId}/${trackingCode}`);
+          setOrderStatus(data.status);
+        } catch (e) {}
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [checkoutStep, trackingCode, tenantId]);
+
   // Derived Data
   const filteredProducts = useMemo(() => {
     return products.filter(prod =>
@@ -153,13 +174,29 @@ export const VirtualStore = () => {
     });
   };
 
-  const total = cart.reduce((acc, curr) => acc + (curr.item.price * curr.quantity), 0);
+  const deliveryFee = Number(company?.delivery_fee ?? 5);
+  const subtotal = cart.reduce((acc, curr) => acc + (curr.item.price * curr.quantity), 0);
+  const discount = appliedCoupon 
+    ? (appliedCoupon.type === 'PERCENTAGE' ? (subtotal * appliedCoupon.value / 100) : appliedCoupon.value)
+    : 0;
+  const total = Math.max(0, subtotal - discount) + deliveryFee;
   const totalItems = cart.reduce((acc, curr) => acc + curr.quantity, 0);
 
   const hasLanche = cart.some(c => c.item.categoryName.toLowerCase().includes('lanche') || c.item.categoryName.toLowerCase().includes('combo') || c.item.name.toLowerCase().includes('burger'));
   const hasBebida = cart.some(c => c.item.categoryName.toLowerCase().includes('bebida') || c.item.name.toLowerCase().includes('coca') || c.item.name.toLowerCase().includes('suco'));
   const showUpsell = hasLanche && !hasBebida;
   const recommendedItem = products.find(p => p.categoryName.toLowerCase().includes('bebida') || p.name.toLowerCase().includes('coca'));
+
+  const handleApplyCoupon = async () => {
+    try {
+      setCouponError('');
+      const { data } = await api.post(`/public/coupon/${tenantId}`, { code: couponCode });
+      setAppliedCoupon({ code: data.code, type: data.discount_type, value: Number(data.discount_value) });
+    } catch (err: any) {
+      setCouponError(err.response?.data?.message || 'Cupom inválido');
+      setAppliedCoupon(null);
+    }
+  };
 
   const handleFinish = async () => {
     if (!tenantId || cart.length === 0) return;
@@ -172,23 +209,43 @@ export const VirtualStore = () => {
         notes: `Delivery - Nome: ${customerName} | Contato: ${customerPhone}${c.notes ? ` | Obs: ${c.notes}` : ''}`
       }));
 
-      await api.post(`/public/order/${tenantId}`, {
+      const { data: orderData } = await api.post(`/public/order/${tenantId}`, {
         items: orderItems,
         customerName,
         customerPhone,
         deliveryAddress: address
       });
 
-      setCheckoutStep('success');
+      setTrackingCode(orderData.tracking_code);
+      setOrderStatus('open');
+      setCheckoutStep('tracking');
+
+      if (company?.whatsapp_number) {
+        let msg = `*NOVO PEDIDO* (Rastreio: ${orderData.tracking_code})\n\n`;
+        cart.forEach(c => {
+          msg += `${c.quantity}x ${c.item.name} (R$ ${c.item.price.toFixed(2)})\n`;
+          if (c.notes) msg += `  *Obs: ${c.notes}*\n`;
+        });
+        msg += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}`;
+        if (appliedCoupon) msg += `\n*Desconto:* -R$ ${discount.toFixed(2)}`;
+        msg += `\n*Taxa de Entrega:* R$ ${deliveryFee.toFixed(2)}`;
+        msg += `\n*Total Pago:* R$ ${total.toFixed(2)}`;
+        msg += `\n*Pagamento:* ${paymentMethod === 'cartao' ? 'Cartão' : paymentMethod === 'pix' ? 'PIX' : 'Dinheiro'}`;
+        msg += `\n\n*Cliente:* ${customerName}\n*Endereço:* ${address}`;
+        
+        const wpUrl = `https://api.whatsapp.com/send?phone=${company.whatsapp_number.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`;
+        window.open(wpUrl, '_blank');
+      }
+
       setTimeout(() => {
         setCart([]);
-        setIsCartOpen(false);
-        setCheckoutStep('cart');
+        setAppliedCoupon(null);
+        setCouponCode('');
         setCustomerName('');
         setCustomerPhone('');
         setAddress('');
         setPaymentMethod(null);
-      }, 5000);
+      }, 1000);
     } catch (err: any) {
       alert('Erro ao enviar o seu pedido: ' + (err.message || 'Erro desconhecido'));
     }
@@ -220,6 +277,20 @@ export const VirtualStore = () => {
         >
           Tentar Novamente
         </button>
+      </div>
+    );
+  }
+
+  if (company && company.is_delivery_open === false) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-slate-800 text-slate-400 rounded-full flex items-center justify-center mb-6">
+          <AlertCircle className="w-10 h-10" />
+        </div>
+        <h1 className="text-2xl font-black mb-2">Loja Fechada</h1>
+        <p className="text-slate-400 text-sm max-w-sm mb-8">
+          No momento não estamos aceitando pedidos. Por favor, retorne durante nosso horário de funcionamento.
+        </p>
       </div>
     );
   }
@@ -456,16 +527,16 @@ export const VirtualStore = () => {
               
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-3xl sticky top-0 z-10">
                 <div className="flex items-center gap-3">
-                  {checkoutStep !== 'cart' && checkoutStep !== 'success' && (
+                  {checkoutStep !== 'cart' && checkoutStep !== 'success' && checkoutStep !== 'tracking' && (
                     <button onClick={() => setCheckoutStep(checkoutStep === 'payment' ? 'address' : 'cart')} className="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-colors rounded-full text-slate-700">
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                   )}
                   <h2 className="text-xl font-black text-slate-800">
-                    {checkoutStep === 'cart' ? 'Sua Sacola' : checkoutStep === 'address' ? 'Dados para Entrega' : checkoutStep === 'payment' ? 'Forma de Pagamento' : 'Pedido Realizado'}
+                    {checkoutStep === 'cart' ? 'Sua Sacola' : checkoutStep === 'address' ? 'Dados para Entrega' : checkoutStep === 'payment' ? 'Forma de Pagamento' : checkoutStep === 'tracking' ? 'Status' : 'Pedido Realizado'}
                   </h2>
                 </div>
-                {checkoutStep !== 'success' && (
+                {checkoutStep !== 'success' && checkoutStep !== 'tracking' && (
                   <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} className="text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors">Fechar</button>
                 )}
               </div>
@@ -558,6 +629,29 @@ export const VirtualStore = () => {
 
                 {checkoutStep === 'payment' && (
                   <div className="space-y-4">
+                    
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Possui um cupom?</label>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={couponCode}
+                          onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="Ex: BEMVINDO10" 
+                          disabled={!!appliedCoupon}
+                          className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 outline-none focus:ring-2 focus:ring-red-500 uppercase font-bold"
+                        />
+                        {!appliedCoupon ? (
+                          <button onClick={handleApplyCoupon} className="bg-slate-800 text-white px-4 rounded-xl font-bold hover:bg-slate-700">Aplicar</button>
+                        ) : (
+                          <button onClick={() => {setAppliedCoupon(null); setCouponCode('');}} className="bg-red-100 text-red-600 px-4 rounded-xl font-bold hover:bg-red-200">Remover</button>
+                        )}
+                      </div>
+                      {couponError && <p className="text-red-500 text-xs mt-2 font-medium">{couponError}</p>}
+                      {appliedCoupon && <p className="text-green-600 text-xs mt-2 font-bold flex items-center gap-1">Cupom aplicado com sucesso!</p>}
+                    </div>
+
+                    <h3 className="font-black text-slate-800 mb-2">Forma de Pagamento</h3>
                     <button 
                       onClick={() => setPaymentMethod('cartao')}
                       className={`w-full border-2 p-4 rounded-2xl font-bold flex items-center gap-3 transition-colors ${
@@ -586,6 +680,28 @@ export const VirtualStore = () => {
                   </div>
                 )}
 
+                {checkoutStep === 'tracking' && (
+                  <div className="py-8 flex flex-col items-center justify-center text-center">
+                    <h2 className="text-2xl font-black text-slate-800 mb-2">Acompanhe seu Pedido</h2>
+                    <p className="text-slate-500 mb-8 max-w-xs text-sm">Seu código: <strong className="text-slate-800">{trackingCode}</strong></p>
+                    
+                    <div className="w-full space-y-4 mb-8">
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'open' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">1</div>
+                         <div className="text-left"><p className="font-bold">Aguardando Confirmação</p></div>
+                      </div>
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'preparing' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">2</div>
+                         <div className="text-left"><p className="font-bold">Preparando</p></div>
+                      </div>
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'ready' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">3</div>
+                         <div className="text-left"><p className="font-bold">Saiu para Entrega / Pronto</p></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {checkoutStep === 'success' && (
                   <div className="py-12 flex flex-col items-center justify-center text-center">
                     <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-emerald-500/40">
@@ -593,28 +709,26 @@ export const VirtualStore = () => {
                     </div>
                     <h2 className="text-2xl font-black text-slate-800 mb-2">Pedido Recebido!</h2>
                     <p className="text-slate-500 mb-8 max-w-xs">A lanchonete já recebeu seu pedido e ele começará a ser preparado em breve.</p>
-                    
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center gap-3 w-full text-left">
-                      <div className="bg-emerald-500 text-white p-2 rounded-full"><MessageCircle className="w-5 h-5" /></div>
-                      <div>
-                        <h4 className="font-bold text-emerald-700 text-sm">Acompanhar via WhatsApp</h4>
-                        <p className="text-emerald-600/80 text-xs">A lanchonete enviará as atualizações no número informado.</p>
-                      </div>
-                    </div>
                   </div>
                 )}
               </div>
 
-              {checkoutStep !== 'success' && (
+              {checkoutStep !== 'success' && checkoutStep !== 'tracking' && (
                 <div className="p-6 bg-slate-50 border-t border-slate-200">
+                  {appliedCoupon && (
+                    <div className="flex justify-between items-center mb-2 text-sm font-medium text-green-600">
+                      <span>Desconto ({appliedCoupon.code})</span>
+                      <span>- {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(discount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center mb-4 text-sm font-medium text-slate-500">
                     <span>Taxa de Entrega</span>
-                    <span>R$ 5,00</span>
+                    <span>{deliveryFee === 0 ? 'Grátis' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(deliveryFee)}</span>
                   </div>
                   <div className="flex justify-between items-center mb-6">
                     <span className="font-bold text-slate-800">Total a Pagar</span>
                     <span className="text-2xl font-black text-slate-900">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total + 5)}
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}
                     </span>
                   </div>
                   

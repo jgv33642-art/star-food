@@ -122,4 +122,58 @@ export class CompanyController {
       next(error);
     }
   };
+
+  getDeliverySettings = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user?.companyId;
+      const result = await pool.query('SELECT whatsapp_number, operating_hours, is_delivery_open, delivery_fee FROM companies WHERE id = $1', [companyId]);
+      res.json(result.rows[0]);
+    } catch (error) { next(error); }
+  }
+
+  updateDeliverySettings = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user?.companyId;
+      const { whatsapp_number, operating_hours, is_delivery_open, delivery_fee } = req.body;
+      const result = await pool.query(
+        'UPDATE companies SET whatsapp_number = $1, operating_hours = $2, is_delivery_open = $3, delivery_fee = $4, updated_at = now() WHERE id = $5 RETURNING whatsapp_number, operating_hours, is_delivery_open, delivery_fee',
+        [whatsapp_number, operating_hours, is_delivery_open, delivery_fee, companyId]
+      );
+      res.json(result.rows[0]);
+    } catch (error) { next(error); }
+  }
+
+  getCoupons = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user?.companyId;
+      const result = await pool.query('SELECT * FROM coupons WHERE company_id = $1 ORDER BY created_at DESC', [companyId]);
+      res.json(result.rows);
+    } catch (error) { next(error); }
+  }
+
+  createCoupon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user?.companyId;
+      const { code, discount_type, discount_value } = req.body;
+      const result = await pool.query(
+        'INSERT INTO coupons (company_id, code, discount_type, discount_value) VALUES ($1, $2, $3, $4) RETURNING *',
+        [companyId, code.toUpperCase().trim(), discount_type, discount_value]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (error: any) { 
+      if (error.message?.includes('unique_company_code')) {
+         return res.status(400).json({message: 'Já existe um cupom com este código'});
+      }
+      next(error); 
+    }
+  }
+
+  toggleCoupon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user?.companyId;
+      const { id } = req.params;
+      const result = await pool.query('UPDATE coupons SET active = NOT active WHERE id = $1 AND company_id = $2 RETURNING *', [id, companyId]);
+      res.json(result.rows[0]);
+    } catch (error) { next(error); }
+  }
 }

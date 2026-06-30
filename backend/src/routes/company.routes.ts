@@ -12,4 +12,11 @@ router.get('/my', companyController.getMyCompany);
 router.post('/upgrade',        requireRole('admin', 'manager', 'gerencia'), companyController.upgradePlan);
 router.post('/purchase-seats', requireRole('admin', 'manager', 'gerencia'), companyController.purchaseSeats);
 
+router.get('/delivery-settings', requireRole('admin', 'manager', 'gerencia', 'caixa'), companyController.getDeliverySettings);
+router.put('/delivery-settings', requireRole('admin', 'manager', 'gerencia'), companyController.updateDeliverySettings);
+
+router.get('/coupons', requireRole('admin', 'manager', 'gerencia', 'caixa'), companyController.getCoupons);
+router.post('/coupons', requireRole('admin', 'manager', 'gerencia'), companyController.createCoupon);
+router.patch('/coupons/:id/toggle', requireRole('admin', 'manager', 'gerencia'), companyController.toggleCoupon);
+
 export default router;

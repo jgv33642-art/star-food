@@ -23,7 +23,7 @@ export class PublicController {
     try {
       const { companyId } = req.params;
       
-      const companyResult = await queryWithRLS(companyId, 'SELECT id, name, phone FROM companies WHERE id = $1', [companyId]);
+      const companyResult = await queryWithRLS(companyId, 'SELECT id, name, phone, whatsapp_number, is_delivery_open, operating_hours, delivery_fee FROM companies WHERE id = $1', [companyId]);
       if (companyResult.rows.length === 0) {
         return res.status(404).json({ message: 'Company not found' });
       }
@@ -66,10 +66,11 @@ export class PublicController {
       }
 
       // Create order
+      const trackingCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       const orderResult = await queryWithRLS(
         companyId,
-        `INSERT INTO orders (company_id, table_id, status, customer_name, customer_phone, delivery_address) VALUES ($1, $2, 'open', $3, $4, $5) RETURNING *`,
-        [companyId, tableId || null, customerName || null, customerPhone || null, deliveryAddress || null]
+        `INSERT INTO orders (company_id, table_id, status, customer_name, customer_phone, delivery_address, tracking_code) VALUES ($1, $2, 'open', $3, $4, $5, $6) RETURNING *`,
+        [companyId, tableId || null, customerName || null, customerPhone || null, deliveryAddress || null, trackingCode]
       );
       const order = orderResult.rows[0];
 
@@ -83,6 +84,36 @@ export class PublicController {
       }
 
       res.status(201).json(order);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  validateCoupon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { companyId } = req.params;
+      const { code } = req.body;
+      if (!code) return res.status(400).json({ message: 'Código não informado' });
+      
+      const result = await queryWithRLS(companyId, 'SELECT * FROM coupons WHERE company_id = $1 AND code = $2 AND active = true', [companyId, code.toUpperCase().trim()]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Cupom inválido ou expirado' });
+      }
+      res.json(result.rows[0]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { companyId, trackingCode } = req.params;
+      const result = await queryWithRLS(companyId, 'SELECT id, status, tracking_code FROM orders WHERE company_id = $1 AND tracking_code = $2', [companyId, trackingCode]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Pedido não encontrado' });
+      }
+      res.json(result.rows[0]);
     } catch (error) {
       next(error);
     }
