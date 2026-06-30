@@ -82,7 +82,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={
         user ? (
-          user.role === 'gerencia' ? <Navigate to="/admin" replace /> :
+          user.role === 'gerencia' ? ((user.plan || 'start').toLowerCase() === 'start' ? <Navigate to="/caixa" replace /> : <Navigate to="/admin" replace />) :
           user.role === 'caixa' ? <Navigate to="/caixa" replace /> :
           user.role === 'garcom' ? <Navigate to="/pedidos" replace /> :
           <Navigate to="/mesas" replace />
@@ -105,7 +105,7 @@ const AppRoutes = () => {
       <Route 
         path="/pedidos" 
         element={
-          <ProtectedRoute allowedRoles={['garcom', 'gerencia']}>
+          <ProtectedRoute allowedRoles={['garcom', 'gerencia']} allowedPlans={['basic', 'pro']}>
             <WaiterDashboard />
           </ProtectedRoute>
         } 
@@ -150,7 +150,7 @@ const AppRoutes = () => {
       <Route 
         path="/delivery" 
         element={
-          <ProtectedRoute allowedRoles={['caixa', 'gerencia']}>
+          <ProtectedRoute allowedRoles={['caixa', 'gerencia']} allowedPlans={['basic', 'pro']}>
             <Delivery />
           </ProtectedRoute>
         } 
@@ -159,7 +159,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <AdminDashboard />
           </ProtectedRoute>
         } 
@@ -169,7 +169,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/financeiro" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Finance />
           </ProtectedRoute>
         } 
@@ -201,7 +201,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/motoboys" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Couriers />
           </ProtectedRoute>
         } 
@@ -209,7 +209,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/fidelidade" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Loyalty />
           </ProtectedRoute>
         } 
@@ -217,7 +217,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/crm" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Loyalty />
           </ProtectedRoute>
         } 
@@ -225,7 +225,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/integracoes" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Integrations />
           </ProtectedRoute>
         } 
@@ -233,7 +233,7 @@ const AppRoutes = () => {
       <Route 
         path="/admin/relatorios" 
         element={
-          <ProtectedRoute allowedRoles={['gerencia']}>
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Reports />
           </ProtectedRoute>
         } 

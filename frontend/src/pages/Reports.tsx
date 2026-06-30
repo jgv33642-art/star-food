@@ -6,6 +6,7 @@ import {
   TrendingUp, Award, Table, AlertCircle, Loader2
 } from 'lucide-react';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 
 type TabType = 'cmv' | 'top-products' | 'export';
 type PeriodType = 'today' | '7days' | '30days' | 'month' | 'custom';
@@ -42,7 +43,9 @@ interface TopProductItem {
 }
 
 export const Reports = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('cmv');
+  const { user } = useAuth();
+  const isPro = user?.plan === 'pro' || user?.plan === 'annual';
+  const [activeTab, setActiveTab] = useState<TabType>(isPro ? 'cmv' : 'top-products');
   const [period, setPeriod] = useState<PeriodType>('30days');
   const [startDate, setStartDate] = useState<string>(
     new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
@@ -155,16 +158,18 @@ export const Reports = () => {
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-md">
           {/* Tabs */}
           <div className="flex bg-slate-950 p-1 border border-slate-850 rounded-2xl w-fit">
-            <button
-              onClick={() => setActiveTab('cmv')}
-              className={`px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'cmv' 
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" /> CMV e Margens
-            </button>
+            {isPro && (
+              <button
+                onClick={() => setActiveTab('cmv')}
+                className={`px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+                  activeTab === 'cmv' 
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" /> CMV e Margens
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('top-products')}
               className={`px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
@@ -472,27 +477,29 @@ export const Reports = () => {
                   </button>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm hover:border-emerald-500/50 transition-colors cursor-pointer group">
-                  <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Percent className="w-7 h-7 text-emerald-500" />
+                {isPro && (
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm hover:border-emerald-500/50 transition-colors cursor-pointer group">
+                    <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Percent className="w-7 h-7 text-emerald-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Exportar Margem CMV</h3>
+                    <p className="text-slate-400 text-sm mb-6">Planilha contendo a quebra detalhada do Custo de Mercadoria Vendida (CMV) por produto para o seu time contábil.</p>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          const dates = getDates();
+                          const data = await api.get<any[]>(`/reports/cmv?from=${dates.from}&to=${dates.to}`);
+                          exportCSV(data, 'relatorio_contabilidade_cmv');
+                        } catch (err: any) {
+                          alert('Erro ao exportar: ' + err.message);
+                        }
+                      }}
+                      className="w-full bg-slate-950 border border-slate-800 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 group-hover:bg-emerald-500 group-hover:border-emerald-500 transition-colors cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" /> Baixar Planilha
+                    </button>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Exportar Margem CMV</h3>
-                  <p className="text-slate-400 text-sm mb-6">Planilha contendo a quebra detalhada do Custo de Mercadoria Vendida (CMV) por produto para o seu time contábil.</p>
-                  <button 
-                    onClick={async () => {
-                      try {
-                        const dates = getDates();
-                        const data = await api.get<any[]>(`/reports/cmv?from=${dates.from}&to=${dates.to}`);
-                        exportCSV(data, 'relatorio_contabilidade_cmv');
-                      } catch (err: any) {
-                        alert('Erro ao exportar: ' + err.message);
-                      }
-                    }}
-                    className="w-full bg-slate-950 border border-slate-800 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 group-hover:bg-emerald-500 group-hover:border-emerald-500 transition-colors cursor-pointer"
-                  >
-                    <Download className="w-4 h-4" /> Baixar Planilha
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </>

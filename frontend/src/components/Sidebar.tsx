@@ -18,19 +18,19 @@ const menuGroups = [
   {
     title: 'Gestão',
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-      { icon: TrendingUp, label: 'Relatórios', path: '/admin/relatorios' },
-      { icon: DollarSign, label: 'Fluxo de Caixa', path: '/admin/financeiro' },
+      { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', minPlan: 'basic' },
+      { icon: TrendingUp, label: 'Relatórios', path: '/admin/relatorios', minPlan: 'basic' },
+      { icon: DollarSign, label: 'Fluxo de Caixa', path: '/admin/financeiro', minPlan: 'basic' },
     ]
   },
   {
     title: 'Operação',
     items: [
-      { icon: Smartphone, label: 'Novo Pedido', path: '/pedidos', roles: ['garcom', 'gerencia'] },
+      { icon: Smartphone, label: 'Novo Pedido', path: '/pedidos', roles: ['garcom', 'gerencia'], minPlan: 'basic' },
       { icon: ShoppingCart, label: 'PDV', path: '/pdv', roles: ['caixa', 'gerencia'] },
       { icon: LayoutGrid, label: 'Mesas', path: '/mesas', roles: ['garcom', 'caixa', 'gerencia'], minPlan: 'basic' },
       { icon: Receipt, label: 'Caixa', path: '/caixa', roles: ['caixa', 'gerencia'] },
-      { icon: Package, label: 'Delivery/iFood', path: '/delivery', roles: ['caixa', 'gerencia'] },
+      { icon: Package, label: 'Delivery/iFood', path: '/delivery', roles: ['caixa', 'gerencia'], minPlan: 'basic' },
     ]
   },
   {
@@ -47,8 +47,8 @@ const menuGroups = [
   {
     title: 'Clientes',
     items: [
-      { icon: Users, label: 'CRM', path: '/admin/crm' },
-      { icon: Heart, label: 'Fidelidade', path: '/admin/fidelidade' },
+      { icon: Users, label: 'CRM', path: '/admin/crm', minPlan: 'basic' },
+      { icon: Heart, label: 'Fidelidade', path: '/admin/fidelidade', minPlan: 'basic' },
     ]
   },
   {
@@ -56,8 +56,8 @@ const menuGroups = [
     items: [
       { icon: Users, label: 'Equipe / PIN', path: '/admin/equipe', minPlan: 'basic' },
       { icon: UserCog, label: 'Usuários', path: '/admin/usuarios', minPlan: 'basic' },
-      { icon: Bike, label: 'Motoboys', path: '/admin/motoboys' },
-      { icon: ShieldCheck, label: 'Permissões', path: '/admin/permissoes' },
+      { icon: Bike, label: 'Motoboys', path: '/admin/motoboys', minPlan: 'basic' },
+      { icon: ShieldCheck, label: 'Permissões', path: '/admin/permissoes', minPlan: 'basic' },
       { icon: Settings, label: 'Configurações', path: '/admin/configuracoes' },
       { icon: Smartphone, label: 'Site Delivery', path: '/admin/delivery-settings', minPlan: 'pro' },
     ]
