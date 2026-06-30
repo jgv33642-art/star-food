@@ -262,6 +262,7 @@ export const WaiterDashboard = () => {
         
         await fetchData(false);
         setActiveContext(prev => prev ? { ...prev, order: newOrder } : null);
+        setIsMenuOpen(true);
       } else {
         const tempOrderId = 'temp-' + Date.now();
         const newOrder: Order = {
@@ -286,6 +287,7 @@ export const WaiterDashboard = () => {
           table: { ...activeContext.table, status: 'busy' },
           order: newOrder
         });
+        setIsMenuOpen(true);
 
         await setCache('tables', updatedTables);
         await setCache('orders', [...orders, newOrder]);
@@ -686,7 +688,14 @@ export const WaiterDashboard = () => {
                 {/* Product List */}
                 <div className="flex-1 flex flex-col min-w-0 bg-slate-900">
                   <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
-                {filteredMenu.length === 0 ? (
+                {products.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6 gap-3">
+                    <p className="font-bold text-slate-400">Nenhum produto cadastrado.</p>
+                    <p className="text-xs text-slate-600 max-w-sm mt-1">
+                      Acesse a tela de Produtos para cadastrar itens no cardápio.
+                    </p>
+                  </div>
+                ) : filteredMenu.length === 0 ? (
                   <div className="text-center py-12 text-slate-500">Nenhum produto encontrado nesta categoria.</div>
                 ) : (
                   filteredMenu.map(item => {
