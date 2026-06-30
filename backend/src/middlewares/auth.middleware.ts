@@ -71,9 +71,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
  * Usage:
  *   router.post('/staff', authMiddleware, requireRole('admin', 'manager'), controller.createStaff)
  */
-export const requireRole = (...allowedRoles: string[]) => {
+export const requireRole = (...allowedRoles: (string | string[])[]) => {
   // Normalize to lowercase
-  const normalized = allowedRoles.map(r => r.toLowerCase());
+  const normalized = allowedRoles.flat().map(r => r.toLowerCase());
 
   // Role alias map (frontend ↔ backend)
   const aliases: Record<string, string[]> = {
