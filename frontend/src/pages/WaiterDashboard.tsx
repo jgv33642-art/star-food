@@ -238,7 +238,9 @@ export const WaiterDashboard = () => {
     setPendingItems(prev => prev.filter(o => o.cartId !== cartId));
   };
 
-  const total = pendingItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const pendingTotal = pendingItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const currentOrderTotal = activeContext?.order?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
+  const tableTotal = currentOrderTotal + pendingTotal;
 
   const handleSelectTable = (table: Table) => {
     const activeOrder = orders.find(o => o.table_id === table.id) || null;
@@ -618,7 +620,7 @@ export const WaiterDashboard = () => {
                     <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800">
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-slate-400">Total a Enviar</span>
-                        <span className="text-3xl font-black text-amber-500">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}</span>
+                        <span className="text-3xl font-black text-amber-500">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(pendingTotal)}</span>
                       </div>
                       <button 
                         onClick={handleOpenPrintModal}
@@ -733,16 +735,24 @@ export const WaiterDashboard = () => {
                 )}
               </div>
 
-              {pendingItems.length > 0 && (
-                <div className="p-4 bg-slate-950 border-t border-slate-800">
+              {/* RODAPÉ DO CARDÁPIO: CONTA DA MESA E ITENS PENDENTES */}
+              <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                  <span className="text-slate-500 text-xs font-bold uppercase tracking-wider block mb-1">Conta da Mesa</span>
+                  <span className="text-emerald-400 font-black text-2xl">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tableTotal)}
+                  </span>
+                </div>
+                {pendingItems.length > 0 && (
                   <button 
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-lg rounded-2xl py-4 transition-all"
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-sm sm:text-base rounded-2xl px-6 py-3 transition-all flex flex-col items-center shadow-lg shadow-indigo-500/20"
                   >
-                    Ver Pedido ({pendingItems.reduce((acc, curr) => acc + curr.quantity, 0)} itens)
+                    <span>Revisar Envio</span>
+                    <span className="text-[10px] font-normal opacity-80">{pendingItems.reduce((acc, curr) => acc + curr.quantity, 0)} itens (+ R$ {pendingTotal.toFixed(2)})</span>
                   </button>
-                </div>
-              )}
+                )}
+              </div>
                 </div>
               </div>
             </div>
