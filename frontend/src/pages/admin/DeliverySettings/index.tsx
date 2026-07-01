@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { Layout } from '../../../components/Layout';
-import { Settings, Percent, Save, Smartphone, Power, Plus, Trash2 } from 'lucide-react';
-import api from '../../../services/api';
+import { Settings, Percent, Save, Smartphone, Power, Plus } from 'lucide-react';
+import { api } from '../../../lib/api';
 
 interface Coupon {
   id: string;
@@ -43,7 +43,7 @@ export const DeliverySettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const { data } = await api.get('/company/delivery-settings');
+      const data: any = await api.get('/company/delivery-settings');
       setWhatsapp(data.whatsapp_number || '');
       setIsOpen(data.is_delivery_open ?? true);
       setFee(data.delivery_fee || '5.00');
@@ -54,7 +54,7 @@ export const DeliverySettings = () => {
 
   const fetchCoupons = async () => {
     try {
-      const { data } = await api.get('/company/coupons');
+      const data: any = await api.get('/company/coupons');
       setCoupons(data);
     } catch (err) {
       console.error(err);
@@ -95,7 +95,7 @@ export const DeliverySettings = () => {
 
   const toggleCoupon = async (id: string) => {
     try {
-      await api.patch(`/company/coupons/${id}/toggle`);
+      await api.put(`/company/coupons/${id}/toggle`, {});
       fetchCoupons();
     } catch (err) {
       console.error(err);

@@ -76,7 +76,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login, loginDevice, loginWithToken } = useAuth();
+  const { loginDevice, loginWithToken } = useAuth();
   const navigate = useNavigate();
   const { isInstallable, installApp } = usePWA();
 

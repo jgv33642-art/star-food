@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, MapPin, Bike, Search, Plus, Minus, CreditCard, ChevronLeft, Sparkles, MessageCircle, Loader2, AlertCircle, Smartphone } from 'lucide-react';
+import { Search, ShoppingBag, Plus, Minus, MapPin, Bike, CreditCard, ChevronLeft, Sparkles, Loader2, AlertCircle, Smartphone } from 'lucide-react';
 import { api } from '../lib/api';
 import { usePWA } from '../hooks/usePWA';
 
@@ -140,7 +140,7 @@ export const VirtualStore = () => {
     if (checkoutStep === 'tracking' && trackingCode) {
       const interval = setInterval(async () => {
         try {
-          const { data } = await api.get(`/public/order-status/${tenantId}/${trackingCode}`);
+          const data: any = await api.get(`/public/order-status/${tenantId}/${trackingCode}`);
           setOrderStatus(data.status);
         } catch (e) {}
       }, 5000);
@@ -190,7 +190,7 @@ export const VirtualStore = () => {
   const handleApplyCoupon = async () => {
     try {
       setCouponError('');
-      const { data } = await api.post(`/public/coupon/${tenantId}`, { code: couponCode });
+      const data: any = await api.post(`/public/coupon/${tenantId}`, { code: couponCode });
       setAppliedCoupon({ code: data.code, type: data.discount_type, value: Number(data.discount_value) });
     } catch (err: any) {
       setCouponError(err.response?.data?.message || 'Cupom inválido');
@@ -209,7 +209,7 @@ export const VirtualStore = () => {
         notes: `Delivery - Nome: ${customerName} | Contato: ${customerPhone}${c.notes ? ` | Obs: ${c.notes}` : ''}`
       }));
 
-      const { data: orderData } = await api.post(`/public/order/${tenantId}`, {
+      const orderData: any = await api.post(`/public/order/${tenantId}`, {
         items: orderItems,
         customerName,
         customerPhone,
