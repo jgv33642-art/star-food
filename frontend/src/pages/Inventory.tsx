@@ -233,7 +233,7 @@ export const Inventory = () => {
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">{error}</span>
               </div>
-              <button onClick={() => setError(null)} className="text-red-400 hover:text-white transition-colors">
+              <button onClick={() => setError(null)} className="text-red-400 hover:text-slate-900 dark:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>
@@ -247,7 +247,7 @@ export const Inventory = () => {
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">{success}</span>
               </div>
-              <button onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-white transition-colors">
+              <button onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-slate-900 dark:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>
@@ -255,7 +255,7 @@ export const Inventory = () => {
         </AnimatePresence>
         
         {/* Actions Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
           <div className="relative flex-1 w-full sm:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
             <input 
@@ -263,7 +263,7 @@ export const Inventory = () => {
               placeholder="Buscar ingrediente..." 
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
             />
           </div>
           <div className="flex w-full sm:w-auto gap-3">
@@ -275,7 +275,7 @@ export const Inventory = () => {
                 setShowRefillModal(true);
               }}
               disabled={ingredients.length === 0}
-              className="flex-1 sm:flex-none bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-medium py-3 px-5 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-750"
+              className="flex-1 sm:flex-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-900 dark:text-white font-medium py-3 px-5 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-750"
             >
               <Plus className="w-5 h-5 text-indigo-400" /> Entrada rápida
             </button>
@@ -295,9 +295,9 @@ export const Inventory = () => {
             <span className="text-sm font-bold font-mono">Carregando lista de estoque...</span>
           </div>
         ) : filteredIngredients.length === 0 ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center text-slate-500">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center text-slate-500">
             <PackageOpen className="w-12 h-12 mx-auto mb-3 opacity-30 text-indigo-400" />
-            <p className="font-bold text-slate-400">Nenhum insumo no estoque.</p>
+            <p className="font-bold text-slate-600 dark:text-slate-400">Nenhum insumo no estoque.</p>
             <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1">
               Cadastre novos ingredientes como pão, carne, molhos para controlar os níveis do estoque.
             </p>
@@ -313,7 +313,7 @@ export const Inventory = () => {
               const percent = min > 0 ? Math.min(100, (qty / min) * 50) : 100;
 
               return (
-                <div key={item.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
+                <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
                   <div className={`absolute top-0 left-0 w-1 h-full ${
                     status === 'ok' ? 'bg-emerald-500' :
                     status === 'low' ? 'bg-amber-500' : 'bg-red-500'
@@ -321,19 +321,19 @@ export const Inventory = () => {
                   
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h4 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">{item.name}</h4>
+                      <h4 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors">{item.name}</h4>
                       <p className="text-slate-500 text-xs mt-0.5">Estoque Mínimo: {min} {item.unit}</p>
                     </div>
                     <div className="flex gap-1">
                       <button 
                         onClick={() => handleOpenEdit(item)}
-                        className="p-1.5 bg-slate-950 hover:bg-slate-800 rounded-lg border border-slate-850 text-slate-400 hover:text-white transition-colors"
+                        className="p-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-850 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => handleDelete(item.id)}
-                        className="p-1.5 bg-slate-950 hover:bg-red-500/10 rounded-lg border border-slate-850 text-slate-400 hover:text-red-400 transition-colors"
+                        className="p-1.5 bg-slate-50 dark:bg-slate-950 hover:bg-red-500/10 rounded-lg border border-slate-850 text-slate-600 dark:text-slate-400 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -345,10 +345,10 @@ export const Inventory = () => {
                       status === 'ok' ? 'text-emerald-500' :
                       status === 'low' ? 'text-amber-500' : 'text-red-500'
                     }`}>{qty}</span>
-                    <span className="text-slate-400 text-lg mb-1">{item.unit}</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-lg mb-1">{item.unit}</span>
                   </div>
 
-                  <div className="w-full bg-slate-950 rounded-full h-2 mb-2">
+                  <div className="w-full bg-slate-50 dark:bg-slate-950 rounded-full h-2 mb-2">
                     <div 
                       className={`h-2 rounded-full transition-all duration-500 ${
                         status === 'ok' ? 'bg-emerald-500' :
@@ -379,38 +379,38 @@ export const Inventory = () => {
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden"
+              className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <PackageOpen className="w-5 h-5 text-indigo-400" /> 
                   {editingIngredient ? 'Editar Ingrediente' : 'Novo Ingrediente'}
                 </h3>
-                <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowAddModal(false)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Nome do Insumo</label>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Nome do Insumo</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex: Carne Bovina 155g, Pão Brioche"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Unidade</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Unidade</label>
                     <select
                       value={unit}
                       onChange={e => setUnit(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     >
                       <option value="un">Unidade (un)</option>
                       <option value="kg">Quilo (kg)</option>
@@ -421,7 +421,7 @@ export const Inventory = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Min. Recomendado</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Min. Recomendado</label>
                     <input
                       type="number"
                       step="0.01"
@@ -429,13 +429,13 @@ export const Inventory = () => {
                       placeholder="Ex: 50"
                       value={minimumStock}
                       onChange={e => setMinimumStock(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Estoque Inicial Atual</label>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Estoque Inicial Atual</label>
                   <input
                     type="number"
                     step="0.01"
@@ -443,7 +443,7 @@ export const Inventory = () => {
                     placeholder="Ex: 120"
                     value={stockQuantity}
                     onChange={e => setStockQuantity(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold"
                   />
                 </div>
 
@@ -451,7 +451,7 @@ export const Inventory = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors"
+                    className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-3 rounded-xl transition-colors"
                   >
                     Cancelar
                   </button>
@@ -486,24 +486,24 @@ export const Inventory = () => {
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden"
+              className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-6 overflow-hidden"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Plus className="w-5 h-5 text-indigo-400" /> Registrar Entrada de Estoque
                 </h3>
-                <button onClick={() => setShowRefillModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowRefillModal(false)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={handleRefill} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Insumo / Ingrediente</label>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Insumo / Ingrediente</label>
                   <select
                     value={selectedRefillId}
                     onChange={e => setSelectedRefillId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   >
                     {ingredients.map(i => (
                       <option key={i.id} value={i.id}>
@@ -514,7 +514,7 @@ export const Inventory = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Quantidade a Adicionar</label>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Quantidade a Adicionar</label>
                   <div className="relative">
                     <input
                       type="number"
@@ -523,7 +523,7 @@ export const Inventory = () => {
                       placeholder="Ex: 50"
                       value={refillQuantity}
                       onChange={e => setRefillQuantity(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold text-lg"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono font-bold text-lg"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold uppercase">
                       {ingredients.find(i => i.id === selectedRefillId)?.unit || ''}
@@ -535,7 +535,7 @@ export const Inventory = () => {
                   <button
                     type="button"
                     onClick={() => setShowRefillModal(false)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors"
+                    className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-3 rounded-xl transition-colors"
                   >
                     Cancelar
                   </button>

@@ -108,19 +108,19 @@ export const SelectComplementsModal = ({ isOpen, onClose, product, onConfirm }: 
   return (
     <AnimatePresence>
       {isOpen && categories.length > 0 && (
-        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm">
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
           >
-            <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950/80 sticky top-0 z-10">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/80 sticky top-0 z-10">
               <div>
-                <h3 className="font-black text-white text-lg leading-tight">{product?.name}</h3>
-                <p className="text-slate-400 text-sm font-medium">Personalize seu item</p>
+                <h3 className="font-black text-slate-900 dark:text-white text-lg leading-tight">{product?.name}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Personalize seu item</p>
               </div>
-              <button onClick={onClose} className="bg-slate-800 p-2 rounded-full text-slate-400 hover:text-white transition-colors">
+              <button onClick={onClose} className="bg-slate-100 dark:bg-slate-800 p-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -134,11 +134,11 @@ export const SelectComplementsModal = ({ isOpen, onClose, product, onConfirm }: 
                 const isMet = !cat.is_required || count >= cat.min_options;
                 
                 return (
-                  <div key={cat.id} className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
-                    <div className="bg-slate-900/50 p-4 border-b border-slate-800 flex justify-between items-center">
+                  <div key={cat.id} className="bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900/50 p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                       <div>
-                        <h4 className="font-bold text-white text-base">{cat.name}</h4>
-                        <p className="text-xs text-slate-400 font-medium mt-0.5">
+                        <h4 className="font-bold text-slate-900 dark:text-white text-base">{cat.name}</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
                           {cat.min_options === cat.max_options 
                             ? `Escolha ${cat.max_options}` 
                             : `Escolha de ${cat.min_options} a ${cat.max_options}`}
@@ -160,16 +160,16 @@ export const SelectComplementsModal = ({ isOpen, onClose, product, onConfirm }: 
                           <div 
                             key={opt.id} 
                             onClick={() => !disabled && handleToggleOption(cat, opt)}
-                            className={`p-4 flex items-center justify-between transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-900/50'}`}
+                            className={`p-4 flex items-center justify-between transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-white dark:bg-slate-900/50'}`}
                           >
                             <div>
-                              <p className="text-white font-medium text-sm">{opt.name}</p>
+                              <p className="text-slate-900 dark:text-white font-medium text-sm">{opt.name}</p>
                               {Number(opt.price) > 0 && (
                                 <p className="text-emerald-400 text-xs font-bold mt-0.5">+ R$ {Number(opt.price).toFixed(2)}</p>
                               )}
                             </div>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${isSelected ? 'bg-indigo-500 border-indigo-500' : 'border-slate-700'}`}>
-                              {isSelected && <Check className="w-4 h-4 text-white" />}
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${isSelected ? 'bg-indigo-500 border-indigo-500' : 'border-slate-300 dark:border-slate-700'}`}>
+                              {isSelected && <Check className="w-4 h-4 text-slate-900 dark:text-white" />}
                             </div>
                           </div>
                         );
@@ -180,14 +180,14 @@ export const SelectComplementsModal = ({ isOpen, onClose, product, onConfirm }: 
               })}
             </div>
 
-            <div className="p-5 bg-slate-950 border-t border-slate-800 sticky bottom-0">
+            <div className="p-5 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 sticky bottom-0">
               {validationError && (
                 <div className="mb-3 text-amber-500 text-xs font-bold flex items-center gap-1.5">
                   <AlertCircle className="w-4 h-4" /> {validationError}
                 </div>
               )}
               <div className="flex justify-between items-center mb-3 px-1">
-                <span className="text-slate-400 font-bold text-sm">Adicionais:</span>
+                <span className="text-slate-600 dark:text-slate-400 font-bold text-sm">Adicionais:</span>
                 <span className="text-emerald-400 font-black text-lg">
                   + R$ {selectedOptions.reduce((acc, curr) => acc + curr.optionPrice, 0).toFixed(2)}
                 </span>
@@ -195,7 +195,7 @@ export const SelectComplementsModal = ({ isOpen, onClose, product, onConfirm }: 
               <button
                 onClick={handleConfirm}
                 disabled={!!validationError}
-                className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-500 text-white font-black py-4 rounded-xl shadow-lg transition-all text-lg"
+                className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 text-white font-black py-4 rounded-xl shadow-lg transition-all text-lg"
               >
                 Confirmar Item
               </button>

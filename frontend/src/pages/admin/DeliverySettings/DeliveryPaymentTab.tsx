@@ -14,14 +14,14 @@ export const DeliveryPaymentTab = ({ initialSettings }: any) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
       {/* LOGÍSTICA DE FRETE */}
       <div className="space-y-6">
-        <h3 className="text-xl font-bold text-white border-b border-slate-800 pb-3">Regras de Entrega</h3>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">Regras de Entrega</h3>
         
         <div>
-          <label className="block text-sm text-slate-300 mb-3">Tipo de Cobrança do Frete</label>
+          <label className="block text-sm text-slate-700 dark:text-slate-300 mb-3">Tipo de Cobrança do Frete</label>
           <select 
             value={feeType}
             onChange={(e) => setFeeType(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3"
           >
             <option value="fixed">Taxa Fixa Padrão</option>
             <option value="distance">Cobrança Dinâmica (Valor por KM)</option>
@@ -32,23 +32,23 @@ export const DeliveryPaymentTab = ({ initialSettings }: any) => {
         {feeType === 'distance' && (
           <div className="grid grid-cols-2 gap-4 bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/20">
             <div>
-              <label className="block text-sm text-slate-300 mb-2">Valor Base (R$)</label>
+              <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">Valor Base (R$)</label>
               <input 
                 type="number" 
                 step="0.50" 
                 value={baseFee}
                 onChange={(e) => setBaseFee(Number(e.target.value))}
-                className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg px-4 py-2" 
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-4 py-2" 
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-300 mb-2">Adicional por KM (R$)</label>
+              <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">Adicional por KM (R$)</label>
               <input 
                 type="number" 
                 step="0.50" 
                 value={feePerKm}
                 onChange={(e) => setFeePerKm(Number(e.target.value))}
-                className="w-full bg-slate-950 border border-slate-700 text-white rounded-lg px-4 py-2" 
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-4 py-2" 
               />
             </div>
           </div>
@@ -56,35 +56,35 @@ export const DeliveryPaymentTab = ({ initialSettings }: any) => {
 
         {feeType === 'fixed' && (
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Valor Fixo de Entrega (R$)</label>
+            <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">Valor Fixo de Entrega (R$)</label>
             <input 
               type="number" 
               step="0.50" 
               value={baseFee}
               onChange={(e) => setBaseFee(Number(e.target.value))}
-              className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3" 
+              className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3" 
             />
           </div>
         )}
 
         <div>
-          <label className="block text-sm text-slate-300 mb-2">Raio Máximo de Entrega (KM)</label>
+          <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">Raio Máximo de Entrega (KM)</label>
           <input 
             type="number" 
             value={maxRadius}
             onChange={(e) => setMaxRadius(Number(e.target.value))}
-            className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3" 
+            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3" 
           />
         </div>
       </div>
 
       {/* MÉTODOS DE PAGAMENTO */}
       <div className="space-y-6">
-        <h3 className="text-xl font-bold text-white border-b border-slate-800 pb-3">Formas de Pagamento</h3>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">Formas de Pagamento</h3>
         
         <div className="space-y-4">
-          <label className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer">
-            <span className="text-white font-medium">Pix (Pelo Site / Automático)</span>
+          <label className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer">
+            <span className="text-slate-900 dark:text-white font-medium">Pix (Pelo Site / Automático)</span>
             <input 
               type="checkbox" 
               checked={acceptsPixOnline}
@@ -93,8 +93,8 @@ export const DeliveryPaymentTab = ({ initialSettings }: any) => {
             />
           </label>
           
-          <label className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer">
-            <span className="text-white font-medium">Máquina de Cartão na Entrega</span>
+          <label className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer">
+            <span className="text-slate-900 dark:text-white font-medium">Máquina de Cartão na Entrega</span>
             <input 
               type="checkbox" 
               checked={acceptsCardDelivery}
@@ -103,8 +103,8 @@ export const DeliveryPaymentTab = ({ initialSettings }: any) => {
             />
           </label>
           
-          <label className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800 cursor-pointer">
-            <span className="text-white font-medium">Dinheiro (Pede troco no checkout)</span>
+          <label className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer">
+            <span className="text-slate-900 dark:text-white font-medium">Dinheiro (Pede troco no checkout)</span>
             <input 
               type="checkbox" 
               checked={acceptsCash}

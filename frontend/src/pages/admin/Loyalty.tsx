@@ -48,8 +48,8 @@ export const Loyalty = () => {
             <Award className="w-6 h-6 text-amber-500" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Programa de Fidelidade</h2>
-            <p className="text-slate-400 text-sm">Acompanhe a pontuação dos seus clientes (1 Ponto = R$ 1,00)</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Programa de Fidelidade</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">Acompanhe a pontuação dos seus clientes (1 Ponto = R$ 1,00)</p>
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export const Loyalty = () => {
             placeholder="Buscar por nome ou WhatsApp..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 text-white pl-10 pr-4 py-2 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white pl-10 pr-4 py-2 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
           />
         </div>
       </div>
@@ -77,26 +77,26 @@ export const Loyalty = () => {
           <p>Carregando clientes...</p>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-950/50 border-b border-slate-800">
-                  <th className="p-4 text-sm font-semibold text-slate-400">Cliente</th>
-                  <th className="p-4 text-sm font-semibold text-slate-400">WhatsApp</th>
-                  <th className="p-4 text-sm font-semibold text-slate-400">Cadastrado em</th>
+                <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
+                  <th className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">Cliente</th>
+                  <th className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">WhatsApp</th>
+                  <th className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">Cadastrado em</th>
                   <th className="p-4 text-sm font-semibold text-amber-500 text-right">Pontos Acumulados</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
                 {filtered.map((customer, index) => (
-                  <tr key={customer.id} className="hover:bg-slate-800/20 transition-colors">
+                  <tr key={customer.id} className="hover:bg-slate-100 dark:bg-slate-800/20 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold border border-slate-700">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold border border-slate-300 dark:border-slate-700">
                           {customer.name?.charAt(0).toUpperCase() || 'C'}
                         </div>
-                        <span className="font-medium text-white">{customer.name || 'Cliente Sem Nome'}</span>
+                        <span className="font-medium text-slate-900 dark:text-white">{customer.name || 'Cliente Sem Nome'}</span>
                         {index < 3 && search === '' && (
                           <span className="text-[10px] bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/30 font-bold uppercase tracking-wider">
                             Top {index + 1}
@@ -104,8 +104,8 @@ export const Loyalty = () => {
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-slate-300">{customer.phone}</td>
-                    <td className="p-4 text-slate-400 text-sm">
+                    <td className="p-4 text-slate-700 dark:text-slate-300">{customer.phone}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">
                       {new Date(customer.created_at).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="p-4 text-right">

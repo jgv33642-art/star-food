@@ -33,7 +33,7 @@ export const Landing = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-slate-950 text-white relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white relative">
       {/* Background Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px]" />
@@ -47,12 +47,12 @@ export const Landing = () => {
           <span className="text-2xl font-bold tracking-tight">Star Food</span>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/login" className="text-slate-300 hover:text-white font-medium transition-colors">
+          <Link to="/login" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white font-medium transition-colors">
             Já tenho conta
           </Link>
           <button 
             onClick={() => { setShowDevModal(true); setStep(1); setPassword(''); setError(false); }}
-            className="text-slate-700 hover:text-slate-300 transition-colors p-1"
+            className="text-slate-700 hover:text-slate-700 dark:text-slate-300 transition-colors p-1"
             title="Painel Admin"
           >
             <Lock className="w-4 h-4" />
@@ -74,7 +74,7 @@ export const Landing = () => {
             </span>
           </h1>
           
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12">
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">
             Um sistema profissional com acessos separados para Garçom, Caixa e Gerência. 
             Controle pedidos, pagamentos e faturamento em tempo real.
           </p>
@@ -82,16 +82,16 @@ export const Landing = () => {
           {/* Pricing Section */}
           <div className="max-w-5xl mx-auto mb-16 text-left">
             <div className="flex justify-center mb-10">
-              <div className="bg-slate-900 border border-slate-800 p-1 rounded-2xl inline-flex relative">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-2xl inline-flex relative">
                 <button 
                   onClick={() => setIsAnnual(false)}
-                  className={`px-6 py-3 rounded-xl font-bold transition-all ${!isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${!isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-600 dark:text-slate-400 hover:text-white'}`}
                 >
                   Faturamento Mensal
                 </button>
                 <button 
                   onClick={() => setIsAnnual(true)}
-                  className={`px-6 py-3 rounded-xl font-bold transition-all ${isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${isAnnual ? 'bg-indigo-500 text-white shadow-lg' : 'text-slate-600 dark:text-slate-400 hover:text-white'}`}
                 >
                   Faturamento Anual <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full ml-1 absolute -top-2 -right-4 animate-bounce">Economize 10%</span>
                 </button>
@@ -100,29 +100,29 @@ export const Landing = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Plano Start */}
-              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 flex flex-col relative">
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 flex flex-col relative">
                 <h3 className="text-2xl font-bold mb-2 text-center">Plano Start</h3>
-                <p className="text-slate-400 mb-6 text-center">Para quem está literalmente começando.</p>
+                <p className="text-slate-600 dark:text-slate-400 mb-6 text-center">Para quem está literalmente começando.</p>
                 <div className="mb-8 text-center">
                   <span className="text-5xl font-black">R$ {isAnnual ? '1.618,80' : '149,90'}</span>
-                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
                   {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 134,90 por mês</div>}
                 </div>
                 
                 <ul className="space-y-4 mb-8 flex-1">
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Atendimento de Balcão e Retirada</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>1 Usuário (Logado por vez)</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Relatórios Simplificados</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Suporte via Ticket/Bot</span>
                   </li>
@@ -130,36 +130,36 @@ export const Landing = () => {
                 
                 <Link 
                   to={`/checkout?plan=start&billing=${isAnnual ? 'annual' : 'monthly'}`}
-                  className="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
+                  className="w-full py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
                 >
                   Assinar Plano Start
                 </Link>
               </div>
 
               {/* Plano Básico */}
-              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 flex flex-col relative">
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 flex flex-col relative">
                 <h3 className="text-2xl font-bold mb-2 text-center">Plano Básico</h3>
-                <p className="text-slate-400 mb-6 text-center">Gestão completa para operação local.</p>
+                <p className="text-slate-600 dark:text-slate-400 mb-6 text-center">Gestão completa para operação local.</p>
                 <div className="mb-8 text-center">
                   <span className="text-5xl font-black">R$ {isAnnual ? '3.238,92' : '299,90'}</span>
-                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
                   {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 269,90 por mês</div>}
                 </div>
                 
                 <ul className="space-y-4 mb-8 flex-1">
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Atendimento de Mesas e Comandas</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Controle de Estoque e Compras</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Relatórios Avançados (DRE/Lucro)</span>
                   </li>
-                  <li className="flex items-center gap-3 text-slate-300">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                     <Check className="w-5 h-5 text-indigo-500 flex-shrink-0" /> 
                     <span>Suporte em Horário Comercial</span>
                   </li>
@@ -167,7 +167,7 @@ export const Landing = () => {
                 
                 <Link 
                   to={`/checkout?plan=basic&billing=${isAnnual ? 'annual' : 'monthly'}`}
-                  className="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
+                  className="w-full py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-lg font-bold rounded-2xl transition-all flex items-center justify-center text-center"
                 >
                   Assinar Plano Básico
                 </Link>
@@ -178,11 +178,11 @@ export const Landing = () => {
                 <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 px-4 py-1 rounded-full text-sm font-bold shadow-lg">
                   Mais Popular
                 </div>
-                <h3 className="text-2xl font-bold mb-2 text-white text-center">Plano Pro</h3>
+                <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white text-center">Plano Pro</h3>
                 <p className="text-indigo-200 mb-6 text-center">O carro-chefe para quem quer Delivery.</p>
                 <div className="mb-8 text-center">
                   <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">R$ {isAnnual ? '4.318,92' : '399,90'}</span>
-                  <span className="text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
                   {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 359,90 por mês</div>}
                 </div>
                 
@@ -207,7 +207,7 @@ export const Landing = () => {
                 
                 <Link 
                   to={`/checkout?plan=pro&billing=${isAnnual ? 'annual' : 'monthly'}`}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] flex items-center justify-center text-center"
+                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-slate-900 dark:text-white text-lg font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] flex items-center justify-center text-center"
                 >
                   Assinar Plano Pro
                 </Link>
@@ -235,32 +235,32 @@ export const Landing = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32 text-left"
         >
-          <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-8 rounded-3xl">
+          <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 p-8 rounded-3xl">
             <div className="w-14 h-14 bg-amber-500/20 text-amber-500 rounded-2xl flex items-center justify-center mb-6">
               <Zap className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold mb-3">Atendimento Ágil</h3>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               Interface passo a passo para o garçom lançar pedidos na mesa em segundos, direto para a cozinha.
             </p>
           </div>
           
-          <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-8 rounded-3xl">
+          <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 p-8 rounded-3xl">
             <div className="w-14 h-14 bg-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
               <ShieldCheck className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold mb-3">Fechamento Seguro</h3>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               Controle de caixa organizado com métodos de pagamento em PIX, Cartão ou Dinheiro.
             </p>
           </div>
 
-          <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-8 rounded-3xl">
+          <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 p-8 rounded-3xl">
             <div className="w-14 h-14 bg-purple-500/20 text-purple-500 rounded-2xl flex items-center justify-center mb-6">
               <BarChart3 className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold mb-3">Métricas Reais</h3>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
               Painel gerencial com gráficos de faturamento, controle de equipe e histórico de vendas completo.
             </p>
           </div>
@@ -274,15 +274,15 @@ export const Landing = () => {
       {/* Dev Auth Modal */}
       {showDevModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-sm w-full relative shadow-2xl">
-            <button onClick={() => setShowDevModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-sm w-full relative shadow-2xl">
+            <button onClick={() => setShowDevModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 dark:text-white">
               <X className="w-5 h-5" />
             </button>
             <div className="flex flex-col items-center mb-6">
-              <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6 text-slate-400" />
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <Lock className="w-6 h-6 text-slate-600 dark:text-slate-400" />
               </div>
-              <h3 className="text-xl font-bold text-white tracking-widest text-center">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-widest text-center">
                 {step === 1 ? 'ACESSO RESTRITO' : 'VERIFICAÇÃO SECUNDÁRIA'}
               </h3>
             </div>
@@ -292,13 +292,13 @@ export const Landing = () => {
                 type="password" 
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(false); }}
-                className={`w-full bg-slate-950 border ${error ? 'border-red-500' : 'border-slate-800'} text-white rounded-xl px-4 py-3 mb-4 text-center tracking-[0.5em] font-mono text-xl focus:outline-none focus:border-indigo-500 transition-colors`}
+                className={`w-full bg-slate-50 dark:bg-slate-950 border ${error ? 'border-red-500' : 'border-slate-200 dark:border-slate-800'} text-slate-900 dark:text-white rounded-xl px-4 py-3 mb-4 text-center tracking-[0.5em] font-mono text-xl focus:outline-none focus:border-indigo-500 transition-colors`}
                 placeholder="******"
                 autoFocus
               />
               <button 
                 type="submit"
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors tracking-widest"
+                className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-colors tracking-widest"
               >
                 VERIFICAR
               </button>

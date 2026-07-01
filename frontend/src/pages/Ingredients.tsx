@@ -139,14 +139,14 @@ export const Ingredients = () => {
             placeholder="Buscar ingrediente..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-200 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           />
         </div>
 
         <div className="flex gap-3 w-full sm:w-auto">
           <button
             onClick={() => fetchIngredients()}
-            className="flex items-center justify-center p-2.5 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl transition-colors"
+            className="flex items-center justify-center p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white rounded-xl transition-colors"
             title="Atualizar"
           >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
@@ -173,7 +173,7 @@ export const Ingredients = () => {
         </motion.div>
       )}
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
         {loading && ingredients.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
             <RefreshCw className="w-8 h-8 animate-spin mb-4 text-indigo-500" />
@@ -182,14 +182,14 @@ export const Ingredients = () => {
         ) : filteredIngredients.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
             <Coffee className="w-12 h-12 mb-4 opacity-20" />
-            <p className="text-lg font-medium text-slate-400">Nenhum ingrediente encontrado</p>
+            <p className="text-lg font-medium text-slate-600 dark:text-slate-400">Nenhum ingrediente encontrado</p>
             <p className="text-sm">Clique em "Novo Ingrediente" para começar.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/30 text-xs tracking-wider text-slate-500 uppercase">
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 text-xs tracking-wider text-slate-500 uppercase">
                   <th className="py-4 px-6 font-medium">Nome</th>
                   <th className="py-4 px-6 font-medium">Unidade</th>
                   <th className="py-4 px-6 font-medium text-right">Estoque Min.</th>
@@ -201,34 +201,34 @@ export const Ingredients = () => {
                   <motion.tr 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     key={item.id} 
-                    className="hover:bg-slate-800/20 transition-colors group"
+                    className="hover:bg-slate-100 dark:bg-slate-800/20 transition-colors group"
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
                           <Coffee className="w-5 h-5" />
                         </div>
-                        <span className="font-bold text-white text-base">{item.name}</span>
+                        <span className="font-bold text-slate-900 dark:text-white text-base">{item.name}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-slate-300">
-                      <span className="bg-slate-800 px-2 py-1 rounded text-xs font-bold uppercase">{item.unit}</span>
+                    <td className="py-4 px-6 text-slate-700 dark:text-slate-300">
+                      <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs font-bold uppercase">{item.unit}</span>
                     </td>
-                    <td className="py-4 px-6 text-right font-bold text-slate-400">
+                    <td className="py-4 px-6 text-right font-bold text-slate-600 dark:text-slate-400">
                       {item.minimum_stock} {item.unit}
                     </td>
                     <td className="py-4 px-6 text-center">
                       <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleOpenEdit(item)}
-                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
+                          className="p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"
                           title="Editar"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                          className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                           title="Remover"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -247,42 +247,42 @@ export const Ingredients = () => {
         {showAddModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
             >
-              <div className="p-6 bg-slate-950/50 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Coffee className="w-5 h-5 text-indigo-500" />
                   {editingIngredient ? 'Editar Ingrediente' : 'Novo Ingrediente'}
                 </h3>
-                <button onClick={() => setShowAddModal(false)} className="text-slate-500 hover:text-white transition-colors">
+                <button onClick={() => setShowAddModal(false)} className="text-slate-500 hover:text-slate-900 dark:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={handleSave} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Nome do Ingrediente</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome do Ingrediente</label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: Queijo Cheddar"
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Unidade</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Unidade</label>
                     <select
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     >
                       <option value="un">Unidade (un)</option>
                       <option value="kg">Quilograma (kg)</option>
@@ -293,7 +293,7 @@ export const Ingredients = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Estoque Mínimo</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Estoque Mínimo</label>
                     <input
                       type="number"
                       min="0"
@@ -301,7 +301,7 @@ export const Ingredients = () => {
                       required
                       value={minimumStock}
                       onChange={(e) => setMinimumStock(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -310,7 +310,7 @@ export const Ingredients = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors"
+                    className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-colors"
                   >
                     Cancelar
                   </button>

@@ -174,33 +174,33 @@ export const Tables = () => {
       {/* Legend & Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <div className="flex gap-4">
-          <div className="flex bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-1">
+          <div className="flex bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-1">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-indigo-500 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-white'}`}
             >
               Lista
             </button>
             <button
               onClick={() => setViewMode('map')}
-              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-colors ${viewMode === 'map' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-colors ${viewMode === 'map' ? 'bg-indigo-500 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-white'}`}
             >
               Planta
             </button>
           </div>
 
-          <div className="hidden md:flex gap-4 bg-slate-900 border border-slate-800 p-2 rounded-xl">
+          <div className="hidden md:flex gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 rounded-xl">
             <div className="flex items-center gap-2 px-3 py-1">
               <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-              <span className="text-sm font-medium text-slate-300">Livre</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Livre</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1">
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span className="text-sm font-medium text-slate-300">Ocupada</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Ocupada</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1">
               <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-              <span className="text-sm font-medium text-slate-300">Fechando</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Fechando</span>
             </div>
           </div>
 
@@ -228,35 +228,35 @@ export const Tables = () => {
                 <div
                   key={table.id}
                   onClick={() => setSelectedTable(table)}
-                  className={`relative bg-slate-900 border-2 rounded-3xl p-6 cursor-pointer transition-all hover:scale-105 ${getStatusColor(table.status).split(' ')[1]}`}
+                  className={`relative bg-white dark:bg-slate-900 border-2 rounded-3xl p-6 cursor-pointer transition-all hover:scale-105 ${getStatusColor(table.status).split(' ')[1]}`}
                 >
                   <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${getStatusBgColor(table.status)} shadow-[0_0_10px_rgba(0,0,0,0.5)]`} />
 
                   <div className="text-center mb-4">
                     <span className="text-slate-500 text-sm font-medium uppercase tracking-wider">Mesa</span>
-                    <h3 className="text-5xl font-black text-white mt-1">{table.number}</h3>
+                    <h3 className="text-5xl font-black text-slate-900 dark:text-white mt-1">{table.number}</h3>
                   </div>
 
-                  <div className="space-y-3 pt-4 border-t border-slate-800/50">
+                  <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800/50">
                     <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
                         <Users className="w-4 h-4" />
                         <span>Capacidade</span>
                       </div>
-                      <span className="font-medium text-white">{table.capacity}</span>
+                      <span className="font-medium text-slate-900 dark:text-white">{table.capacity}</span>
                     </div>
 
                     {table.status !== 'livre' && (
                       <>
                         <div className="flex justify-between items-center text-sm">
-                          <div className="flex items-center gap-1.5 text-slate-400">
+                          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
                             <Clock className="w-4 h-4" />
                             <span>Tempo</span>
                           </div>
-                          <span className="font-medium text-white">{table.timeOpen}</span>
+                          <span className="font-medium text-slate-900 dark:text-white">{table.timeOpen}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                          <div className="flex items-center gap-1.5 text-slate-400">
+                          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
                             <Receipt className="w-4 h-4" />
                             <span>Total</span>
                           </div>
@@ -271,7 +271,7 @@ export const Tables = () => {
               ))}
             </div>
           ) : (
-            <div className="relative w-full h-[600px] bg-slate-900/50 border border-slate-800 rounded-3xl p-8 overflow-hidden shadow-inner">
+            <div className="relative w-full h-[600px] bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 overflow-hidden shadow-inner">
               <div className="absolute top-8 left-8 text-slate-500 font-black text-2xl uppercase tracking-[0.5em] opacity-10">Entrada</div>
               <div className="absolute top-8 right-8 text-slate-500 font-black text-2xl uppercase tracking-[0.5em] opacity-10">Caixa</div>
               <div className="absolute bottom-8 right-8 text-slate-500 font-black text-2xl uppercase tracking-[0.5em] opacity-10">Cozinha</div>
@@ -308,7 +308,7 @@ export const Tables = () => {
                     )}
 
                     {/* Status tooltip */}
-                    <div className="absolute -top-12 opacity-0 group-hover:opacity-100 bg-slate-800 text-white text-xs px-3 py-1 rounded shadow-xl transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    <div className="absolute -top-12 opacity-0 group-hover:opacity-100 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs px-3 py-1 rounded shadow-xl transition-opacity pointer-events-none whitespace-nowrap z-10">
                       {table.status.toUpperCase()} {table.total ? `(R$ ${table.total.toFixed(2)})` : ''}
                     </div>
                   </div>
@@ -328,13 +328,13 @@ export const Tables = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedTable(null)}
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm z-50"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 overflow-hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl z-50 overflow-hidden"
             >
               <div className={`p-6 border-b flex justify-between items-center ${
                 selectedTable.status === 'livre' ? 'border-emerald-500/20 bg-emerald-500/5' :
@@ -342,7 +342,7 @@ export const Tables = () => {
                 'border-amber-500/20 bg-amber-500/5'
               }`}>
                 <div>
-                  <h3 className="text-2xl font-black text-white">Mesa {selectedTable.number}</h3>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white">Mesa {selectedTable.number}</h3>
                   <p className={`text-sm font-bold uppercase tracking-wider ${
                     selectedTable.status === 'livre' ? 'text-emerald-500' :
                     selectedTable.status === 'ocupada' ? 'text-red-500' :
@@ -351,7 +351,7 @@ export const Tables = () => {
                     {selectedTable.status}
                   </p>
                 </div>
-                <button onClick={() => setSelectedTable(null)} className="w-8 h-8 flex items-center justify-center bg-slate-800 text-slate-400 rounded-full hover:bg-slate-700 hover:text-white transition-colors">
+                <button onClick={() => setSelectedTable(null)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full hover:bg-slate-700 hover:text-slate-900 dark:text-white transition-colors">
                   &times;
                 </button>
               </div>
@@ -362,7 +362,7 @@ export const Tables = () => {
                     <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <AlertCircle className="w-8 h-8" />
                     </div>
-                    <p className="text-slate-300 font-medium mb-8">Esta mesa está limpa e pronta para uso.</p>
+                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-8">Esta mesa está limpa e pronta para uso.</p>
                     <div className="flex flex-col gap-4">
                       <button
                         onClick={() => {
@@ -375,7 +375,7 @@ export const Tables = () => {
                       </button>
                       <button
                         onClick={() => setShowQrCode(true)}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-slate-800/20 flex items-center justify-center gap-2"
+                        className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-slate-800/20 flex items-center justify-center gap-2"
                       >
                         Gerar QR Code (Cardápio)
                       </button>
@@ -391,16 +391,16 @@ export const Tables = () => {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <div className="flex justify-between items-center p-4 bg-slate-950 rounded-xl border border-slate-800">
-                      <span className="text-slate-400">Garçom Responsável</span>
-                      <span className="text-white font-medium">{selectedTable.waiter || '—'}</span>
+                    <div className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-400">Garçom Responsável</span>
+                      <span className="text-slate-900 dark:text-white font-medium">{selectedTable.waiter || '—'}</span>
                     </div>
 
                     <div className="flex gap-4">
                       <button onClick={handleLancarPedido} className="flex-1 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white border border-indigo-500/20 font-bold py-3 rounded-xl transition-all">
                         Ver Pedido
                       </button>
-                      <button onClick={handleLancarPedido} className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">
+                      <button onClick={handleLancarPedido} className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-all">
                         Adicionar Item
                       </button>
                     </div>
@@ -433,7 +433,7 @@ export const Tables = () => {
                     </button>
 
                     {isCaixaOrAdmin && (
-                      <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row gap-4 mt-6">
+                      <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 mt-6">
                         <button className="flex-1 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
                           <AlertCircle className="w-4 h-4" /> Cancelar Pedido
                         </button>
@@ -457,23 +457,23 @@ export const Tables = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
             >
-              <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white">Adicionar Mesa</h3>
-                <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white transition-colors">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Adicionar Mesa</h3>
+                <button onClick={() => setShowAddModal(false)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
               <form onSubmit={handleAddTable} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Número da Mesa</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Número da Mesa</label>
                   <input
                     type="number"
                     min="1"
@@ -481,14 +481,14 @@ export const Tables = () => {
                     value={newTableNumber}
                     onChange={(e) => setNewTableNumber(e.target.value)}
                     placeholder="Ex: 11"
-                    className="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
                 </div>
                 <div className="flex gap-4 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors"
+                    className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-3 rounded-xl transition-colors"
                   >
                     Cancelar
                   </button>
@@ -514,7 +514,7 @@ export const Tables = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -524,7 +524,7 @@ export const Tables = () => {
             >
               <button 
                 onClick={() => setShowQrCode(false)} 
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition-colors"
+                className="absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-800 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>

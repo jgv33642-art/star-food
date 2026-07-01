@@ -62,20 +62,20 @@ export const SuperAdmin = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
           <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-black text-white mb-2">Acesso Restrito</h1>
-          <p className="text-slate-400 text-sm mb-6">Área exclusiva do Proprietário SaaS.</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Acesso Restrito</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">Área exclusiva do Proprietário SaaS.</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Digite a senha mestre..." 
-              className="w-full bg-slate-950 border border-slate-800 text-center text-white text-xl tracking-widest rounded-xl py-3 px-4 focus:ring-2 focus:ring-red-500 outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center text-slate-900 dark:text-white text-xl tracking-widest rounded-xl py-3 px-4 focus:ring-2 focus:ring-red-500 outline-none"
             />
             <button type="submit" className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition-colors">
               Desbloquear Painel
@@ -87,20 +87,20 @@ export const SuperAdmin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-300 flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-700 dark:text-slate-300 flex">
       {/* Sidebar Simples do Super Admin */}
-      <div className="w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-6 shrink-0">
+      <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-6 shrink-0">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <Shield className="text-white w-5 h-5" />
+            <Shield className="text-slate-900 dark:text-white w-5 h-5" />
           </div>
-          <span className="font-black text-white text-lg">SaaS Master</span>
+          <span className="font-black text-slate-900 dark:text-white text-lg">SaaS Master</span>
         </div>
         
         <button 
           onClick={() => setActiveTab('overview')}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'overview' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            activeTab === 'overview' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'
           }`}
         >
           <Building className="w-5 h-5" /> Restaurantes
@@ -109,7 +109,7 @@ export const SuperAdmin = () => {
         <button 
           onClick={() => setActiveTab('planos')}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'planos' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            activeTab === 'planos' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'
           }`}
         >
           <ListChecks className="w-5 h-5" /> Planos & Preços
@@ -118,7 +118,7 @@ export const SuperAdmin = () => {
         <button 
           onClick={() => setActiveTab('gateway')}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'gateway' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            activeTab === 'gateway' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'
           }`}
         >
           <CreditCard className="w-5 h-5" /> Gateway & Receitas
@@ -127,7 +127,7 @@ export const SuperAdmin = () => {
         <button 
           onClick={() => setActiveTab('teste')}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'teste' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            activeTab === 'teste' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'
           }`}
         >
           <Building className="w-5 h-5" /> Ambiente de Teste
@@ -136,7 +136,7 @@ export const SuperAdmin = () => {
 
       {/* Área Principal */}
       <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
-        <h1 className="text-3xl font-black text-white mb-8">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-8">
           {activeTab === 'overview' ? 'Gestão de Assinantes (Tenants)' : 
            activeTab === 'planos' ? 'Configuração de Planos SaaS' : 
            activeTab === 'teste' ? 'Laboratório de Testes' : 'Gateway de Assinaturas'}
@@ -145,32 +145,32 @@ export const SuperAdmin = () => {
         {activeTab === 'overview' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                <div className="flex items-center gap-3 mb-2 text-slate-400"><Users className="w-5 h-5"/> Clientes Ativos</div>
-                <h3 className="text-4xl font-black text-white">2</h3>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+                <div className="flex items-center gap-3 mb-2 text-slate-600 dark:text-slate-400"><Users className="w-5 h-5"/> Clientes Ativos</div>
+                <h3 className="text-4xl font-black text-slate-900 dark:text-white">2</h3>
               </div>
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                <div className="flex items-center gap-3 mb-2 text-slate-400"><DollarSign className="w-5 h-5"/> MRR (Mensalidade)</div>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+                <div className="flex items-center gap-3 mb-2 text-slate-600 dark:text-slate-400"><DollarSign className="w-5 h-5"/> MRR (Mensalidade)</div>
                 <h3 className="text-4xl font-black text-emerald-400">R$ {totalMRR.toFixed(2)}</h3>
               </div>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden mt-8">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden mt-8">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-slate-950/50 border-b border-slate-800">
-                    <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Restaurante</th>
-                    <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Plano</th>
-                    <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Mensalidade</th>
-                    <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                  <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
+                    <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Restaurante</th>
+                    <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Plano</th>
+                    <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Mensalidade</th>
+                    <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tenants.map(t => (
-                    <tr key={t.id} className="border-b border-slate-800">
-                      <td className="py-4 px-6 font-medium text-white">{t.name}</td>
-                      <td className="py-4 px-6 text-slate-400">{t.plan}</td>
-                      <td className="py-4 px-6 text-slate-400">R$ {t.mrr.toFixed(2)}</td>
+                    <tr key={t.id} className="border-b border-slate-200 dark:border-slate-800">
+                      <td className="py-4 px-6 font-medium text-slate-900 dark:text-white">{t.name}</td>
+                      <td className="py-4 px-6 text-slate-600 dark:text-slate-400">{t.plan}</td>
+                      <td className="py-4 px-6 text-slate-600 dark:text-slate-400">R$ {t.mrr.toFixed(2)}</td>
                       <td className="py-4 px-6">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           t.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
@@ -186,20 +186,20 @@ export const SuperAdmin = () => {
 
         {activeTab === 'planos' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-slate-400 mb-8 max-w-3xl">
+            <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-3xl">
               Defina os 3 pacotes que você vai vender na Landing Page. Para cada pacote, você pode escolher o nome, o valor cobrado mensalmente e quais ferramentas o restaurante terá direito.
             </p>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               {plans.map(plan => (
-                <div key={plan.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col">
+                <div key={plan.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col">
                   <div className="mb-4">
                     <label className="block text-xs font-medium text-slate-500 uppercase mb-1">Nome do Plano</label>
                     <input 
                       type="text" 
                       value={plan.name}
                       onChange={(e) => setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, name: e.target.value } : p))}
-                      className="w-full bg-slate-950 border border-slate-800 text-white text-xl font-black rounded-xl py-2 px-4 focus:ring-2 focus:ring-amber-500 outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xl font-black rounded-xl py-2 px-4 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
                   </div>
                   
@@ -209,7 +209,7 @@ export const SuperAdmin = () => {
                       type="number" 
                       value={plan.price}
                       onChange={(e) => setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, price: Number(e.target.value) } : p))}
-                      className="w-full bg-slate-950 border border-slate-800 text-amber-400 text-2xl font-black rounded-xl py-2 px-4 focus:ring-2 focus:ring-amber-500 outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-amber-400 text-2xl font-black rounded-xl py-2 px-4 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
                   </div>
 
@@ -223,22 +223,22 @@ export const SuperAdmin = () => {
                               type="text" 
                               value={feat}
                               onChange={(e) => updateFeature(plan.id, idx, e.target.value)}
-                              className="flex-1 bg-slate-950 border border-slate-800 text-slate-300 text-sm rounded-lg py-2 px-3 focus:ring-2 focus:ring-amber-500 outline-none"
+                              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm rounded-lg py-2 px-3 focus:ring-2 focus:ring-amber-500 outline-none"
                             />
-                            <button onClick={() => removeFeature(plan.id, idx)} className="w-10 h-10 shrink-0 flex items-center justify-center bg-slate-950 border border-slate-800 rounded-lg text-slate-500 hover:text-red-500 hover:border-red-500 transition-colors">
+                            <button onClick={() => removeFeature(plan.id, idx)} className="w-10 h-10 shrink-0 flex items-center justify-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 hover:text-red-500 hover:border-red-500 transition-colors">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </motion.div>
                         ))}
                       </AnimatePresence>
                     </div>
-                    <button onClick={() => addFeature(plan.id)} className="w-full mt-4 py-2 border border-dashed border-slate-700 text-slate-400 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:border-amber-500 hover:text-amber-500 transition-colors">
+                    <button onClick={() => addFeature(plan.id)} className="w-full mt-4 py-2 border border-dashed border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:border-amber-500 hover:text-amber-500 transition-colors">
                       <Plus className="w-4 h-4" /> Adicionar Funcionalidade
                     </button>
                   </div>
 
-                  <div className="pt-6 mt-6 border-t border-slate-800">
-                    <button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors">
+                  <div className="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800">
+                    <button className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-colors">
                       Salvar Plano
                     </button>
                   </div>
@@ -250,24 +250,24 @@ export const SuperAdmin = () => {
 
         {activeTab === 'gateway' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
               <div className="w-16 h-16 bg-indigo-500/10 text-indigo-500 rounded-2xl flex items-center justify-center mb-6">
                 <Key className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-black text-white mb-2">Chaves do seu Banco (Stripe/Mercado Pago)</h2>
-              <p className="text-slate-400 mb-8">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Chaves do seu Banco (Stripe/Mercado Pago)</h2>
+              <p className="text-slate-600 dark:text-slate-400 mb-8">
                 Configure aqui a chave da sua conta bancária/gateway. É para esta conta que o valor das mensalidades de todos os restaurantes vai cair automaticamente.
               </p>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Secret Key do Gateway</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Secret Key do Gateway</label>
                   <input 
                     type="password" 
                     value={gatewayKey}
                     onChange={(e) => setGatewayKey(e.target.value)}
                     placeholder="sk_live_123456789..." 
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-4 px-4 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-4 px-4 focus:ring-2 focus:ring-indigo-500 outline-none"
                   />
                   <p className="text-xs text-slate-500 mt-2">Esta chave nunca será compartilhada com os clientes (tenants).</p>
                 </div>
@@ -284,18 +284,18 @@ export const SuperAdmin = () => {
 
         {activeTab === 'teste' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
               <div className="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mb-6">
                 <Building className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-black text-white mb-2">Ambiente de Testes</h2>
-              <p className="text-slate-400 mb-8">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Ambiente de Testes</h2>
+              <p className="text-slate-600 dark:text-slate-400 mb-8">
                 Utilize esta área para validar e testar as novas ferramentas, integrações e atualizações que você está desenvolvendo para os restaurantes antes de liberá-las.
               </p>
               
-              <div className="p-6 border border-dashed border-slate-700 rounded-2xl bg-slate-950 flex flex-col items-center justify-center text-center">
+              <div className="p-6 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center text-center">
                 <p className="text-slate-500 mb-4">Adicione aqui seus componentes de teste, painéis de debug ou botões para disparar eventos simulados.</p>
-                <button className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">
+                <button className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-bold py-3 px-6 rounded-xl transition-colors">
                   <Plus className="w-4 h-4 inline mr-2" />
                   Adicionar Novo Teste
                 </button>

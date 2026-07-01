@@ -20,15 +20,15 @@ export const Integrations = () => {
       <div className="max-w-4xl space-y-6">
         
         {/* WhatsApp Integration */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-start gap-4">
-              <div className={`p-4 rounded-2xl ${whatsappConnected ? 'bg-green-500/20 text-green-500' : 'bg-slate-800 text-slate-500'}`}>
+              <div className={`p-4 rounded-2xl ${whatsappConnected ? 'bg-green-500/20 text-green-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                 <MessageCircle className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">WhatsApp Automático</h3>
-                <p className="text-slate-400 text-sm max-w-md">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">WhatsApp Automático</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm max-w-md">
                   Envie notificações automáticas para seus clientes quando o pedido sair para entrega ou quando a mesa for atualizada.
                 </p>
                 <div className="mt-4 flex items-center gap-2">
@@ -38,7 +38,7 @@ export const Integrations = () => {
                       <CheckCircle2 className="w-4 h-4" /> Conectado
                     </span>
                   ) : (
-                    <span className="text-sm font-bold text-slate-500 bg-slate-800 px-2 py-1 rounded">
+                    <span className="text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                       Desconectado
                     </span>
                   )}
@@ -68,16 +68,16 @@ export const Integrations = () => {
           </div>
           
           {whatsappConnected && (
-            <div className="mt-8 pt-8 border-t border-slate-800">
-              <h4 className="font-bold text-white mb-4">Gatilhos Ativos:</h4>
+            <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Gatilhos Ativos:</h4>
               <div className="space-y-3">
-                <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-700">
-                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-green-500 focus:ring-green-500 bg-slate-900 border-slate-600" />
-                  <span className="text-slate-300">Avisar cliente quando pedido delivery mudar para "Saiu para Entrega"</span>
+                <label className="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
+                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-green-500 focus:ring-green-500 bg-white dark:bg-slate-900 border-slate-600" />
+                  <span className="text-slate-700 dark:text-slate-300">Avisar cliente quando pedido delivery mudar para "Saiu para Entrega"</span>
                 </label>
-                <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-700">
-                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-green-500 focus:ring-green-500 bg-slate-900 border-slate-600" />
-                  <span className="text-slate-300">Avisar cliente (QR Code) sobre status do pedido na mesa</span>
+                <label className="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
+                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-green-500 focus:ring-green-500 bg-white dark:bg-slate-900 border-slate-600" />
+                  <span className="text-slate-700 dark:text-slate-300">Avisar cliente (QR Code) sobre status do pedido na mesa</span>
                 </label>
               </div>
             </div>

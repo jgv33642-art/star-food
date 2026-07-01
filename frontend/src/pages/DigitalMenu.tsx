@@ -184,7 +184,7 @@ export const DigitalMenu = () => {
 
   if (orderStatus === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
         <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
         <h3 className="font-bold text-lg font-mono">Carregando cardápio digital...</h3>
         <p className="text-xs text-slate-500 mt-2">Sincronizando produtos e preços em tempo real</p>
@@ -194,17 +194,17 @@ export const DigitalMenu = () => {
 
   if (orderStatus === 'error') {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
           <AlertCircle className="w-10 h-10" />
         </motion.div>
-        <h1 className="text-2xl font-black mb-2 text-white">Oops! Algo deu errado</h1>
-        <p className="text-slate-400 text-sm max-w-sm mb-8">
+        <h1 className="text-2xl font-black mb-2 text-slate-900 dark:text-white">Oops! Algo deu errado</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm max-w-sm mb-8">
           {errorMessage || 'Não foi possível encontrar a mesa ou carregar o cardápio para este estabelecimento.'}
         </p>
         <button 
           onClick={() => loadMenuData(true)}
-          className="bg-slate-800 text-white px-8 py-3 rounded-full font-bold hover:bg-slate-700 transition-colors border border-slate-700"
+          className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-3 rounded-full font-bold hover:bg-slate-700 transition-colors border border-slate-300 dark:border-slate-700"
         >
           Tentar Novamente
         </button>
@@ -214,12 +214,12 @@ export const DigitalMenu = () => {
 
   if (orderStatus === 'success') {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-24 h-24 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mb-6">
           <ChefHat className="w-12 h-12" />
         </motion.div>
         <h1 className="text-3xl font-black mb-4">Pedido Recebido!</h1>
-        <p className="text-slate-400 mb-8 max-w-sm">
+        <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-sm">
           A cozinha já está preparando o seu pedido. Em breve ele será entregue na sua **Mesa {table?.number}**.
         </p>
         <button 
@@ -335,10 +335,10 @@ export const DigitalMenu = () => {
           >
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="w-full bg-slate-900 text-white rounded-full p-4 flex items-center justify-between shadow-xl shadow-slate-900/30"
+              className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-full p-4 flex items-center justify-between shadow-xl shadow-slate-900/30"
             >
               <div className="flex items-center gap-3">
-                <div className="bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center relative">
+                <div className="bg-slate-100 dark:bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center relative">
                   <ShoppingBag className="w-5 h-5" />
                   <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-slate-900">
                     {totalItems}
@@ -361,7 +361,7 @@ export const DigitalMenu = () => {
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsCartOpen(false)}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-white dark:bg-slate-900/40 backdrop-blur-sm"
             />
             <motion.div 
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}

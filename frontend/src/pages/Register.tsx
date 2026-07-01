@@ -31,30 +31,30 @@ export const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative ">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 relative ">
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-amber-500/20 rounded-full blur-[100px]" />
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/20 rounded-full blur-[100px]" />
 
-      <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors z-10 font-medium">
+      <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors z-10 font-medium">
         <ArrowLeft className="w-5 h-5" /> Voltar ao Início
       </Link>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden z-10"
+        className="w-full max-w-md bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden z-10"
       >
         <div className="p-8">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-              <User className="text-white w-8 h-8" />
+              <User className="text-slate-900 dark:text-white w-8 h-8" />
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-center text-white mb-2">
+          <h2 className="text-3xl font-bold text-center text-slate-900 dark:text-white mb-2">
             Criar Nova Conta
           </h2>
-          <p className="text-slate-400 text-center mb-8">
+          <p className="text-slate-600 dark:text-slate-400 text-center mb-8">
             Preencha os dados abaixo para cadastrar sua empresa no sistema.
           </p>
 
@@ -72,7 +72,7 @@ export const Register = () => {
                 placeholder="Nome da empresa / lanchonete"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
                 disabled={loading}
               />
@@ -85,7 +85,7 @@ export const Register = () => {
                 placeholder="Crie uma Senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
                 disabled={loading}
               />
@@ -94,7 +94,7 @@ export const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all mt-4 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed text-slate-900 dark:text-white font-bold rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all mt-4 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -108,7 +108,7 @@ export const Register = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
               Já tem uma conta?
               <Link to="/login" className="ml-2 text-amber-500 hover:text-amber-400 font-medium">
                 Fazer login

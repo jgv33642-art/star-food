@@ -206,13 +206,13 @@ export const Login = () => {
   }, [pin]);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative ">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 relative ">
       {/* Background glows */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-amber-500/20 rounded-full blur-[100px]" />
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-600/20 rounded-full blur-[100px]" />
       <div className="absolute top-[40%] left-[60%] w-72 h-72 bg-indigo-600/10 rounded-full blur-[80px]" />
 
-      <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors z-10 font-medium">
+      <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors z-10 font-medium">
         <ArrowLeft className="w-5 h-5" /> Voltar ao Início
       </Link>
 
@@ -224,18 +224,18 @@ export const Login = () => {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <Utensils className="text-white w-8 h-8" />
+            <Utensils className="text-slate-900 dark:text-white w-8 h-8" />
           </div>
         </div>
 
         {/* Mode Toggle Tabs */}
-        <div className="flex bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-1.5 rounded-2xl mb-4 shadow-lg">
+        <div className="flex bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-1.5 rounded-2xl mb-4 shadow-lg">
           <button
             onClick={() => { setMode('email'); setError(''); }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
               mode === 'email'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-orange-500/20'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-900 dark:text-white shadow-md shadow-orange-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white'
             }`}
           >
             <Building2 className="w-4 h-4" /> Conta do Estabelecimento
@@ -244,8 +244,8 @@ export const Login = () => {
             onClick={() => { setMode('pin'); setError(''); setSelectedStaff(null); setPin(''); }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
               mode === 'pin'
-                ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-slate-900 dark:text-white shadow-md shadow-indigo-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white'
             }`}
           >
             <Hash className="w-4 h-4" /> Login por PIN
@@ -261,11 +261,11 @@ export const Login = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden"
+              className="bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden"
             >
               <div className="p-8">
-                <h2 className="text-2xl font-bold text-center text-white mb-1">Bem-vindo de volta</h2>
-                <p className="text-slate-400 text-center text-sm mb-7">Login do Gerente / Administrador</p>
+                <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-1">Bem-vindo de volta</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-center text-sm mb-7">Login do Gerente / Administrador</p>
 
                 {error && (
                   <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm text-center">
@@ -281,7 +281,7 @@ export const Login = () => {
                       placeholder="Nome do estabelecimento"
                       value={companyName}
                       onChange={e => setCompanyName(e.target.value)}
-                      className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                       required
                       disabled={loading}
                     />
@@ -294,7 +294,7 @@ export const Login = () => {
                       placeholder="Senha"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full bg-slate-950/50 border border-slate-800 text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                       required
                       disabled={loading}
                     />
@@ -303,7 +303,7 @@ export const Login = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-60 text-white font-bold text-lg rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-60 text-slate-900 dark:text-white font-bold text-lg rounded-xl py-4 shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Entrando...</>
@@ -312,7 +312,7 @@ export const Login = () => {
                 </form>
 
                 <div className="mt-7 text-center">
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">
                     Não tem conta?{' '}
                     <Link to="/register" className="ml-1 text-amber-500 hover:text-amber-400 font-medium transition-colors">
                       Criar conta
@@ -330,7 +330,7 @@ export const Login = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden"
+              className="bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden"
             >
               <AnimatePresence mode="wait">
 
@@ -343,8 +343,8 @@ export const Login = () => {
                     exit={{ opacity: 0 }}
                     className="p-6"
                   >
-                    <h2 className="text-xl font-bold text-center text-white mb-1">Quem está entrando?</h2>
-                    <p className="text-slate-400 text-center text-sm mb-6">Selecione seu nome para continuar</p>
+                    <h2 className="text-xl font-bold text-center text-slate-900 dark:text-white mb-1">Quem está entrando?</h2>
+                    <p className="text-slate-600 dark:text-slate-400 text-center text-sm mb-6">Selecione seu nome para continuar</p>
 
                     {staffLoading ? (
                       <div className="flex items-center justify-center py-10">
@@ -367,8 +367,8 @@ export const Login = () => {
                           >
                             <span className="text-2xl">{roleIcon(member.role)}</span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-white font-bold text-sm truncate">{member.name}</p>
-                              <p className="text-slate-400 text-xs">{roleLabel(member.role)}</p>
+                              <p className="text-slate-900 dark:text-white font-bold text-sm truncate">{member.name}</p>
+                              <p className="text-slate-600 dark:text-slate-400 text-xs">{roleLabel(member.role)}</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-slate-500 shrink-0" />
                           </motion.button>
@@ -391,7 +391,7 @@ export const Login = () => {
                     <div className="flex items-center gap-3 mb-5">
                       <button
                         onClick={() => { setSelectedStaff(null); setPin(''); setPinError(''); }}
-                        className="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                       >
                         <ArrowLeft className="w-4 h-4" />
                       </button>
@@ -399,18 +399,18 @@ export const Login = () => {
                         {roleIcon(selectedStaff.role)}
                       </div>
                       <div>
-                        <p className="text-white font-bold text-sm">{selectedStaff.name}</p>
-                        <p className="text-slate-400 text-xs">{roleLabel(selectedStaff.role)}</p>
+                        <p className="text-slate-900 dark:text-white font-bold text-sm">{selectedStaff.name}</p>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs">{roleLabel(selectedStaff.role)}</p>
                       </div>
                       <button
                         onClick={() => { setSelectedStaff(null); setPin(''); setPinError(''); }}
-                        className="ml-auto text-slate-500 hover:text-white cursor-pointer"
+                        className="ml-auto text-slate-500 hover:text-slate-900 dark:text-white cursor-pointer"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <h3 className="text-center text-white font-bold text-lg">Digite seu PIN</h3>
+                    <h3 className="text-center text-slate-900 dark:text-white font-bold text-lg">Digite seu PIN</h3>
 
                     {/* PIN Dots with shake animation */}
                     <motion.div
@@ -441,8 +441,8 @@ export const Login = () => {
                           className={`h-16 rounded-2xl font-bold text-2xl transition-all active:scale-95 cursor-pointer ${
                             !k ? 'invisible' :
                             k === 'del'
-                              ? 'bg-slate-800/80 text-slate-400 hover:bg-red-500/10 hover:text-red-400'
-                              : 'bg-slate-800/80 hover:bg-slate-700 text-white shadow-sm active:shadow-none border border-slate-700/50'
+                              ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-400'
+                              : 'bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-700 text-slate-900 dark:text-white shadow-sm active:shadow-none border border-slate-300 dark:border-slate-700/50'
                           }`}
                         >
                           {k === 'del' ? '⌫' : k}
@@ -457,7 +457,7 @@ export const Login = () => {
                         animate={{ opacity: 1, y: 0 }}
                         onClick={handlePinLogin}
                         disabled={loading}
-                        className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 disabled:opacity-60 text-white font-bold text-lg rounded-2xl py-4 shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
+                        className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 disabled:opacity-60 text-slate-900 dark:text-white font-bold text-lg rounded-2xl py-4 shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
                       >
                         {loading
                           ? <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Verificando...</>
@@ -480,7 +480,7 @@ export const Login = () => {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-auto">
           <button
             onClick={installApp}
-            className="flex items-center gap-2 px-5 py-3 bg-slate-900/90 border border-slate-800 text-white rounded-full text-sm font-bold shadow-2xl hover:bg-slate-800 hover:border-slate-700 transition-all hover:scale-105 active:scale-95 group"
+            className="flex items-center gap-2 px-5 py-3 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-full text-sm font-bold shadow-2xl hover:bg-slate-100 dark:bg-slate-800 hover:border-slate-300 dark:border-slate-700 transition-all hover:scale-105 active:scale-95 group"
           >
             <Smartphone className="w-4 h-4 text-amber-500 animate-bounce group-hover:scale-110 transition-transform" />
             <span>Instalar Aplicativo (PWA)</span>

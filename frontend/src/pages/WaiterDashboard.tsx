@@ -464,7 +464,7 @@ export const WaiterDashboard = () => {
             
             {/* HEADER FAST OPEN */}
             <div className="bg-indigo-600 rounded-3xl p-6 shadow-xl">
-              <h2 className="text-white font-black text-xl mb-4 text-center sm:text-left">
+              <h2 className="text-slate-900 dark:text-white font-black text-xl mb-4 text-center sm:text-left">
                 Lançamento Rápido
               </h2>
               <form onSubmit={handleFastOpen} className="flex flex-col sm:flex-row gap-3">
@@ -490,8 +490,8 @@ export const WaiterDashboard = () => {
               </form>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-              <h3 className="text-xl font-bold text-white mb-4">{label} Ativa</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{label} Ativa</h3>
               <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <input 
@@ -499,7 +499,7 @@ export const WaiterDashboard = () => {
                   placeholder={`Buscar ${label.toLowerCase()} por número...`} 
                   value={tableSearch}
                   onChange={e => setTableSearch(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-lg"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-lg"
                 />
               </div>
 
@@ -510,7 +510,7 @@ export const WaiterDashboard = () => {
                     const activeOrder = orders.find(o => o.table_id === t.id);
                     const statusColor = t.status === 'busy' ? 'border-red-500 bg-red-500/5' : 
                                       t.status === 'closing' ? 'border-amber-500 bg-amber-500/5' : 
-                                      'border-slate-800 bg-slate-950 hover:border-emerald-500';
+                                      'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-emerald-500';
                     return (
                       <button 
                         key={t.id} 
@@ -518,14 +518,14 @@ export const WaiterDashboard = () => {
                         className={`p-5 rounded-2xl border transition-all text-left flex flex-col justify-between h-28 cursor-pointer ${statusColor}`}
                       >
                         <div>
-                          <p className="text-white font-black text-xl">{label} {t.number}</p>
+                          <p className="text-slate-900 dark:text-white font-black text-xl">{label} {t.number}</p>
                           {activeOrder && (
-                            <p className="text-slate-400 text-xs mt-1 font-mono">Cmd: #{activeOrder.id.slice(0, 4)}</p>
+                            <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 font-mono">Cmd: #{activeOrder.id.slice(0, 4)}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 mt-2">
                           <span className={`w-2.5 h-2.5 rounded-full ${t.status === 'busy' ? 'bg-red-500' : t.status === 'closing' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-                          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">
+                          <span className="text-[10px] uppercase font-black tracking-wider text-slate-600 dark:text-slate-400">
                             {t.status === 'busy' ? 'Ocupada' : t.status === 'closing' ? 'Fechando' : 'Livre'}
                           </span>
                         </div>
@@ -537,16 +537,16 @@ export const WaiterDashboard = () => {
           </motion.div>
         ) : (
           /* DETALHES DA MESA SELECIONADA */
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
             {/* Header da Comanda */}
-            <div className="bg-slate-950 p-6 flex items-center justify-between border-b border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-950 p-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
               <div>
-                <h3 className="text-2xl font-black text-white">{label} {activeContext.table.number}</h3>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white">{label} {activeContext.table.number}</h3>
                 <p className="text-amber-500 font-bold text-sm">
                   {activeContext.order ? `Pedido Ativo: #${activeContext.order.id.slice(0, 8)}` : 'Sem pedido aberto'}
                 </p>
               </div>
-              <button onClick={() => setActiveContext(null)} className="p-2 text-slate-400 hover:text-white bg-slate-900 rounded-xl transition-colors">
+              <button onClick={() => setActiveContext(null)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white bg-white dark:bg-slate-900 rounded-xl transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
@@ -555,7 +555,7 @@ export const WaiterDashboard = () => {
               {/* Se a comanda não está aberta, mostra botão para abrir */}
               {!activeContext.order ? (
                 <div className="text-center py-12 space-y-4">
-                  <p className="text-slate-400">Esta {label.toLowerCase()} está livre no momento. Abra para começar a lançar pedidos.</p>
+                  <p className="text-slate-600 dark:text-slate-400">Esta {label.toLowerCase()} está livre no momento. Abra para começar a lançar pedidos.</p>
                   <button 
                     onClick={handleOpenNewComanda}
                     className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-lg py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/10 transition-all active:scale-98 cursor-pointer"
@@ -567,11 +567,11 @@ export const WaiterDashboard = () => {
                 <>
                   {/* Produtos já lançados */}
                   {activeContext.order.items.length > 0 && (
-                    <div className="mb-6 bg-slate-950/40 p-4 rounded-2xl border border-slate-800/80">
+                    <div className="mb-6 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800/80">
                       <h4 className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3">Itens Lançados</h4>
                       <div className="space-y-2">
                         {activeContext.order.items.map((it, idx) => (
-                          <div key={idx} className="flex justify-between items-center text-xs text-slate-400">
+                          <div key={idx} className="flex justify-between items-center text-xs text-slate-600 dark:text-slate-400">
                             <span>{it.quantity}x {it.product_name}</span>
                             <span className="font-mono">R$ {(it.price * it.quantity).toFixed(2)}</span>
                           </div>
@@ -581,7 +581,7 @@ export const WaiterDashboard = () => {
                   )}
 
                   {/* Lançamento de Novos Itens */}
-                  <h4 className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-3">Lançar Novos Itens</h4>
+                  <h4 className="text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider font-bold mb-3">Lançar Novos Itens</h4>
                   <button 
                     onClick={() => setIsMenuOpen(true)}
                     className="w-full bg-indigo-500/10 border-2 border-dashed border-indigo-500/50 hover:bg-indigo-500/20 hover:border-indigo-500 text-indigo-400 font-bold rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all mb-6"
@@ -592,14 +592,14 @@ export const WaiterDashboard = () => {
 
                   <div className="space-y-4 mb-6">
                     {pendingItems.map(o => (
-                      <div key={o.cartId} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 gap-4">
+                      <div key={o.cartId} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 gap-4">
                         <div className="flex-1">
-                          <h4 className="text-white font-medium">{o.product.name}</h4>
+                          <h4 className="text-slate-900 dark:text-white font-medium">{o.product.name}</h4>
                           <p className="text-amber-500 font-bold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.price * o.quantity)}</p>
                           {o.complements && o.complements.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {o.complements.map((c, i) => (
-                                <span key={i} className="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded-md">
+                                <span key={i} className="text-[10px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md">
                                   {c.optionName} {c.optionPrice > 0 && `(+R$ ${c.optionPrice.toFixed(2)})`}
                                 </span>
                               ))}
@@ -608,12 +608,12 @@ export const WaiterDashboard = () => {
                         </div>
                         
                         <div className="flex items-center justify-between sm:justify-end gap-4">
-                          <div className="flex items-center gap-3 bg-slate-900 rounded-xl p-1 border border-slate-700">
-                            <button onClick={() => updateQuantity(o.cartId, -1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Minus className="w-4 h-4" /></button>
-                            <span className="font-bold text-white w-6 text-center">{o.quantity}</span>
-                            <button onClick={() => updateQuantity(o.cartId, 1)} className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
+                          <div className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-xl p-1 border border-slate-300 dark:border-slate-700">
+                            <button onClick={() => updateQuantity(o.cartId, -1)} className="p-2 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:bg-slate-800"><Minus className="w-4 h-4" /></button>
+                            <span className="font-bold text-slate-900 dark:text-white w-6 text-center">{o.quantity}</span>
+                            <button onClick={() => updateQuantity(o.cartId, 1)} className="p-2 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:bg-slate-800"><Plus className="w-4 h-4" /></button>
                           </div>
-                          <button onClick={() => removePendingItem(o.cartId)} className="p-3 text-slate-500 hover:text-red-400 bg-slate-900 rounded-xl transition-colors">
+                          <button onClick={() => removePendingItem(o.cartId)} className="p-3 text-slate-500 hover:text-red-400 bg-white dark:bg-slate-900 rounded-xl transition-colors">
                             <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
@@ -622,9 +622,9 @@ export const WaiterDashboard = () => {
                   </div>
 
                   {pendingItems.length > 0 && (
-                    <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                    <div className="bg-slate-50 dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
                       <div className="flex justify-between items-center mb-4">
-                        <span className="text-slate-400">Total a Enviar</span>
+                        <span className="text-slate-600 dark:text-slate-400">Total a Enviar</span>
                         <span className="text-3xl font-black text-amber-500">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(pendingTotal)}</span>
                       </div>
                       <button 
@@ -649,11 +649,11 @@ export const WaiterDashboard = () => {
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
-            className="fixed inset-0 z-50 flex flex-col bg-slate-950 sm:p-6 lg:p-12 lg:bg-slate-950/80 lg:backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-slate-950 sm:p-6 lg:p-12 lg:bg-slate-50 dark:bg-slate-950/80 lg:backdrop-blur-sm"
           >
-            <div className="flex-1 bg-slate-900 sm:rounded-3xl border-slate-800 sm:border flex flex-col overflow-hidden max-w-2xl mx-auto w-full shadow-2xl">
+            <div className="flex-1 bg-white dark:bg-slate-900 sm:rounded-3xl border-slate-200 dark:border-slate-800 sm:border flex flex-col overflow-hidden max-w-2xl mx-auto w-full shadow-2xl">
               
-              <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-4">
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                   <input 
@@ -662,10 +662,10 @@ export const WaiterDashboard = () => {
                     placeholder="Buscar produto..." 
                     value={menuSearch}
                     onChange={e => setMenuSearch(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-lg"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-lg"
                   />
                 </div>
-                <button onClick={() => setIsMenuOpen(false)} className="p-4 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-300 transition-colors cursor-pointer">
+                <button onClick={() => setIsMenuOpen(false)} className="p-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-700 dark:text-slate-300 transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -673,9 +673,9 @@ export const WaiterDashboard = () => {
               {/* Sidebar and Main Layout */}
               <div className="flex-1 flex flex-col md:flex-row min-h-0">
                 {/* Category Sidebar (Scroll X on Mobile, Scroll Y on Desktop) */}
-                <div className="w-full md:w-[250px] bg-slate-950 border-b md:border-b-0 md:border-r border-slate-800 flex md:flex-col overflow-x-auto md:overflow-y-auto p-4 gap-2 md:gap-3 custom-scrollbar shrink-0">
+                <div className="w-full md:w-[250px] bg-slate-50 dark:bg-slate-950 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex md:flex-col overflow-x-auto md:overflow-y-auto p-4 gap-2 md:gap-3 custom-scrollbar shrink-0">
                   <div className="hidden md:block mb-2 px-2">
-                    <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Categorias</h4>
+                    <h4 className="text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Categorias</h4>
                   </div>
                   {categories.map((cat) => (
                     <button
@@ -684,7 +684,7 @@ export const WaiterDashboard = () => {
                       className={`px-4 py-3 rounded-xl text-sm font-bold transition-all shrink-0 md:text-left cursor-pointer whitespace-nowrap md:whitespace-normal ${
                         selectedCategory === cat
                           ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 md:scale-[1.02]'
-                          : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-200 border border-slate-200 dark:border-slate-800'
                       }`}
                     >
                       {cat}
@@ -693,11 +693,11 @@ export const WaiterDashboard = () => {
                 </div>
 
                 {/* Product List */}
-                <div className="flex-1 flex flex-col min-w-0 bg-slate-900">
+                <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900">
                   <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
                 {products.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6 gap-3">
-                    <p className="font-bold text-slate-400">Nenhum produto cadastrado.</p>
+                    <p className="font-bold text-slate-600 dark:text-slate-400">Nenhum produto cadastrado.</p>
                     <p className="text-xs text-slate-600 max-w-sm mt-1">
                       Acesse a tela de Produtos para cadastrar itens no cardápio.
                     </p>
@@ -711,20 +711,20 @@ export const WaiterDashboard = () => {
                     const pendingCount = itemPending.reduce((sum, p) => sum + p.quantity, 0);
 
                     return (
-                      <div key={item.id} className="flex flex-col p-3.5 bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
+                      <div key={item.id} className="flex flex-col p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-850 hover:border-indigo-500/50 rounded-2xl transition-all shadow-sm">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-2xl shadow-inner select-none">
+                            <div className="w-12 h-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-2xl shadow-inner select-none">
                               {emoji}
                             </div>
                             <div>
-                              <h4 className="text-white font-bold text-base leading-tight">{item.name}</h4>
+                              <h4 className="text-slate-900 dark:text-white font-bold text-base leading-tight">{item.name}</h4>
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-amber-500 font-bold text-sm">
                                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
                                 </span>
                                 {item.category_name && (
-                                  <span className="bg-slate-900 text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-slate-800">
+                                  <span className="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border border-slate-200 dark:border-slate-800">
                                     {item.category_name}
                                   </span>
                                 )}
@@ -737,14 +737,14 @@ export const WaiterDashboard = () => {
                               <button onClick={() => {
                                 const lastItem = itemPending[itemPending.length - 1];
                                 if (lastItem) updateQuantity(lastItem.cartId, -1);
-                              }} className="w-8 h-8 flex items-center justify-center bg-slate-900 rounded-full text-slate-300 shadow-sm cursor-pointer"><Minus className="w-4 h-4" /></button>
+                              }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full text-slate-700 dark:text-slate-300 shadow-sm cursor-pointer"><Minus className="w-4 h-4" /></button>
                               <span className="font-bold text-sm w-4 text-center text-indigo-400">{pendingCount}</span>
                               <button onClick={() => addPendingItem(item)} className="w-8 h-8 flex items-center justify-center bg-indigo-500 rounded-full text-white shadow-sm cursor-pointer"><Plus className="w-4 h-4" /></button>
                             </div>
                           ) : (
                             <button 
                               onClick={() => addPendingItem(item)}
-                              className="bg-slate-900 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
+                              className="bg-white dark:bg-slate-900 hover:bg-indigo-600 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
                             >
                               <Plus className="w-5 h-5" />
                             </button>
@@ -752,7 +752,7 @@ export const WaiterDashboard = () => {
                         </div>
 
                         {pendingCount > 0 && (
-                          <div className="mt-3 pt-3 border-t border-slate-800/50 flex items-center justify-between">
+                          <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800/50 flex items-center justify-between">
                             <button 
                               onClick={() => {
                                 const lastItem = itemPending[itemPending.length - 1];
@@ -766,7 +766,7 @@ export const WaiterDashboard = () => {
                               {itemPending[itemPending.length - 1]?.notes ? (
                                 <span className="text-indigo-400 line-clamp-1">Obs: {itemPending[itemPending.length - 1]?.notes}</span>
                               ) : (
-                                <span className="text-slate-400 hover:text-indigo-400 underline decoration-dashed underline-offset-2">+ adicionar observação</span>
+                                <span className="text-slate-600 dark:text-slate-400 hover:text-indigo-400 underline decoration-dashed underline-offset-2">+ adicionar observação</span>
                               )}
                             </button>
                           </div>
@@ -778,7 +778,7 @@ export const WaiterDashboard = () => {
               </div>
 
               {/* RODAPÉ DO CARDÁPIO: CONTA DA MESA E ITENS PENDENTES */}
-              <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
                   <span className="text-slate-500 text-xs font-bold uppercase tracking-wider block mb-1">Conta da Mesa</span>
                   <span className="text-emerald-400 font-black text-2xl">
@@ -809,29 +809,29 @@ export const WaiterDashboard = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-slate-50 dark:bg-slate-950/90 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
             >
-              <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Confirmar Pedido</h3>
-                  <p className="text-slate-400 text-sm">{label} {activeContext?.table.number} • Pedido #{activeContext?.order?.id.slice(0, 8)}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Confirmar Pedido</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">{label} {activeContext?.table.number} • Pedido #{activeContext?.order?.id.slice(0, 8)}</p>
                 </div>
-                <button onClick={() => !isPrinting && setIsPrintModalOpen(false)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+                <button onClick={() => !isPrinting && setIsPrintModalOpen(false)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-900 flex flex-col gap-6">
-                <p className="text-slate-300 text-sm">Confirmar e enviar os itens selecionados para a produção?</p>
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-slate-900 flex flex-col gap-6">
+                <p className="text-slate-700 dark:text-slate-300 text-sm">Confirmar e enviar os itens selecionados para a produção?</p>
+                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
                   {pendingItems.map(o => (
-                    <div key={o.product.id} className="flex justify-between text-sm text-slate-400">
+                    <div key={o.product.id} className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
                       <span>{o.quantity}x {o.product.name}</span>
                       <span>R$ {(o.product.price * o.quantity).toFixed(2)}</span>
                     </div>
@@ -839,11 +839,11 @@ export const WaiterDashboard = () => {
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-950 border-t border-slate-800 flex gap-4">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex gap-4">
                 <button 
                   onClick={() => setIsPrintModalOpen(false)}
                   disabled={isPrinting}
-                  className="flex-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-medium py-4 rounded-xl transition-colors"
+                  className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-900 dark:text-white font-medium py-4 rounded-xl transition-colors"
                 >
                   Cancelar
                 </button>

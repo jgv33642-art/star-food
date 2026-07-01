@@ -509,13 +509,13 @@ export const StockImport = () => {
 
         {/* Navigation Tabs (Only visible when not in reconciliation review screen) */}
         {!parsedNfe && (
-          <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-850 max-w-xl mx-auto shadow-inner">
+          <div className="flex bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-850 max-w-xl mx-auto shadow-inner">
             <button
               onClick={() => setActiveTab('xml')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'xml' 
                   ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white'
               }`}
             >
               <FileText className="w-4 h-4" /> NF-e (XML)
@@ -526,7 +526,7 @@ export const StockImport = () => {
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'qrcode' 
                   ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white'
               }`}
             >
               <QrCode className="w-4 h-4" /> Cupom (QR Code)
@@ -537,7 +537,7 @@ export const StockImport = () => {
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'manual' 
                   ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white'
               }`}
             >
               <Keyboard className="w-4 h-4" /> Recibo (Manual)
@@ -552,13 +552,13 @@ export const StockImport = () => {
             {/* Tab 1: XML File Uploader */}
             {activeTab === 'xml' && (
               <div className="max-w-xl mx-auto">
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center shadow-lg relative overflow-hidden group">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-lg relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   
                   <UploadCloud className="w-16 h-16 text-indigo-500 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
                   
-                  <h2 className="text-xl font-bold text-white mb-2">Importação de XML de NF-e</h2>
-                  <p className="text-slate-400 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Importação de XML de NF-e</h2>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
                     Arraste ou selecione o arquivo .xml da nota fiscal eletrônica de compra.
                   </p>
 
@@ -584,7 +584,7 @@ export const StockImport = () => {
 
             {/* Tab 2: NFC-e QR Code Scanner (Camera or URL copy paste) */}
             {activeTab === 'qrcode' && (
-              <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-lg text-center space-y-6 relative overflow-hidden">
+              <div className="max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg text-center space-y-6 relative overflow-hidden">
                 {/* Laser scan animation overlay */}
                 {scannerActive && (
                   <div 
@@ -596,7 +596,7 @@ export const StockImport = () => {
                 )}
 
                 <div className="flex items-center justify-between border-b border-slate-850 pb-4">
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <QrCode className="w-5 h-5 text-indigo-400" /> Leitor de NFC-e / SAT
                   </h3>
                   {scannerActive && (
@@ -639,14 +639,14 @@ export const StockImport = () => {
 
                 {cameras.length > 1 && (
                   <div className="text-left space-y-1">
-                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mudar Dispositivo de Câmera</label>
+                    <label className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Mudar Dispositivo de Câmera</label>
                     <select
                       value={selectedCameraId}
                       onChange={(e) => {
                         setSelectedCameraId(e.target.value);
                         if (scannerActive) startScanner(); // Restart using newly selected camera device
                       }}
-                      className="w-full bg-slate-950 border border-slate-850 text-white rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-850 text-slate-900 dark:text-white rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
                     >
                       {cameras.map((camera, i) => (
                         <option key={camera.id} value={camera.id}>
@@ -664,7 +664,7 @@ export const StockImport = () => {
                 )}
 
                 <div className="border-t border-slate-850 pt-5 space-y-4">
-                  <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider text-left">
+                  <p className="text-slate-600 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider text-left">
                     Ou Cole a URL da SEFAZ Manualmente
                   </p>
                   <div className="flex gap-2">
@@ -673,7 +673,7 @@ export const StockImport = () => {
                       placeholder="https://www.sefaz.sp.gov.br/nfce/consulta..."
                       value={qrcodeUrlInput}
                       onChange={(e) => setQrcodeUrlInput(e.target.value)}
-                      className="flex-1 bg-slate-950 border border-slate-850 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none placeholder:text-slate-700 font-mono"
+                      className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-850 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none placeholder:text-slate-700 font-mono"
                     />
                     <button
                       onClick={() => handleQrCodeUrl(qrcodeUrlInput)}
@@ -689,9 +689,9 @@ export const StockImport = () => {
 
             {/* Tab 3: Fast keyboard/spreadsheet layout for standard receipts */}
             {activeTab === 'manual' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-lg space-y-6">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg space-y-6">
                 <div className="flex items-center justify-between border-b border-slate-850 pb-4">
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Keyboard className="w-5 h-5 text-indigo-400" /> Digitação Rápida de Recibo
                   </h3>
                   <span className="text-xs text-slate-500 font-medium">Usabilidade 100% via Teclado</span>
@@ -700,43 +700,43 @@ export const StockImport = () => {
                 {/* Header info */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">CNPJ do Fornecedor</label>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">CNPJ do Fornecedor</label>
                     <input
                       type="text"
                       placeholder="00.000.000/0000-00"
                       value={manualCnpj}
                       onChange={(e) => handleCnpjChange(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-850 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Razão Social / Nome Fantasia</label>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Razão Social / Nome Fantasia</label>
                     <input
                       type="text"
                       placeholder="Ex: Comercial de Alimentos LTDA"
                       value={manualSupplierName}
                       onChange={(e) => setManualSupplierName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-850 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Data da Compra</label>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Data da Compra</label>
                     <input
                       type="date"
                       value={manualDate}
                       onChange={(e) => setManualDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none appearance-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-850 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none appearance-none"
                     />
                   </div>
                 </div>
 
                 {/* Quick input row */}
-                <div className="bg-slate-950/40 border border-slate-850 rounded-2xl p-5 space-y-4 relative">
+                <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-850 rounded-2xl p-5 space-y-4 relative">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     
                     {/* Product Autocomplete Search */}
                     <div className="md:col-span-6 relative">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                         Buscar Produto ou Bipar Código/EAN
                       </label>
                       <input
@@ -749,12 +749,12 @@ export const StockImport = () => {
                           setSearchSkuOrName(e.target.value);
                           setShowSuggestions(true);
                         }}
-                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                       />
                       
                       {/* Suggestions list */}
                       {showSuggestions && suggestions.length > 0 && (
-                        <div className="absolute left-0 right-0 z-40 mt-2 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl overflow-hidden divide-y divide-slate-850">
+                        <div className="absolute left-0 right-0 z-40 mt-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden divide-y divide-slate-850">
                           {suggestions.map((prod) => (
                             <button
                               key={prod.id}
@@ -764,7 +764,7 @@ export const StockImport = () => {
                                 setSearchSkuOrName(prod.name);
                                 setShowSuggestions(false);
                               }}
-                              className="w-full text-left px-4 py-3 hover:bg-slate-900 text-white text-xs font-semibold flex justify-between items-center transition-colors cursor-pointer"
+                              className="w-full text-left px-4 py-3 hover:bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-semibold flex justify-between items-center transition-colors cursor-pointer"
                             >
                               <span>{prod.name}</span>
                               <span className="text-slate-500 font-mono text-[10px]">{prod.sku || 'Sem SKU'}</span>
@@ -776,19 +776,19 @@ export const StockImport = () => {
 
                     {/* Selected Badge */}
                     <div className="md:col-span-2">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Qtd.</label>
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Qtd.</label>
                       <input
                         type="number"
                         min="0.01"
                         step="any"
                         value={manualQuantity}
                         onChange={(e) => setManualQuantity(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-center font-bold"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-center font-bold"
                       />
                     </div>
 
                     <div className="md:col-span-3">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Custo Total R$</label>
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Custo Total R$</label>
                       <input
                         type="number"
                         min="0.01"
@@ -802,7 +802,7 @@ export const StockImport = () => {
                             addManualItem();
                           }
                         }}
-                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none font-bold"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none font-bold"
                       />
                     </div>
 
@@ -832,15 +832,15 @@ export const StockImport = () => {
                 </div>
 
                 {/* Draft list table */}
-                <div className="border border-slate-850 rounded-2xl overflow-hidden bg-slate-950/20">
+                <div className="border border-slate-850 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950/20">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-950 border-b border-slate-850">
-                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Item Selecionado</th>
-                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center w-24">Quantidade</th>
-                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center w-36">Custo Total</th>
-                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center w-32">Custo Unitário</th>
-                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right w-20">Remover</th>
+                      <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-850">
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Item Selecionado</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-center w-24">Quantidade</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-center w-36">Custo Total</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-center w-32">Custo Unitário</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-right w-20">Remover</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -852,18 +852,18 @@ export const StockImport = () => {
                         </tr>
                       ) : (
                         draftItems.map((item, index) => (
-                          <tr key={index} className="border-b border-slate-850 hover:bg-slate-800/10 transition-colors">
+                          <tr key={index} className="border-b border-slate-850 hover:bg-slate-100 dark:bg-slate-800/10 transition-colors">
                             <td className="py-3 px-4">
-                              <p className="text-white font-bold text-sm">{item.name}</p>
+                              <p className="text-slate-900 dark:text-white font-bold text-sm">{item.name}</p>
                               <p className="text-slate-500 text-xs font-mono">SKU/EAN: {item.ean || 'Sem Código'}</p>
                             </td>
-                            <td className="py-3 px-4 text-center text-white font-semibold text-sm">
+                            <td className="py-3 px-4 text-center text-slate-900 dark:text-white font-semibold text-sm">
                               {item.quantity}
                             </td>
                             <td className="py-3 px-4 text-center text-emerald-400 font-extrabold text-sm">
                               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.quantity * item.costPrice)}
                             </td>
-                            <td className="py-3 px-4 text-center text-slate-400 text-xs font-mono">
+                            <td className="py-3 px-4 text-center text-slate-600 dark:text-slate-400 text-xs font-mono">
                               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.costPrice)}
                             </td>
                             <td className="py-3 px-4 text-right">
@@ -904,12 +904,12 @@ export const StockImport = () => {
             className="space-y-6"
           >
             {/* Header info */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row justify-between gap-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row justify-between gap-6 shadow-sm">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                   <FileText className="w-4 h-4 text-indigo-400" /> Origem da Entrada de Estoque
                 </div>
-                <p className="text-white font-mono text-sm tracking-wide bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-850 truncate max-w-sm">
+                <p className="text-slate-900 dark:text-white font-mono text-sm tracking-wide bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-850 truncate max-w-sm">
                   {parsedNfe.accessKey ? `Chave: ${parsedNfe.accessKey}` : 'Entrada Manual de Recibo'}
                 </p>
               </div>
@@ -917,8 +917,8 @@ export const StockImport = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1 max-w-2xl">
                 <div>
                   <span className="block text-slate-500 text-xs font-medium mb-1">Fornecedor</span>
-                  <span className="text-white font-bold text-sm block truncate">{parsedNfe.supplierName}</span>
-                  <span className="text-slate-400 text-xs font-mono">
+                  <span className="text-slate-900 dark:text-white font-bold text-sm block truncate">{parsedNfe.supplierName}</span>
+                  <span className="text-slate-600 dark:text-slate-400 text-xs font-mono">
                     {parsedNfe.supplierCnpj ? parsedNfe.supplierCnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5") : 'Não Informado'}
                   </span>
                 </div>
@@ -934,7 +934,7 @@ export const StockImport = () => {
                       setParsedNfe(null);
                       setDraftItems([]);
                     }}
-                    className="text-slate-400 hover:text-white px-4 py-2 rounded-xl text-sm border border-slate-880 hover:bg-slate-800/50 transition-all cursor-pointer"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white px-4 py-2 rounded-xl text-sm border border-slate-880 hover:bg-slate-100 dark:bg-slate-800/50 transition-all cursor-pointer"
                   >
                     Descartar e Voltar
                   </button>
@@ -943,10 +943,10 @@ export const StockImport = () => {
             </div>
 
             {/* Reconciliation Table */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-              <div className="p-5 border-b border-slate-800 bg-slate-950/20">
-                <h3 className="text-lg font-bold text-white">Conciliação de Itens</h3>
-                <p className="text-slate-400 text-xs mt-1">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+              <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/20">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Conciliação de Itens</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs mt-1">
                   Revise as quantidades e vincule produtos pendentes antes de registrar a entrada física.
                 </p>
               </div>
@@ -954,13 +954,13 @@ export const StockImport = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
-                    <tr className="bg-slate-950/50 border-b border-slate-800">
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Item do Cupom / Nota</th>
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider w-24">Qtd. Documento</th>
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider w-32">Fator Conversão</th>
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Valores Unitários</th>
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status / Mapeamento Interno</th>
-                      <th className="py-4 px-5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Ações</th>
+                    <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Item do Cupom / Nota</th>
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider w-24">Qtd. Documento</th>
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider w-32">Fator Conversão</th>
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Valores Unitários</th>
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status / Mapeamento Interno</th>
+                      <th className="py-4 px-5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -969,14 +969,14 @@ export const StockImport = () => {
                       const finalCost = item.costPrice / item.conversionFactor;
 
                       return (
-                        <tr key={idx} className="border-b border-slate-800 hover:bg-slate-800/20 transition-all">
+                        <tr key={idx} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:bg-slate-800/20 transition-all">
                           <td className="py-4 px-5">
-                            <p className="text-white font-bold text-sm">{item.name}</p>
+                            <p className="text-slate-900 dark:text-white font-bold text-sm">{item.name}</p>
                             <p className="text-slate-500 text-xs font-mono mt-0.5">
                               Cód. Forn: #{item.supplierCode || 'N/A'} | EAN: {item.ean || 'Sem código'}
                             </p>
                           </td>
-                          <td className="py-4 px-5 text-white font-semibold text-sm">
+                          <td className="py-4 px-5 text-slate-900 dark:text-white font-semibold text-sm">
                             {item.quantity}
                           </td>
                           <td className="py-4 px-5">
@@ -985,11 +985,11 @@ export const StockImport = () => {
                               min="1"
                               value={item.conversionFactor}
                               onChange={(e) => handleFactorChange(idx, e.target.value)}
-                              className="w-20 bg-slate-950 border border-slate-800 text-white rounded-lg px-2.5 py-1 text-center font-bold text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                              className="w-20 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-lg px-2.5 py-1 text-center font-bold text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                             />
                           </td>
                           <td className="py-4 px-5">
-                            <div className="text-slate-400 text-xs">
+                            <div className="text-slate-600 dark:text-slate-400 text-xs">
                               Preço Compra: <span className="text-slate-200">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.costPrice)}</span>
                             </div>
                             <div className="text-indigo-400 font-bold text-xs mt-0.5">
@@ -1003,7 +1003,7 @@ export const StockImport = () => {
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/15">
                                   <CheckCircle2 className="w-3.5 h-3.5" /> Vinculado
                                 </span>
-                                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1">
+                                <div className="text-xs text-slate-700 dark:text-slate-300 font-semibold flex items-center gap-1">
                                   <CornerDownRight className="w-3.5 h-3.5 text-slate-500" />
                                   {item.matchedProduct.name} <span className="text-slate-500 font-mono text-[10px]">({item.matchedProduct.sku})</span>
                                 </div>
@@ -1022,7 +1022,7 @@ export const StockImport = () => {
                                 <>
                                   <button
                                     onClick={() => openLinkModal(idx)}
-                                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                                    className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                                   >
                                     <Link2 className="w-3.5 h-3.5" /> Vincular
                                   </button>
@@ -1055,9 +1055,9 @@ export const StockImport = () => {
               </div>
 
               {/* Confirm Actions */}
-              <div className="p-6 bg-slate-950/40 border-t border-slate-800 flex justify-between items-center">
-                <span className="text-xs text-slate-400">
-                  Total de Itens: <strong className="text-white">{parsedNfe.items.length}</strong> | Itens Vinculados: <strong className="text-white">{parsedNfe.items.filter(i => i.matchedProduct).length}</strong>
+              <div className="p-6 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  Total de Itens: <strong className="text-slate-900 dark:text-white">{parsedNfe.items.length}</strong> | Itens Vinculados: <strong className="text-slate-900 dark:text-white">{parsedNfe.items.filter(i => i.matchedProduct).length}</strong>
                 </span>
 
                 <button
@@ -1085,16 +1085,16 @@ export const StockImport = () => {
       {/* MODAL DE VÍNCULO MANUAL */}
       <AnimatePresence>
         {linkingIndex !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl"
             >
-              <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">Vincular a Produto Interno</h3>
-                <button onClick={() => setLinkingIndex(null)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Vincular a Produto Interno</h3>
+                <button onClick={() => setLinkingIndex(null)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -1107,7 +1107,7 @@ export const StockImport = () => {
                     placeholder="Buscar produto por nome ou SKU..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-11 pr-4 focus:ring-1 focus:ring-indigo-500 outline-none transition-all text-sm"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:ring-1 focus:ring-indigo-500 outline-none transition-all text-sm"
                   />
                 </div>
 
@@ -1119,13 +1119,13 @@ export const StockImport = () => {
                       <button
                         key={prod.id}
                         onClick={() => confirmLink(prod)}
-                        className="w-full text-left p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 rounded-xl transition-all flex justify-between items-center group cursor-pointer"
+                        className="w-full text-left p-3.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:bg-slate-800 border border-slate-850 hover:border-slate-300 dark:border-slate-700 rounded-xl transition-all flex justify-between items-center group cursor-pointer"
                       >
                         <div>
-                          <p className="text-white font-bold text-sm group-hover:text-indigo-400 transition-colors">{prod.name}</p>
-                          <p className="text-slate-400 text-xs font-mono mt-0.5">SKU/Código: {prod.sku || 'Sem SKU'}</p>
+                          <p className="text-slate-900 dark:text-white font-bold text-sm group-hover:text-indigo-400 transition-colors">{prod.name}</p>
+                          <p className="text-slate-600 dark:text-slate-400 text-xs font-mono mt-0.5">SKU/Código: {prod.sku || 'Sem SKU'}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                        <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-slate-900 dark:text-white transition-colors" />
                       </button>
                     ))
                   )}
@@ -1139,63 +1139,63 @@ export const StockImport = () => {
       {/* MODAL DE CADASTRO RÁPIDO DE PRODUTO */}
       <AnimatePresence>
         {creatingIndex !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
             >
-              <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">Cadastrar Produto Novo</h3>
-                <button onClick={() => setCreatingIndex(null)} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Cadastrar Produto Novo</h3>
+                <button onClick={() => setCreatingIndex(null)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors cursor-pointer">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={confirmCreateProduct} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Nome do Produto</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Nome do Produto</label>
                   <input
                     type="text"
                     required
                     value={newProdName}
                     onChange={(e) => setNewProdName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Código / SKU</label>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Código / SKU</label>
                     <input
                       type="text"
                       required
                       value={newProdSku}
                       onChange={(e) => setNewProdSku(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none font-mono"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Preço de Venda (R$)</label>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Preço de Venda (R$)</label>
                     <input
                       type="number"
                       step="0.01"
                       required
                       value={newProdPrice}
                       onChange={(e) => setNewProdPrice(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Categoria</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Categoria</label>
                   <select
                     required
                     value={newProdCategoryId}
                     onChange={(e) => setNewProdCategoryId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
                   >
                     <option value="">Selecione...</option>
                     {categories.map((cat) => (
@@ -1204,11 +1204,11 @@ export const StockImport = () => {
                   </select>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800 flex gap-4">
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-4">
                   <button
                     type="button"
                     onClick={() => setCreatingIndex(null)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-750 text-white font-medium py-3 rounded-xl transition-colors cursor-pointer"
+                    className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-750 text-slate-900 dark:text-white font-medium py-3 rounded-xl transition-colors cursor-pointer"
                   >
                     Cancelar
                   </button>

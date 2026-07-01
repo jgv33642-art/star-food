@@ -179,7 +179,7 @@ export const Finance = () => {
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">{error}</span>
               </div>
-              <button onClick={() => setError(null)} className="text-red-400 hover:text-white transition-colors">
+              <button onClick={() => setError(null)} className="text-red-400 hover:text-slate-900 dark:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>
@@ -200,7 +200,7 @@ export const Finance = () => {
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 transition={{ delay: 0.1 }} 
-                className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-sm relative overflow-hidden"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm relative overflow-hidden"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
@@ -210,8 +210,8 @@ export const Finance = () => {
                     <ArrowUpRight className="w-3.5 h-3.5 mr-0.5"/> Faturamento
                   </span>
                 </div>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">Faturamento Bruto</p>
-                <h3 className="text-3xl font-black text-white mt-1 font-mono">
+                <p className="text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Faturamento Bruto</p>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRevenue)}
                 </h3>
               </motion.div>
@@ -221,7 +221,7 @@ export const Finance = () => {
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 transition={{ delay: 0.2 }} 
-                className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-sm"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-3 bg-red-500/10 rounded-2xl text-red-450">
@@ -231,8 +231,8 @@ export const Finance = () => {
                     <ArrowDownRight className="w-3.5 h-3.5 mr-0.5"/> Custos + Despesas
                   </span>
                 </div>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">Custo + Despesas (CMV + Taxas + Fixas)</p>
-                <h3 className="text-3xl font-black text-white mt-1 font-mono">
+                <p className="text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Custo + Despesas (CMV + Taxas + Fixas)</p>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalCMV + estimatedFixedExpenses + estimatedFees)}
                 </h3>
               </motion.div>
@@ -245,12 +245,12 @@ export const Finance = () => {
                 className="bg-gradient-to-br from-indigo-500 to-purple-650 p-6 rounded-3xl shadow-lg shadow-indigo-500/15"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-white/20 rounded-2xl text-white">
+                  <div className="p-3 bg-white/20 rounded-2xl text-slate-900 dark:text-white">
                     <DollarSign className="w-6 h-6" />
                   </div>
                 </div>
                 <p className="text-indigo-150 text-xs font-bold uppercase tracking-wider">Lucro Líquido Real</p>
-                <h3 className="text-3xl font-black text-white mt-1 font-mono">
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(netProfit)}
                 </h3>
               </motion.div>
@@ -263,30 +263,30 @@ export const Finance = () => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.98 }} 
                 animate={{ opacity: 1, scale: 1 }} 
-                className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm"
               >
-                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                   <Activity className="w-5 h-5 text-indigo-400" /> DRE Simplificado (Competência)
                 </h3>
                 <div className="space-y-4 font-mono">
                   <div className="flex justify-between items-center pb-2 border-b border-slate-850">
-                    <span className="text-slate-400 text-sm">1. Receita Bruta (Vendas)</span>
-                    <span className="font-bold text-white">R$ {totalRevenue.toFixed(2)}</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">1. Receita Bruta (Vendas)</span>
+                    <span className="font-bold text-slate-900 dark:text-white">R$ {totalRevenue.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-slate-850">
-                    <span className="text-slate-400 text-sm">2. Custo de Mercadorias Vendidas (CMV)</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">2. Custo de Mercadorias Vendidas (CMV)</span>
                     <span className="font-bold text-red-400">- R$ {totalCMV.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-slate-850">
-                    <span className="text-slate-400 text-sm">3. Despesas Fixas Operacionais</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">3. Despesas Fixas Operacionais</span>
                     <span className="font-bold text-red-400">- R$ {estimatedFixedExpenses.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-slate-850">
-                    <span className="text-slate-400 text-sm">4. Taxas de Meios de Pagamento (4%)</span>
+                    <span className="text-slate-600 dark:text-slate-400 text-sm">4. Taxas de Meios de Pagamento (4%)</span>
                     <span className="font-bold text-orange-400">- R$ {estimatedFees.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-base font-bold text-white uppercase font-sans">LUCRO LÍQUIDO</span>
+                    <span className="text-base font-bold text-slate-900 dark:text-white uppercase font-sans">LUCRO LÍQUIDO</span>
                     <span className={`text-2xl font-black ${netProfit >= 0 ? 'text-emerald-500' : 'text-red-400'}`}>
                       R$ {netProfit.toFixed(2)}
                     </span>
@@ -300,36 +300,36 @@ export const Finance = () => {
                   initial={{ opacity: 0, scale: 0.98 }} 
                   animate={{ opacity: 1, scale: 1 }} 
                   transition={{ delay: 0.1 }} 
-                  className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm"
                 >
-                  <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                     <PieChart className="w-5 h-5 text-amber-500" /> Distribuição de Vendas
                   </h3>
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between text-xs font-bold mb-1">
                         <span className="text-slate-350">Cartão de Crédito/Débito</span>
-                        <span className="text-white font-mono">{methodPercentages.cartao}%</span>
+                        <span className="text-slate-900 dark:text-white font-mono">{methodPercentages.cartao}%</span>
                       </div>
-                      <div className="w-full bg-slate-950 rounded-full h-2">
+                      <div className="w-full bg-slate-50 dark:bg-slate-950 rounded-full h-2">
                         <div className="bg-indigo-500 h-2 rounded-full transition-all duration-500" style={{ width: `${methodPercentages.cartao}%` }}></div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-xs font-bold mb-1">
                         <span className="text-slate-350">PIX</span>
-                        <span className="text-white font-mono">{methodPercentages.pix}%</span>
+                        <span className="text-slate-900 dark:text-white font-mono">{methodPercentages.pix}%</span>
                       </div>
-                      <div className="w-full bg-slate-950 rounded-full h-2">
+                      <div className="w-full bg-slate-50 dark:bg-slate-950 rounded-full h-2">
                         <div className="bg-emerald-500 h-2 rounded-full transition-all duration-500" style={{ width: `${methodPercentages.pix}%` }}></div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-xs font-bold mb-1">
                         <span className="text-slate-350">Dinheiro (Espécie)</span>
-                        <span className="text-white font-mono">{methodPercentages.dinheiro}%</span>
+                        <span className="text-slate-900 dark:text-white font-mono">{methodPercentages.dinheiro}%</span>
                       </div>
-                      <div className="w-full bg-slate-950 rounded-full h-2">
+                      <div className="w-full bg-slate-50 dark:bg-slate-950 rounded-full h-2">
                         <div className="bg-amber-500 h-2 rounded-full transition-all duration-500" style={{ width: `${methodPercentages.dinheiro}%` }}></div>
                       </div>
                     </div>
@@ -341,9 +341,9 @@ export const Finance = () => {
                   initial={{ opacity: 0, scale: 0.98 }} 
                   animate={{ opacity: 1, scale: 1 }} 
                   transition={{ delay: 0.2 }} 
-                  className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm"
                 >
-                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-emerald-500" /> Faturamento por Hora (Pico)
                   </h3>
                   <div className="flex items-end justify-between h-28 gap-2 mt-6">
@@ -351,13 +351,13 @@ export const Finance = () => {
                       const amount = salesByHour[hour];
                       const heightPercent = maxEveningRevenue > 0 ? (amount / maxEveningRevenue) * 100 : 0;
                       return (
-                        <div key={hour} className="w-full bg-slate-950 rounded-t-lg relative group h-full flex flex-col justify-end">
+                        <div key={hour} className="w-full bg-slate-50 dark:bg-slate-950 rounded-t-lg relative group h-full flex flex-col justify-end">
                           <motion.div 
                             initial={{ height: 0 }} 
                             animate={{ height: `${Math.max(4, heightPercent)}%` }} 
                             className={`w-full rounded-t-lg transition-all ${amount > 0 ? 'bg-indigo-500 hover:bg-indigo-400' : 'bg-slate-850'}`}
                           />
-                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] text-slate-400 bg-slate-950 border border-slate-800 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono whitespace-nowrap">
+                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono whitespace-nowrap">
                             R$ {amount.toFixed(0)}
                           </span>
                           <div className="text-[10px] text-slate-500 text-center mt-2 font-bold font-mono">{hour}h</div>
@@ -370,9 +370,9 @@ export const Finance = () => {
             </div>
 
             {/* Transactions Table */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 className="text-xl font-bold text-white">Histórico de Lançamentos</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+              <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Histórico de Lançamentos</h3>
                 <div className="flex gap-4 w-full sm:w-auto">
                   <div className="relative flex-1 sm:w-64">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
@@ -381,7 +381,7 @@ export const Finance = () => {
                       placeholder="Buscar por descrição ou método..." 
                       value={search}
                       onChange={e => setSearch(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-2.5 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-2.5 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
                     />
                   </div>
                 </div>
@@ -390,12 +390,12 @@ export const Finance = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-950/50 border-b border-slate-800">
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Código</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Descrição</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Meio / Método</th>
-                      <th className="py-4 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Valor</th>
+                    <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
+                      <th className="py-4 px-6 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Código</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Data</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Descrição</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Meio / Método</th>
+                      <th className="py-4 px-6 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-right">Valor</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -407,12 +407,12 @@ export const Finance = () => {
                       </tr>
                     ) : (
                       filteredTransactions.map((trx) => (
-                        <tr key={trx.id} className="border-b border-slate-850 hover:bg-slate-800/10 transition-colors">
-                          <td className="py-4 px-6 text-xs text-slate-400 font-mono">{trx.id}</td>
-                          <td className="py-4 px-6 text-xs text-white">{trx.date}</td>
-                          <td className="py-4 px-6 text-xs font-medium text-white">{trx.description}</td>
-                          <td className="py-4 px-6 text-xs text-slate-400">
-                            <span className="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg text-[10px] font-bold text-slate-350">
+                        <tr key={trx.id} className="border-b border-slate-850 hover:bg-slate-100 dark:bg-slate-800/10 transition-colors">
+                          <td className="py-4 px-6 text-xs text-slate-600 dark:text-slate-400 font-mono">{trx.id}</td>
+                          <td className="py-4 px-6 text-xs text-slate-900 dark:text-white">{trx.date}</td>
+                          <td className="py-4 px-6 text-xs font-medium text-slate-900 dark:text-white">{trx.description}</td>
+                          <td className="py-4 px-6 text-xs text-slate-600 dark:text-slate-400">
+                            <span className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-lg text-[10px] font-bold text-slate-350">
                               {trx.method}
                             </span>
                           </td>

@@ -180,7 +180,7 @@ export const DevPanel = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
-              <Settings className="text-white w-5 h-5" />
+              <Settings className="text-slate-900 dark:text-white w-5 h-5" />
             </div>
             <div>
               <h1 className="text-slate-900 font-bold text-lg">Painel Administrativo</h1>
@@ -347,7 +347,7 @@ export const DevPanel = () => {
               <button
                 onClick={handleSaveDbUrl}
                 disabled={savingDbUrl || apiStatus === 'offline'}
-                className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                className="w-full bg-white dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 disabled:bg-slate-300 text-slate-900 dark:text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
               >
                 {savingDbUrl ? 'Salvando...' : 'Atualizar Conexão'}
               </button>

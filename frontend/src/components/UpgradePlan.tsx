@@ -41,28 +41,28 @@ export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps)
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div 
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-50 dark:bg-slate-950/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md relative z-10 shadow-2xl p-8 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md relative z-10 shadow-2xl p-8 overflow-hidden">
         {/* Glow effect */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-indigo-500/20 blur-3xl rounded-full" />
         
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
 
         <div className="flex flex-col items-center text-center mt-4">
           <div className="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
-            <ShieldCheck className="w-8 h-8 text-white" />
+            <ShieldCheck className="w-8 h-8 text-slate-900 dark:text-white" />
           </div>
           
-          <h2 className="text-2xl font-bold text-white mb-2">Recurso Premium</h2>
-          <p className="text-slate-400 mb-8">
-            Essa funcionalidade está disponível a partir do plano <span className="text-white font-bold capitalize">{requiredPlan}</span>. 
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Recurso Premium</h2>
+          <p className="text-slate-600 dark:text-slate-400 mb-8">
+            Essa funcionalidade está disponível a partir do plano <span className="text-slate-900 dark:text-white font-bold capitalize">{requiredPlan}</span>. 
             Faça um upgrade agora para escalar ainda mais as suas vendas.
           </p>
 
@@ -75,7 +75,7 @@ export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps)
           </button>
           <button
             onClick={onClose}
-            className="w-full py-3 text-slate-400 hover:text-white font-medium mt-3"
+            className="w-full py-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white font-medium mt-3"
           >
             Talvez mais tarde
           </button>

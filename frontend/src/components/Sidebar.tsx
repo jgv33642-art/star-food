@@ -97,14 +97,14 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
   };
 
   return (
-    <aside className={`w-64 bg-slate-950 border-r border-slate-800 h-screen flex flex-col fixed left-0 top-0 overflow-y-auto custom-scrollbar z-50 transform transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside className={`w-64 bg-slate-50 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-screen flex flex-col fixed left-0 top-0 overflow-y-auto custom-scrollbar z-50 transform transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Star Food" className="w-10 h-10 object-contain rounded-xl" />
-            <span className="text-xl font-bold text-white tracking-tight">Star Food</span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Star Food</span>
           </div>
-          <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white">
+          <button onClick={onClose} className="lg:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -134,7 +134,7 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                             `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${
                               isActive 
                               ? 'bg-indigo-500/10 text-indigo-400' 
-                              : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:bg-slate-900 hover:text-slate-200'
                             }`
                           }
                         >
@@ -149,7 +149,7 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                       ) : (
                         <div 
                           onClick={(e) => handleBlockedClick(e, (item as any).minPlan)}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-500 hover:bg-slate-900/50 hover:text-slate-400 cursor-pointer transition-all"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-slate-500 hover:bg-white dark:bg-slate-900/50 hover:text-slate-600 dark:text-slate-400 cursor-pointer transition-all"
                         >
                           <item.icon className="w-5 h-5 opacity-50" />
                           <span className="flex-1 opacity-50">{item.label}</span>
@@ -164,10 +164,10 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
           ))}
         </nav>
 
-        <div className="mt-8 pt-6 border-t border-slate-800">
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-3 rounded-xl font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 transition-all text-sm group"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-3 rounded-xl font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all text-sm group"
           >
             {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" /> : <Moon className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />}
             {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}

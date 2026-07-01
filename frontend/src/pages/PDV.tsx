@@ -244,7 +244,7 @@ export const PDV = () => {
               <AlertTriangle className="w-5 h-5 flex-shrink-0" />
               <span className="text-xs font-bold font-mono">{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-white transition-colors">
+            <button onClick={() => setError(null)} className="text-red-400 hover:text-slate-900 dark:text-white transition-colors">
               <X className="w-4 h-4" />
             </button>
           </motion.div>
@@ -260,7 +260,7 @@ export const PDV = () => {
               <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
               <span className="text-xs font-bold font-mono">{successMessage}</span>
             </div>
-            <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:text-white transition-colors">
+            <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:text-slate-900 dark:text-white transition-colors">
               <X className="w-4 h-4" />
             </button>
           </motion.div>
@@ -276,8 +276,8 @@ export const PDV = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           
           {/* Esquerda: Produtos */}
-          <div className="flex-1 flex flex-col bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-slate-800">
+          <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
               <div className="relative mb-4 flex gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
@@ -287,7 +287,7 @@ export const PDV = () => {
                     placeholder="Buscar produtos (Esc para sair)..." 
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
                 </div>
                 {!cashier && (
@@ -308,7 +308,7 @@ export const PDV = () => {
                     className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                       activeCategory === cat 
                       ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-700'
                     }`}
                   >
                     {cat}
@@ -322,7 +322,7 @@ export const PDV = () => {
                 <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-6 gap-3">
                   <ShoppingCart className="w-12 h-12 opacity-25 text-indigo-400" />
                   <div>
-                    <p className="font-bold text-slate-400">Nenhum produto cadastrado.</p>
+                    <p className="font-bold text-slate-600 dark:text-slate-400">Nenhum produto cadastrado.</p>
                     <p className="text-xs text-slate-600 max-w-sm mt-1">
                       Você precisa cadastrar produtos e categorias no menu de Produtos para que apareçam aqui.
                     </p>
@@ -344,12 +344,12 @@ export const PDV = () => {
                     <div 
                       key={item.id}
                       onClick={() => addToCart(item)}
-                      className="bg-slate-950 border border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center text-center group"
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center text-center group"
                     >
-                      <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform">
                         {item.img}
                       </div>
-                      <h4 className="text-white font-medium text-sm mb-1 leading-tight">{item.name}</h4>
+                      <h4 className="text-slate-900 dark:text-white font-medium text-sm mb-1 leading-tight">{item.name}</h4>
                       <p className="text-indigo-400 font-bold mt-auto">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
                       </p>
@@ -361,10 +361,10 @@ export const PDV = () => {
           </div>
 
           {/* Direita: Carrinho */}
-          <div className="w-full lg:w-96 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col shadow-sm">
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-white">Pedido Atual</h3>
-              <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-lg text-xs font-medium">Mesa Avulsa</span>
+          <div className="w-full lg:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col shadow-sm">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Pedido Atual</h3>
+              <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1 rounded-lg text-xs font-medium">Mesa Avulsa</span>
             </div>
 
             <div className="flex-1 p-6">
@@ -378,17 +378,17 @@ export const PDV = () => {
                   {cart.map(({ item, quantity }) => (
                     <div key={item.id} className="flex gap-3 items-center">
                       <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{item.name}</p>
-                        <p className="text-slate-400 text-xs">
+                        <p className="text-slate-900 dark:text-white font-medium text-sm">{item.name}</p>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs">
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 bg-slate-950 rounded-lg border border-slate-800 p-1">
-                        <button onClick={() => updateQuantity(item.id, -1)} className="p-1 text-slate-400 hover:text-white transition-colors"><Minus className="w-3 h-3" /></button>
-                        <span className="w-4 text-center text-sm font-bold text-white">{quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, 1)} className="p-1 text-slate-400 hover:text-white transition-colors"><Plus className="w-3 h-3" /></button>
+                      <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-1">
+                        <button onClick={() => updateQuantity(item.id, -1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"><Minus className="w-3 h-3" /></button>
+                        <span className="w-4 text-center text-sm font-bold text-slate-900 dark:text-white">{quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, 1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"><Plus className="w-3 h-3" /></button>
                       </div>
-                      <div className="w-16 text-right font-bold text-white text-sm">
+                      <div className="w-16 text-right font-bold text-slate-900 dark:text-white text-sm">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * quantity)}
                       </div>
                       <button onClick={() => removeFromCart(item.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors">
@@ -400,9 +400,9 @@ export const PDV = () => {
               )}
             </div>
 
-            <div className="p-6 bg-slate-950/50 rounded-b-3xl border-t border-slate-800">
+            <div className="p-6 bg-slate-50 dark:bg-slate-950/50 rounded-b-3xl border-t border-slate-200 dark:border-slate-800">
               <div className="flex justify-between items-center mb-6">
-                <span className="text-slate-400 font-medium">Total</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">Total</span>
                 <span className="text-3xl font-black text-indigo-400">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}
                 </span>
@@ -411,36 +411,36 @@ export const PDV = () => {
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <button 
                   onClick={() => setPaymentMethod('cartao')}
-                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'cartao' ? 'bg-indigo-500/20 border-indigo-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
+                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'cartao' ? 'bg-indigo-500/20 border-indigo-500' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-700'}`}
                 >
                   <CreditCard className="w-5 h-5 text-indigo-400" />
-                  <span className="text-xs font-medium text-white">Cartão</span>
-                  <span className="text-[10px] text-slate-500 bg-slate-900 px-1.5 rounded">[F2]</span>
+                  <span className="text-xs font-medium text-slate-900 dark:text-white">Cartão</span>
+                  <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-900 px-1.5 rounded">[F2]</span>
                 </button>
                 <button 
                   onClick={() => setPaymentMethod('pix')}
-                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'pix' ? 'bg-emerald-500/20 border-emerald-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
+                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'pix' ? 'bg-emerald-500/20 border-emerald-500' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-700'}`}
                 >
                   <QrCode className="w-5 h-5 text-emerald-400" />
-                  <span className="text-xs font-medium text-white">PIX</span>
-                  <span className="text-[10px] text-slate-500 bg-slate-900 px-1.5 rounded">[F3]</span>
+                  <span className="text-xs font-medium text-slate-900 dark:text-white">PIX</span>
+                  <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-900 px-1.5 rounded">[F3]</span>
                 </button>
                 <button 
                   onClick={() => setPaymentMethod('dinheiro')}
-                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'dinheiro' ? 'bg-amber-500/20 border-amber-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
+                  className={`rounded-xl py-3 flex flex-col items-center justify-center gap-1 transition-colors border ${paymentMethod === 'dinheiro' ? 'bg-amber-500/20 border-amber-500' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-700'}`}
                 >
                   <Banknote className="w-5 h-5 text-amber-400" />
-                  <span className="text-xs font-medium text-white">Dinheiro</span>
-                  <span className="text-[10px] text-slate-500 bg-slate-900 px-1.5 rounded">[F4]</span>
+                  <span className="text-xs font-medium text-slate-900 dark:text-white">Dinheiro</span>
+                  <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-900 px-1.5 rounded">[F4]</span>
                 </button>
               </div>
 
               <div className="flex gap-2">
-                <button onClick={() => clearCart()} className="px-4 py-3 bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl transition-colors relative group">
+                <button onClick={() => clearCart()} className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-red-500/20 text-slate-700 dark:text-slate-300 hover:text-red-400 rounded-xl transition-colors relative group">
                   <Trash2 className="w-5 h-5" />
-                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Esc</span>
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Esc</span>
                 </button>
-                <button onClick={() => setShowSplitModal(true)} disabled={cart.length === 0} className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-50 rounded-xl transition-colors">
+                <button onClick={() => setShowSplitModal(true)} disabled={cart.length === 0} className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-700 dark:text-slate-300 disabled:opacity-50 rounded-xl transition-colors">
                   <SplitSquareHorizontal className="w-5 h-5" />
                 </button>
                 <button 
@@ -474,13 +474,13 @@ export const PDV = () => {
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh]"
             >
-              <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-indigo-400" /> Calculadora de Divisão
                 </h3>
-                <button onClick={() => setShowSplitModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowSplitModal(false)} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -489,24 +489,24 @@ export const PDV = () => {
                 <div className="flex flex-col md:flex-row gap-6 mb-6">
                   {/* Controls */}
                   <div className="flex-1 space-y-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Dividir a conta para quantas pessoas?</label>
-                    <div className="flex items-center gap-3 bg-slate-950 p-2 rounded-xl border border-slate-800 w-fit">
-                      <button onClick={() => setSplitCount(Math.max(2, splitCount - 1))} className="w-10 h-10 rounded-lg bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dividir a conta para quantas pessoas?</label>
+                    <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 w-fit">
+                      <button onClick={() => setSplitCount(Math.max(2, splitCount - 1))} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700">
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="text-xl font-bold text-white w-8 text-center">{splitCount}</span>
-                      <button onClick={() => setSplitCount(splitCount + 1)} className="w-10 h-10 rounded-lg bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700">
+                      <span className="text-xl font-bold text-slate-900 dark:text-white w-8 text-center">{splitCount}</span>
+                      <button onClick={() => setSplitCount(splitCount + 1)} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700">
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   
                   <div className="flex-1 space-y-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Taxa de Serviço (10%)</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Taxa de Serviço (10%)</label>
                     <button 
                       onClick={() => setUseTenPercent(!useTenPercent)}
                       className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border ${
-                        useTenPercent ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-slate-950 text-slate-500 border-slate-800'
+                        useTenPercent ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 border-slate-200 dark:border-slate-800'
                       }`}
                     >
                       <CheckCircle2 className={`w-5 h-5 ${useTenPercent ? 'text-indigo-400' : 'text-slate-600'}`} />
@@ -516,20 +516,20 @@ export const PDV = () => {
                 </div>
 
                 {/* Calculation Display */}
-                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6">
+                <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-slate-400">Subtotal dos itens</span>
-                    <span className="text-white font-medium">R$ {total.toFixed(2)}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Subtotal dos itens</span>
+                    <span className="text-slate-900 dark:text-white font-medium">R$ {total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-slate-400">Taxa de Serviço {useTenPercent ? '(10%)' : '(0%)'}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Taxa de Serviço {useTenPercent ? '(10%)' : '(0%)'}</span>
                     <span className="text-emerald-400 font-medium">+ R$ {(useTenPercent ? total * 0.1 : 0).toFixed(2)}</span>
                   </div>
-                  <div className="h-px bg-slate-800 w-full mb-4"></div>
+                  <div className="h-px bg-slate-100 dark:bg-slate-800 w-full mb-4"></div>
                   
                   <div className="flex justify-between items-end mb-6">
-                    <span className="text-slate-300 font-bold">Total a Pagar</span>
-                    <span className="text-3xl font-black text-white">R$ {(total * (useTenPercent ? 1.1 : 1)).toFixed(2)}</span>
+                    <span className="text-slate-700 dark:text-slate-300 font-bold">Total a Pagar</span>
+                    <span className="text-3xl font-black text-slate-900 dark:text-white">R$ {(total * (useTenPercent ? 1.1 : 1)).toFixed(2)}</span>
                   </div>
 
                   <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex items-center justify-between">
@@ -548,10 +548,10 @@ export const PDV = () => {
               </div>
 
               {/* Multiple / Partial Payments Section */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6 mx-6">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 mb-6 mx-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-white font-bold text-sm uppercase tracking-wider">Pagamentos Múltiplos</h4>
-                  <span className="text-xs text-slate-400">Restante: <span className="font-mono text-amber-500 font-bold">R$ {currentRemaining.toFixed(2)}</span></span>
+                  <h4 className="text-slate-900 dark:text-white font-bold text-sm uppercase tracking-wider">Pagamentos Múltiplos</h4>
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Restante: <span className="font-mono text-amber-500 font-bold">R$ {currentRemaining.toFixed(2)}</span></span>
                 </div>
                 
                 {currentRemaining > 0 && (
@@ -559,7 +559,7 @@ export const PDV = () => {
                     <select
                       value={selectedPartialMethod}
                       onChange={(e: any) => setSelectedPartialMethod(e.target.value)}
-                      className="bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 w-32"
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 w-32"
                     >
                       <option value="dinheiro">Dinheiro</option>
                       <option value="pix">PIX</option>
@@ -571,7 +571,7 @@ export const PDV = () => {
                       value={partialAmountInput}
                       onChange={e => setPartialAmountInput(e.target.value)}
                       placeholder="Valor"
-                      className="flex-1 bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-mono"
+                      className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-mono"
                     />
                     <button
                       onClick={handleAddPartialPayment}
@@ -585,8 +585,8 @@ export const PDV = () => {
                 {partialPayments.length > 0 && (
                   <div className="space-y-2 mt-4">
                     {partialPayments.map((p, idx) => (
-                      <div key={idx} className="flex justify-between text-xs bg-slate-950 p-2 rounded-lg border border-slate-800">
-                        <span className="text-slate-300 font-bold uppercase">{p.method}</span>
+                      <div key={idx} className="flex justify-between text-xs bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <span className="text-slate-700 dark:text-slate-300 font-bold uppercase">{p.method}</span>
                         <span className="text-emerald-400 font-mono font-bold">R$ {p.amount.toFixed(2)}</span>
                       </div>
                     ))}
@@ -594,7 +594,7 @@ export const PDV = () => {
                 )}
               </div>
 
-              <div className="p-6 border-t border-slate-800 bg-slate-900/50 rounded-b-3xl">
+              <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 rounded-b-3xl">
                 <button 
                   onClick={handleCobrar}
                   disabled={submitting || (partialPayments.length > 0 && currentRemaining > 0.01)}

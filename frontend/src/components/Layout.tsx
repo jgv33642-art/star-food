@@ -12,7 +12,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex font-sans text-slate-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-700 dark:text-slate-300">
       
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
@@ -28,7 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         <Header onOpenMenu={() => setIsMobileMenuOpen(true)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 relative">
           <div className="mb-6 sm:mb-8 flex justify-between items-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{title}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{title}</h2>
           </div>
           <motion.div
             initial={{ opacity: 0, y: 15 }}

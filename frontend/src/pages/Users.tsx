@@ -237,26 +237,26 @@ export const Users = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
           <RefreshCw className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-          <span className="text-slate-400 font-bold">Carregando dados da equipe...</span>
+          <span className="text-slate-600 dark:text-slate-400 font-bold">Carregando dados da equipe...</span>
         </div>
       ) : (
         <div className="space-y-8">
           
           {/* Sessão de Assinatura & Limites do Plano */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 relative overflow-hidden">
             <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none" />
             
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-slate-800">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div>
                 <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
                   company?.plan === 'pro' 
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20' 
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-slate-900 dark:text-white shadow-md shadow-indigo-500/20' 
                   : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                 }`}>
                   Plano {company?.plan === 'pro' ? 'Secondary (PRO)' : 'Primary (Básico)'}
                 </span>
-                <h2 className="text-2xl font-black text-white mt-3">Limite de Acessos Simultâneos</h2>
-                <p className="text-slate-400 text-sm mt-1">
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-3">Limite de Acessos Simultâneos</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
                   Seus acessos de login para funcionários estão limitados conforme o plano ativo do restaurante.
                 </p>
               </div>
@@ -264,7 +264,7 @@ export const Users = () => {
               {company?.plan === 'basic' ? (
                 <button
                   onClick={() => handleOpenPayment('upgrade')}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-600/25 transition-all hover:scale-105 active:scale-95"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-slate-900 dark:text-white font-bold py-3 px-6 rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-600/25 transition-all hover:scale-105 active:scale-95"
                 >
                   <Sparkles className="w-5 h-5 text-indigo-200" />
                   Upgrade para Plano Pro (Ilimitado)
@@ -281,16 +281,16 @@ export const Users = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
               
               {/* Gerencia */}
-              <div className="bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
+              <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-bold text-slate-300 text-sm">Dono & Gerentes</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Dono & Gerentes</span>
                     <Shield className="w-4 h-4 text-indigo-400" />
                   </div>
-                  <h4 className="text-2xl font-black text-white">
+                  <h4 className="text-2xl font-black text-slate-900 dark:text-white">
                     {company?.usage.managers} / {company?.plan === 'pro' ? '∞' : company?.limits.managers}
                   </h4>
-                  <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-800">
+                  <div className="w-full bg-white dark:bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-200 dark:border-slate-800">
                     <div 
                       className={`h-full bg-indigo-500 transition-all duration-500`}
                       style={{ 
@@ -310,16 +310,16 @@ export const Users = () => {
               </div>
 
               {/* Caixa */}
-              <div className="bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
+              <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-bold text-slate-300 text-sm">Caixas</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Caixas</span>
                     <CreditCard className="w-4 h-4 text-emerald-400" />
                   </div>
-                  <h4 className="text-2xl font-black text-white">
+                  <h4 className="text-2xl font-black text-slate-900 dark:text-white">
                     {company?.usage.cashiers} / {company?.plan === 'pro' ? '∞' : company?.limits.cashiers}
                   </h4>
-                  <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-800">
+                  <div className="w-full bg-white dark:bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-200 dark:border-slate-800">
                     <div 
                       className={`h-full bg-emerald-500 transition-all duration-500`}
                       style={{ 
@@ -339,16 +339,16 @@ export const Users = () => {
               </div>
 
               {/* Garcom */}
-              <div className="bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
+              <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-850 p-5 rounded-2xl flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-bold text-slate-300 text-sm">Garçons</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 text-sm">Garçons</span>
                     <UsersIcon className="w-4 h-4 text-amber-400" />
                   </div>
-                  <h4 className="text-2xl font-black text-white">
+                  <h4 className="text-2xl font-black text-slate-900 dark:text-white">
                     {company?.usage.waiters} / {company?.plan === 'pro' ? '∞' : company?.limits.waiters}
                   </h4>
-                  <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-800">
+                  <div className="w-full bg-white dark:bg-slate-900 h-2.5 rounded-full overflow-hidden mt-3 border border-slate-200 dark:border-slate-800">
                     <div 
                       className={`h-full bg-amber-500 transition-all duration-500`}
                       style={{ 
@@ -371,11 +371,11 @@ export const Users = () => {
           </div>
 
           {/* Listagem de Colaboradores */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h3 className="text-xl font-bold text-white">Funcionários Cadastrados</h3>
-                <p className="text-slate-400 text-xs mt-1">Gerencie quem tem login e permissão de uso no sistema.</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Funcionários Cadastrados</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs mt-1">Gerencie quem tem login e permissão de uso no sistema.</p>
               </div>
               
               <button
@@ -388,33 +388,33 @@ export const Users = () => {
             </div>
 
             {users.length === 0 ? (
-              <div className="text-center py-12 bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl">
+              <div className="text-center py-12 bg-slate-50 dark:bg-slate-950/40 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                 <UsersIcon className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                <h4 className="font-bold text-slate-400">Nenhum funcionário cadastrado</h4>
+                <h4 className="font-bold text-slate-600 dark:text-slate-400">Nenhum funcionário cadastrado</h4>
                 <p className="text-slate-500 text-xs mt-1">Adicione o primeiro garçom, caixa ou gerente acima.</p>
               </div>
             ) : (
-              <div className="bg-slate-950/40 border border-slate-850 rounded-2xl overflow-hidden">
+              <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-850 rounded-2xl overflow-hidden">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-slate-950 border-b border-slate-800">
-                      <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Colaborador</th>
-                      <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">E-mail</th>
-                      <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Cargo</th>
-                      <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                      <th className="py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Ações</th>
+                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+                      <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Colaborador</th>
+                      <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">E-mail</th>
+                      <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Cargo</th>
+                      <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                      <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map(u => (
-                      <tr key={u.id} className="border-b border-slate-850 hover:bg-slate-900/30 transition-colors">
-                        <td className="py-4 px-6 font-bold text-white flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold uppercase text-xs">
+                      <tr key={u.id} className="border-b border-slate-850 hover:bg-white dark:bg-slate-900/30 transition-colors">
+                        <td className="py-4 px-6 font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold uppercase text-xs">
                             {u.name.substring(0, 2)}
                           </div>
                           {u.name}
                         </td>
-                        <td className="py-4 px-6 text-slate-400 text-sm">{u.email}</td>
+                        <td className="py-4 px-6 text-slate-600 dark:text-slate-400 text-sm">{u.email}</td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
                             u.role.toLowerCase() === 'admin' || u.role.toLowerCase() === 'manager'
@@ -442,14 +442,14 @@ export const Users = () => {
                         <td className="py-4 px-6 text-right space-x-2">
                           <button
                             onClick={() => handleOpenEditModal(u)}
-                            className="p-2 text-slate-500 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition-colors"
+                            className="p-2 text-slate-500 hover:text-slate-900 dark:text-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg transition-colors"
                             title="Editar colaborador"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteUser(u.id)}
-                            className="p-2 text-slate-500 hover:text-red-400 bg-slate-900 border border-slate-800 rounded-lg transition-colors"
+                            className="p-2 text-slate-500 hover:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg transition-colors"
                             title="Excluir/Desativar"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -471,11 +471,11 @@ export const Users = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl relative"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl relative"
                 >
                   <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors"
+                    className="absolute top-6 right-6 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -485,16 +485,16 @@ export const Users = () => {
                       <UserCheck className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                         {editingUser ? 'Editar Colaborador' : 'Adicionar Novo Colaborador'}
                       </h3>
-                      <p className="text-slate-400 text-xs mt-0.5">Cadastre credenciais e cargos de trabalho.</p>
+                      <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5">Cadastre credenciais e cargos de trabalho.</p>
                     </div>
                   </div>
 
                   <form onSubmit={handleSaveUser} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Nome Completo</label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
                         <input 
@@ -503,13 +503,13 @@ export const Users = () => {
                           value={formName}
                           onChange={e => setFormName(e.target.value)}
                           placeholder="Ex: João da Silva"
-                          className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail de Login</label>
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">E-mail de Login</label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
                         <input 
@@ -518,13 +518,13 @@ export const Users = () => {
                           value={formEmail}
                           onChange={e => setFormEmail(e.target.value)}
                           placeholder="Ex: joao@restaurante.com"
-                          className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
                         {editingUser ? 'Senha (Deixe em branco para manter)' : 'Senha de Acesso'}
                       </label>
                       <div className="relative">
@@ -535,17 +535,17 @@ export const Users = () => {
                           value={formPassword}
                           onChange={e => setFormPassword(e.target.value)}
                           placeholder={editingUser ? '••••••••' : 'Mínimo 6 caracteres'}
-                          className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo / Funções</label>
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Cargo / Funções</label>
                       <select 
                         value={formRole}
                         onChange={e => setFormRole(e.target.value as any)}
-                        className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                       >
                         <option value="waiter">Garçom</option>
                         <option value="cashier">Caixa (PDV)</option>
@@ -572,7 +572,7 @@ export const Users = () => {
                       <button
                         type="button"
                         onClick={() => setIsModalOpen(false)}
-                        className="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 font-bold px-5 py-2.5 rounded-xl text-sm"
+                        className="bg-slate-50 dark:bg-slate-950 hover:bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold px-5 py-2.5 rounded-xl text-sm"
                       >
                         Cancelar
                       </button>
@@ -598,11 +598,11 @@ export const Users = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  className="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative"
                 >
                   <button 
                     onClick={() => setPaymentModal(null)}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                    className="absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -611,8 +611,8 @@ export const Users = () => {
                     <CreditCard className="w-7 h-7" />
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-2">Simulação de Pagamento</h3>
-                  <p className="text-slate-400 text-xs mb-6 px-4">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Simulação de Pagamento</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-xs mb-6 px-4">
                     {paymentModal.type === 'upgrade' 
                       ? 'Upgrade para o Plano PRO com acessos ilimitados por R$ 149,90/mês' 
                       : `Adquirir vaga adicional para ${
@@ -629,7 +629,7 @@ export const Users = () => {
                           <div 
                             key={idx} 
                             className={`w-full h-full ${
-                              idx % 2 === 0 || idx % 3 === 0 ? 'bg-slate-950' : 'bg-transparent'
+                              idx % 2 === 0 || idx % 3 === 0 ? 'bg-slate-50 dark:bg-slate-950' : 'bg-transparent'
                             }`} 
                           />
                         ))}
@@ -647,7 +647,7 @@ export const Users = () => {
                     className={`text-xs font-bold px-4 py-2 rounded-full border transition-all mb-6 ${
                       pixCopied 
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                      : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                      : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:text-white'
                     }`}
                   >
                     {pixCopied ? 'Copiado!' : 'Copiar Código Copia e Cola'}
@@ -662,7 +662,7 @@ export const Users = () => {
                     </button>
                     <button
                       onClick={() => setPaymentModal(null)}
-                      className="w-full bg-slate-950 hover:bg-slate-900 text-slate-400 font-bold py-3 rounded-xl text-sm"
+                      className="w-full bg-slate-50 dark:bg-slate-950 hover:bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 font-bold py-3 rounded-xl text-sm"
                     >
                       Cancelar
                     </button>

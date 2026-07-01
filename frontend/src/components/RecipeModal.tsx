@@ -94,20 +94,20 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-sm"
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl"
           >
-            <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+            <div className="p-6 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-white">Ficha Técnica</h3>
-                <p className="text-slate-400 text-sm mt-1">{productName}</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Ficha Técnica</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">{productName}</p>
               </div>
-              <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+              <button onClick={onClose} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -115,12 +115,12 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
             <div className="p-6">
               <form onSubmit={handleAdd} className="flex gap-4 mb-8">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Ingrediente</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Ingrediente</label>
                   <select
                     value={selectedIngredient}
                     onChange={(e) => setSelectedIngredient(e.target.value)}
                     required
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none"
                   >
                     <option value="">Selecione...</option>
                     {availableIngredients.map(ing => (
@@ -129,7 +129,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
                   </select>
                 </div>
                 <div className="w-32">
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Quantidade</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Quantidade</label>
                   <input
                     type="number"
                     step="0.001"
@@ -137,7 +137,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder="Ex: 1.5"
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-3 outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none"
                   />
                 </div>
                 <div className="flex items-end">
@@ -156,13 +156,13 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
                   <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
                 </div>
               ) : (
-                <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/50">
+                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950/50">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-900 border-b border-slate-800">
+                    <thead className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
                       <tr>
-                        <th className="p-4 text-slate-400 font-medium">Ingrediente</th>
-                        <th className="p-4 text-slate-400 font-medium">Quantidade</th>
-                        <th className="p-4 text-right text-slate-400 font-medium">Ações</th>
+                        <th className="p-4 text-slate-600 dark:text-slate-400 font-medium">Ingrediente</th>
+                        <th className="p-4 text-slate-600 dark:text-slate-400 font-medium">Quantidade</th>
+                        <th className="p-4 text-right text-slate-600 dark:text-slate-400 font-medium">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -174,9 +174,9 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
                         </tr>
                       ) : (
                         ingredients.map((item) => (
-                          <tr key={item.id} className="border-b border-slate-800/50 hover:bg-slate-800/20">
-                            <td className="p-4 text-white">{item.name}</td>
-                            <td className="p-4 text-slate-300">{item.quantity} {item.unit}</td>
+                          <tr key={item.id} className="border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-100 dark:bg-slate-800/20">
+                            <td className="p-4 text-slate-900 dark:text-white">{item.name}</td>
+                            <td className="p-4 text-slate-700 dark:text-slate-300">{item.quantity} {item.unit}</td>
                             <td className="p-4 text-right">
                               <button
                                 onClick={() => handleRemove(item.ingredient_id)}
@@ -194,10 +194,10 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, produ
               )}
             </div>
             
-            <div className="p-6 bg-slate-900 border-t border-slate-800 flex justify-end">
+            <div className="p-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 onClick={onClose}
-                className="bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-6 rounded-xl transition-colors"
+                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-2 px-6 rounded-xl transition-colors"
               >
                 Concluído
               </button>

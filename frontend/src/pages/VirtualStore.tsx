@@ -253,7 +253,7 @@ export const VirtualStore = () => {
 
   if (checkoutStep === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
         <Loader2 className="w-12 h-12 text-red-500 animate-spin mb-4" />
         <h3 className="font-bold text-lg font-mono">Carregando loja virtual...</h3>
         <p className="text-xs text-slate-500 mt-2">Atualizando cardápio e preços em tempo real</p>
@@ -263,12 +263,12 @@ export const VirtualStore = () => {
 
   if (checkoutStep === 'error') {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
           <AlertCircle className="w-10 h-10" />
         </div>
         <h1 className="text-2xl font-black mb-2">Loja Indisponível</h1>
-        <p className="text-slate-400 text-sm max-w-sm mb-8">
+        <p className="text-slate-600 dark:text-slate-400 text-sm max-w-sm mb-8">
           {errorMessage || 'Não foi possível encontrar as configurações da loja virtual especificada.'}
         </p>
         <button 
@@ -283,12 +283,12 @@ export const VirtualStore = () => {
 
   if (company && company.is_delivery_open === false) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-slate-800 text-slate-400 rounded-full flex items-center justify-center mb-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full flex items-center justify-center mb-6">
           <AlertCircle className="w-10 h-10" />
         </div>
         <h1 className="text-2xl font-black mb-2">Loja Fechada</h1>
-        <p className="text-slate-400 text-sm max-w-sm mb-8">
+        <p className="text-slate-600 dark:text-slate-400 text-sm max-w-sm mb-8">
           No momento não estamos aceitando pedidos. Por favor, retorne durante nosso horário de funcionamento.
         </p>
       </div>
@@ -356,7 +356,7 @@ export const VirtualStore = () => {
 
           {/* Busca */}
           <div className="relative mt-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 dark:text-slate-400" />
             <input 
               type="text" 
               placeholder="Buscar em todo o cardápio..." 
@@ -537,7 +537,7 @@ export const VirtualStore = () => {
                   </h2>
                 </div>
                 {checkoutStep !== 'success' && checkoutStep !== 'tracking' && (
-                  <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} className="text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors">Fechar</button>
+                  <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} className="text-slate-600 dark:text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors">Fechar</button>
                 )}
               </div>
 
@@ -642,7 +642,7 @@ export const VirtualStore = () => {
                           className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 outline-none focus:ring-2 focus:ring-red-500 uppercase font-bold"
                         />
                         {!appliedCoupon ? (
-                          <button onClick={handleApplyCoupon} className="bg-slate-800 text-white px-4 rounded-xl font-bold hover:bg-slate-700">Aplicar</button>
+                          <button onClick={handleApplyCoupon} className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white px-4 rounded-xl font-bold hover:bg-slate-700">Aplicar</button>
                         ) : (
                           <button onClick={() => {setAppliedCoupon(null); setCouponCode('');}} className="bg-red-100 text-red-600 px-4 rounded-xl font-bold hover:bg-red-200">Remover</button>
                         )}
@@ -675,7 +675,7 @@ export const VirtualStore = () => {
                         paymentMethod === 'dinheiro' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-slate-200 text-slate-600 hover:border-red-500'
                       }`}
                     >
-                      <ShoppingBag className="w-6 h-6 text-slate-400" /> Pagar na Entrega (Dinheiro)
+                      <ShoppingBag className="w-6 h-6 text-slate-600 dark:text-slate-400" /> Pagar na Entrega (Dinheiro)
                     </button>
                   </div>
                 )}
@@ -686,16 +686,16 @@ export const VirtualStore = () => {
                     <p className="text-slate-500 mb-8 max-w-xs text-sm">Seu código: <strong className="text-slate-800">{trackingCode}</strong></p>
                     
                     <div className="w-full space-y-4 mb-8">
-                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'open' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">1</div>
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'open' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-50 border-slate-200 text-slate-600 dark:text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-slate-900 dark:text-white shrink-0">1</div>
                          <div className="text-left"><p className="font-bold">Aguardando Confirmação</p></div>
                       </div>
-                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'preparing' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">2</div>
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'preparing' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-600 dark:text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-slate-900 dark:text-white shrink-0">2</div>
                          <div className="text-left"><p className="font-bold">Preparando</p></div>
                       </div>
-                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'ready' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-white shrink-0">3</div>
+                      <div className={`p-4 rounded-xl border flex items-center gap-3 ${orderStatus === 'ready' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-600 dark:text-slate-400'}`}>
+                         <div className="w-8 h-8 rounded-full bg-current flex items-center justify-center text-slate-900 dark:text-white shrink-0">3</div>
                          <div className="text-left"><p className="font-bold">Saiu para Entrega / Pronto</p></div>
                       </div>
                     </div>
@@ -705,7 +705,7 @@ export const VirtualStore = () => {
                 {checkoutStep === 'success' && (
                   <div className="py-12 flex flex-col items-center justify-center text-center">
                     <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-emerald-500/40">
-                      <Bike className="w-10 h-10 text-white" />
+                      <Bike className="w-10 h-10 text-slate-900 dark:text-white" />
                     </div>
                     <h2 className="text-2xl font-black text-slate-800 mb-2">Pedido Recebido!</h2>
                     <p className="text-slate-500 mb-8 max-w-xs">A lanchonete já recebeu seu pedido e ele começará a ser preparado em breve.</p>

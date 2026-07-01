@@ -100,15 +100,15 @@ export const PaymentCheckout = () => {
   if (error || !orderSummary) {
     return (
       <Layout title="Fechamento de Conta">
-        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
+        <div className="max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 mb-6 border border-red-500/20">
             <AlertTriangle className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">Erro</h3>
-          <p className="text-slate-400 text-sm mb-6">{error || 'Pedido não encontrado.'}</p>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Erro</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">{error || 'Pedido não encontrado.'}</p>
           <button 
             onClick={() => navigate('/caixa')}
-            className="bg-slate-850 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition-all"
+            className="bg-slate-850 hover:bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold py-3 px-6 rounded-xl transition-all"
           >
             Voltar ao Caixa
           </button>
@@ -210,26 +210,26 @@ export const PaymentCheckout = () => {
   if (successData) {
     return (
       <Layout title="Conta Fechada!">
-        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
+        <div className="max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 mb-6 border border-emerald-500/20">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h3 className="text-2xl font-black text-white mb-2">Pagamento Realizado!</h3>
-          <p className="text-slate-400 text-sm mb-6">
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Pagamento Realizado!</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
             Comanda #{order.id.slice(0, 4)} foi encerrada com sucesso.
           </p>
 
-          <div className="bg-slate-950 p-5 rounded-2xl border border-slate-850 w-full mb-6 text-left space-y-3.5">
-            <div className="flex justify-between text-sm text-slate-400">
+          <div className="bg-slate-50 dark:bg-slate-950 p-5 rounded-2xl border border-slate-850 w-full mb-6 text-left space-y-3.5">
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
               <span>Faturamento Total:</span>
-              <span className="font-bold text-white font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subtotal)}</span>
+              <span className="font-bold text-slate-900 dark:text-white font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm text-slate-400">
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
               <span>Valor Pago nesta Transação:</span>
               <span className="font-bold text-emerald-400 font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(successData.totalPaid)}</span>
             </div>
             {successData.change > 0 && (
-              <div className="flex justify-between text-sm text-slate-400 border-t border-slate-800 pt-3">
+              <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-3">
                 <span className="text-amber-500 font-bold">Troco a Devolver:</span>
                 <span className="font-bold text-amber-500 font-mono text-lg">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(successData.change)}</span>
               </div>
@@ -239,7 +239,7 @@ export const PaymentCheckout = () => {
           <div className="flex gap-4 w-full">
             <button 
               onClick={() => alert('Imprimindo via do cliente via ESC/POS...')}
-              className="flex-1 bg-slate-850 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-800 text-sm"
+              className="flex-1 bg-slate-850 hover:bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-800 text-sm"
             >
               <Printer className="w-4 h-4" /> Via Cliente
             </button>
@@ -261,17 +261,17 @@ export const PaymentCheckout = () => {
         
         {/* Left Side: Summary & Items (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-850">
               <button 
                 onClick={() => navigate('/caixa')} 
-                className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-300 transition-colors cursor-pointer"
+                className="p-2.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h3 className="text-lg font-bold text-white">Comanda #{order.id.slice(0, 4)}</h3>
-                <p className="text-slate-400 text-xs mt-0.5">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Comanda #{order.id.slice(0, 4)}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs mt-0.5">
                   {order.table_number ? `Mesa ${order.table_number}` : 'Avulsa / Balcão'}
                 </p>
               </div>
@@ -281,8 +281,8 @@ export const PaymentCheckout = () => {
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item, idx) => (
                 <div key={idx} className="flex justify-between items-center text-sm">
-                  <span className="text-slate-400 font-medium">{item.quantity}x {item.product_name}</span>
-                  <span className="text-white font-bold font-mono">
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">{item.quantity}x {item.product_name}</span>
+                  <span className="text-slate-900 dark:text-white font-bold font-mono">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}
                   </span>
                 </div>
@@ -291,16 +291,16 @@ export const PaymentCheckout = () => {
 
             {/* Finance Details */}
             <div className="pt-6 border-t border-slate-850 mt-6 space-y-3.5">
-              <div className="flex justify-between text-sm text-slate-400">
+              <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
                 <span>Subtotal:</span>
-                <span className="font-bold text-white font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subtotal)}</span>
+                <span className="font-bold text-slate-900 dark:text-white font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm text-slate-455">
                 <span>Já Pago:</span>
                 <span className="font-bold text-emerald-400 font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(alreadyPaid)}</span>
               </div>
-              <div className="flex justify-between text-sm border-t border-slate-800 pt-3">
-                <span className="text-slate-400 font-bold">A Pagar Restante:</span>
+              <div className="flex justify-between text-sm border-t border-slate-200 dark:border-slate-800 pt-3">
+                <span className="text-slate-600 dark:text-slate-400 font-bold">A Pagar Restante:</span>
                 <span className="font-bold text-amber-500 font-mono text-xl">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(initialRemaining)}</span>
               </div>
             </div>
@@ -310,28 +310,28 @@ export const PaymentCheckout = () => {
         {/* Right Side: Splitting & Payment Methods (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Bill splitting control */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-400">
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-white">Dividir Conta</h4>
-                <p className="text-xs text-slate-400 mt-0.5">Defina em quantas pessoas deseja dividir o saldo restante</p>
+                <h4 className="font-bold text-slate-900 dark:text-white">Dividir Conta</h4>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Defina em quantas pessoas deseja dividir o saldo restante</p>
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3.5 bg-slate-950 p-1.5 border border-slate-850 rounded-2xl">
+              <div className="flex items-center gap-3.5 bg-slate-50 dark:bg-slate-950 p-1.5 border border-slate-850 rounded-2xl">
                 <button 
                   onClick={() => setSplitCount(prev => Math.max(1, prev - 1))}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                  className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <span className="text-lg font-bold text-white w-8 text-center">{splitCount}</span>
+                <span className="text-lg font-bold text-slate-900 dark:text-white w-8 text-center">{splitCount}</span>
                 <button 
                   onClick={() => setSplitCount(prev => prev + 1)}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                  className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -347,8 +347,8 @@ export const PaymentCheckout = () => {
 
           {/* Add Payment Form */}
           {currentRemaining > 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-              <h3 className="text-lg font-bold text-white">Lançar Pagamento Parcial ou Integral</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Lançar Pagamento Parcial ou Integral</h3>
               
               {/* Payment Methods Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -357,7 +357,7 @@ export const PaymentCheckout = () => {
                   className={`p-4 rounded-2xl border transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
                     selectedMethod === 'cash'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                      : 'bg-slate-950 border-slate-850 text-slate-400 hover:border-slate-700'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-850 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:border-slate-700'
                   }`}
                 >
                   <Banknote className="w-6 h-6" />
@@ -369,7 +369,7 @@ export const PaymentCheckout = () => {
                   className={`p-4 rounded-2xl border transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
                     selectedMethod === 'pix'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                      : 'bg-slate-950 border-slate-850 text-slate-400 hover:border-slate-700'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-850 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:border-slate-700'
                   }`}
                 >
                   <QrCode className="w-6 h-6" />
@@ -381,7 +381,7 @@ export const PaymentCheckout = () => {
                   className={`p-4 rounded-2xl border transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
                     selectedMethod === 'credit'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                      : 'bg-slate-950 border-slate-850 text-slate-400 hover:border-slate-700'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-850 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:border-slate-700'
                   }`}
                 >
                   <CreditCard className="w-6 h-6" />
@@ -393,7 +393,7 @@ export const PaymentCheckout = () => {
                   className={`p-4 rounded-2xl border transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
                     selectedMethod === 'debit'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                      : 'bg-slate-950 border-slate-850 text-slate-400 hover:border-slate-700'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-850 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:border-slate-700'
                   }`}
                 >
                   <CreditCard className="w-6 h-6" />
@@ -402,28 +402,28 @@ export const PaymentCheckout = () => {
               </div>
 
               {selectedMethod && (
-                <div className="bg-slate-950 p-6 rounded-2xl border border-slate-850 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                <div className="bg-slate-50 dark:bg-slate-950 p-6 rounded-2xl border border-slate-850 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
                   <div className="space-y-2">
-                    <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Valor a Pagar (R$)</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Valor a Pagar (R$)</label>
                     <input 
                       type="number" 
                       step="0.01"
                       value={paymentAmount}
                       onChange={e => setPaymentAmount(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
                     />
                   </div>
 
                   {selectedMethod === 'cash' ? (
                     <div className="space-y-2">
-                      <label className="text-xs text-slate-400 font-bold uppercase tracking-wider">Valor Recebido (R$)</label>
+                      <label className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Valor Recebido (R$)</label>
                       <input 
                         type="number" 
                         step="0.01"
                         placeholder="0.00"
                         value={receivedAmount}
                         onChange={e => setReceivedAmount(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
                       />
                       {changeValue > 0 && (
                         <span className="text-xs text-amber-500 font-bold block mt-1">
@@ -449,27 +449,27 @@ export const PaymentCheckout = () => {
               )}
             </div>
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
               <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/20 mb-4 animate-bounce">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-white text-lg">Conta Pronta para Fechamento!</h4>
-              <p className="text-slate-400 text-sm mt-1 max-w-sm">O valor integral da comanda já está coberto pelos pagamentos registrados abaixo.</p>
+              <h4 className="font-bold text-slate-900 dark:text-white text-lg">Conta Pronta para Fechamento!</h4>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1 max-w-sm">O valor integral da comanda já está coberto pelos pagamentos registrados abaixo.</p>
             </div>
           )}
 
           {/* List of accumulated payments */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-6">Pagamentos da Transação Atual</h3>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Pagamentos da Transação Atual</h3>
             
             <div className="space-y-4">
               {localPayments.length === 0 ? (
                 <div className="text-center py-8 text-slate-500 text-sm">Nenhum pagamento adicionado para esta transação ainda.</div>
               ) : (
                 localPayments.map((pmt) => (
-                  <div key={pmt.id} className="flex justify-between items-center p-4 bg-slate-950 border border-slate-850 rounded-2xl">
+                  <div key={pmt.id} className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-950 border border-slate-850 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold text-white">{formatMethodLabel(pmt.method)}</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white">{formatMethodLabel(pmt.method)}</span>
                       {pmt.receivedAmount !== undefined && (
                         <span className="text-xs text-slate-500 font-mono">
                           (Rec: {formatBRL(pmt.receivedAmount)} / Troco: {formatBRL(pmt.changeAmount)})
@@ -477,10 +477,10 @@ export const PaymentCheckout = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="font-bold text-white font-mono">{formatBRL(pmt.amount)}</span>
+                      <span className="font-bold text-slate-900 dark:text-white font-mono">{formatBRL(pmt.amount)}</span>
                       <button 
                         onClick={() => handleRemoveLocalPayment(pmt.id)}
-                        className="text-red-400 hover:text-white p-2 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                        className="text-red-400 hover:text-slate-900 dark:text-white p-2 hover:bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

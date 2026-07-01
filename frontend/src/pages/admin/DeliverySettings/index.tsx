@@ -105,11 +105,11 @@ export const DeliverySettings = () => {
   if (!hasPremiumPlan()) {
     return (
       <div className="p-8 max-w-4xl mx-auto text-center mt-20">
-        <h2 className="text-3xl font-black text-white mb-4">Recurso Premium</h2>
-        <p className="text-slate-400 mb-8 text-lg">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Recurso Premium</h2>
+        <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">
           O Módulo Premium (Integração WhatsApp, Cupons e Horários) está disponível apenas no Plano Pro.
         </p>
-        <button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-105 transition-transform text-white font-bold py-4 px-8 rounded-2xl shadow-lg">
+        <button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-105 transition-transform text-slate-900 dark:text-white font-bold py-4 px-8 rounded-2xl shadow-lg">
           Fazer Upgrade
         </button>
       </div>
@@ -118,44 +118,44 @@ export const DeliverySettings = () => {
 
   return (
     <Layout title="Configurações do Delivery">
-      <div className="p-4 md:p-8 max-w-7xl mx-auto text-white">
+      <div className="p-4 md:p-8 max-w-7xl mx-auto text-slate-900 dark:text-white">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-black tracking-tight">Delivery PRO</h1>
-            <p className="text-slate-400 mt-2">Gerencie cupons, whatsapp e status da loja.</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Gerencie cupons, whatsapp e status da loja.</p>
           </div>
         </div>
 
         {/* TABS HEADER */}
-        <div className="flex overflow-x-auto gap-2 mb-8 bg-slate-900/50 p-2 rounded-2xl border border-slate-800">
+        <div className="flex overflow-x-auto gap-2 mb-8 bg-white dark:bg-slate-900/50 p-2 rounded-2xl border border-slate-200 dark:border-slate-800">
           <button 
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap
-              ${activeTab === 'general' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+              ${activeTab === 'general' ? 'bg-indigo-600 text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'}`}
           >
             <Settings className="w-5 h-5" /> Configurações Gerais
           </button>
           <button 
             onClick={() => setActiveTab('coupons')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap
-              ${activeTab === 'coupons' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+              ${activeTab === 'coupons' ? 'bg-purple-600 text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'}`}
           >
             <Percent className="w-5 h-5" /> Cupons de Desconto
           </button>
         </div>
 
         {/* TAB CONTENT */}
-        <div className="bg-slate-900/30 p-6 md:p-8 rounded-3xl border border-slate-800">
+        <div className="bg-white dark:bg-slate-900/30 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800">
           
           {activeTab === 'general' && (
             <div className="space-y-8">
-              <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+              <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-300 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <Power className={`w-8 h-8 ${isOpen ? 'text-green-500' : 'text-red-500'}`} />
                     <div>
                       <h3 className="text-xl font-bold">Status da Loja (Delivery)</h3>
-                      <p className="text-slate-400 text-sm">Se fechado, os clientes não poderão fazer pedidos.</p>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm">Se fechado, os clientes não poderão fazer pedidos.</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -166,29 +166,29 @@ export const DeliverySettings = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-300 dark:border-slate-700">
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Smartphone className="w-5 h-5 text-green-400"/> WhatsApp para Pedidos</h3>
-                  <p className="text-sm text-slate-400 mb-4">Número que receberá a mensagem com o pedido (apenas números com DDD).</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Número que receberá a mensagem com o pedido (apenas números com DDD).</p>
                   <input
                     type="text"
                     placeholder="Ex: 11999999999"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
-                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-300 dark:border-slate-700">
                   <h3 className="text-lg font-bold mb-4">Taxa de Entrega Padrão</h3>
-                  <p className="text-sm text-slate-400 mb-4">Valor cobrado nas entregas feitas pelo site.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Valor cobrado nas entregas feitas pelo site.</p>
                   <div className="relative">
-                    <span className="absolute left-4 top-3 text-slate-400">R$</span>
+                    <span className="absolute left-4 top-3 text-slate-600 dark:text-slate-400">R$</span>
                     <input
                       type="number"
                       step="0.10"
                       value={fee}
                       onChange={(e) => setFee(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -208,33 +208,33 @@ export const DeliverySettings = () => {
 
           {activeTab === 'coupons' && (
             <div>
-              <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 mb-8">
+              <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-300 dark:border-slate-700 mb-8">
                 <h3 className="text-xl font-bold mb-4">Criar Novo Cupom</h3>
                 <form onSubmit={handleCreateCoupon} className="flex flex-col md:flex-row gap-4 items-end">
                   <div className="flex-1 w-full">
-                    <label className="block text-sm text-slate-400 mb-2">Código do Cupom</label>
+                    <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Código do Cupom</label>
                     <input
                       required
                       type="text"
                       placeholder="Ex: BEMVINDO10"
                       value={newCouponCode}
                       onChange={(e) => setNewCouponCode(e.target.value.toUpperCase())}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold uppercase tracking-wider focus:outline-none focus:border-purple-500"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold uppercase tracking-wider focus:outline-none focus:border-purple-500"
                     />
                   </div>
                   <div className="w-full md:w-48">
-                    <label className="block text-sm text-slate-400 mb-2">Tipo de Desconto</label>
+                    <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Tipo de Desconto</label>
                     <select
                       value={newCouponType}
                       onChange={(e) => setNewCouponType(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
                     >
                       <option value="PERCENTAGE">Porcentagem (%)</option>
                       <option value="FIXED">Valor Fixo (R$)</option>
                     </select>
                   </div>
                   <div className="w-full md:w-48">
-                    <label className="block text-sm text-slate-400 mb-2">Valor</label>
+                    <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Valor</label>
                     <input
                       required
                       type="number"
@@ -242,7 +242,7 @@ export const DeliverySettings = () => {
                       placeholder="Ex: 10"
                       value={newCouponValue}
                       onChange={(e) => setNewCouponValue(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
                     />
                   </div>
                   <button type="submit" className="w-full md:w-auto bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
@@ -254,7 +254,7 @@ export const DeliverySettings = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-800 text-slate-400">
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
                       <th className="pb-4 font-medium">Código</th>
                       <th className="pb-4 font-medium">Desconto</th>
                       <th className="pb-4 font-medium text-center">Status</th>
@@ -263,7 +263,7 @@ export const DeliverySettings = () => {
                   </thead>
                   <tbody>
                     {coupons.map(coupon => (
-                      <tr key={coupon.id} className="border-b border-slate-800/50">
+                      <tr key={coupon.id} className="border-b border-slate-200 dark:border-slate-800/50">
                         <td className="py-4 font-bold tracking-wider text-purple-400">{coupon.code}</td>
                         <td className="py-4 font-medium">
                           {coupon.discount_type === 'PERCENTAGE' ? `${coupon.discount_value}%` : `R$ ${parseFloat(coupon.discount_value.toString()).toFixed(2)}`}
@@ -276,7 +276,7 @@ export const DeliverySettings = () => {
                         <td className="py-4 text-right">
                           <button 
                             onClick={() => toggleCoupon(coupon.id)}
-                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${coupon.active ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-green-600/20 hover:bg-green-600/30 text-green-400'}`}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${coupon.active ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-700 text-slate-700 dark:text-slate-300' : 'bg-green-600/20 hover:bg-green-600/30 text-green-400'}`}
                           >
                             {coupon.active ? 'Desativar' : 'Ativar'}
                           </button>
