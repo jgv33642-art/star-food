@@ -58,7 +58,51 @@ export class MercadoPagoService {
       throw new Error('Não foi possível gerar o link de pagamento.');
     }
   }
+  /**
+   * Processa um pagamento transparente com cartão de crédito (Checkout Transparente)
+   */
+  async createPayment(companyId: string, email: string, token: string, installments: number, paymentMethodId: string, issuerId: string, payer: any, plan: string, price: number) {
+    const mpClient = getClient();
+    if (!mpClient) throw new Error('Mercado Pago Access Token não configurado.');
 
+    const payment = new Payment(mpClient);
+
+    try {
+      const response = await payment.create({
+        body: {
+          transaction_amount: Number(price),
+          token: token,
+          description: `Assinatura Plano ${plan.toUpperCase()}`,
+          installments: installments,
+          payment_method_id: paymentMethodId,
+          issuer_id: issuerId,
+          payer: {
+            email: email,
+            identification: payer.identification
+          },
+          external_reference: companyId,
+          additional_info: {
+            items: [
+              {
+                id: `plan_${plan}`,
+                title: `Assinatura Plano ${plan.toUpperCase()}`,
+                description: `Mensalidade`,
+                picture_url: '',
+                category_id: 'services',
+                quantity: 1,
+                unit_price: Number(price)
+              }
+            ]
+          }
+        }
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Erro ao processar pagamento transparente:', error);
+      throw new Error('Falha ao processar pagamento com a operadora do cartão.');
+    }
+  }
   /**
    * Busca as informações reais de um pagamento diretamente no servidor do Mercado Pago (Validação Reversa)
    */

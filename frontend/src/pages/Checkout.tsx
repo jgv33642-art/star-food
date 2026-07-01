@@ -4,6 +4,9 @@ import { ShieldCheck, ArrowLeft, ShoppingCart, Download, Laptop, Smartphone, Che
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
+
+initMercadoPago((import.meta as any).env.VITE_MERCADO_PAGO_PUBLIC_KEY || '', { locale: 'pt-BR' });
 
 const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: string, priceAnnual: string }> = {
   start: {
@@ -48,10 +51,10 @@ export const Checkout = () => {
   const isAnnual = billingCycle === 'annual';
   const finalPrice = isAnnual ? planInfo.priceAnnual : planInfo.priceMonthly;
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Custom form submission not handled manually anymore; CardPayment handles it
+  const onSubmitMP = async (formData: any) => {
     if (!companyName || !userName || !email || !password) {
-      setError('Por favor, preencha todos os campos da conta.');
+      setError('Por favor, preencha os campos da conta acima primeiro.');
       return;
     }
     
@@ -59,18 +62,23 @@ export const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1. Cria a conta no banco (com status de plano aguardando pagamento ou criado como basic/start provisoriamente)
+      // 1. Cria a conta no banco
       await register(companyName, password, planKey);
       
-      // 2. Chama nossa nova rota de pagamentos passando o plano
-      const data = await api.post<any>('/payments/checkout', { plan: planKey });
+      // 2. Chama a rota de pagamento transparente
+      const response = await api.post<any>('/payments/transparent', { 
+        plan: planKey,
+        token: formData.token,
+        issuer_id: formData.issuer_id,
+        payment_method_id: formData.payment_method_id,
+        installments: formData.installments,
+        payer: { ...formData.payer, email: email }
+      });
 
-      if (data.initPoint) {
-        // 3. Redireciona o usuário para a tela segura do Mercado Pago
-        window.location.href = data.initPoint;
-      } else {
-        // Fallback em caso de erro sem exception
+      if (response.status === 'authorized' || response.status === 'approved' || response.status === 'preapproved') {
         setIsSuccess(true);
+      } else {
+        setError('O pagamento não foi aprovado pelo cartão. Verifique o saldo ou tente outro.');
       }
     } catch (err: any) {
       let errorMessage = err.message || 'Erro ao processar o pagamento e criar conta.';
@@ -78,8 +86,13 @@ export const Checkout = () => {
         errorMessage = 'Este e-mail já está cadastrado. Por favor, tente fazer login ou use outro e-mail.';
       }
       setError(errorMessage);
+    } finally {
       setLoading(false);
     }
+  };
+
+  const initialization = {
+    amount: parseFloat(finalPrice.replace('.', '').replace(',', '.')),
   };
 
   const handleInstallPWA = () => {
@@ -185,7 +198,7 @@ export const Checkout = () => {
         <div className="p-8 md:w-2/3">
           <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6">Criar Conta e Assinar</h2>
           
-          <form onSubmit={handleSubscribe} className="space-y-6 mt-6">
+          <div className="space-y-6 mt-6">
             {error && (
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
                 {error}
@@ -219,19 +232,23 @@ export const Checkout = () => {
               </div>
             </div>
 
-            <button 
-              type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-500/50 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex justify-center items-center gap-2 mt-4"
-            >
-              {loading ? (
-                <span className="animate-pulse">Processando Assinatura...</span>
-              ) : (
-                <>Pagar e Acessar Sistema <ShieldCheck className="w-5 h-5" /></>
-              )}
-            </button>
+            {/* Componente Invisível do Mercado Pago */}
+            <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Dados de Pagamento</h3>
+              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                <CardPayment
+                  initialization={initialization}
+                  customization={{
+                    visual: { style: { theme: 'default' } },
+                    paymentMethods: { maxInstallments: 1 }
+                  }}
+                  onSubmit={onSubmitMP}
+                />
+              </div>
+            </div>
+            {loading && <div className="text-center text-indigo-500 font-bold mt-4 animate-pulse">Processando Assinatura... Aguarde.</div>}
             <p className="text-xs text-center text-slate-500 mt-4">Transação 100% segura. Cancele quando quiser.</p>
-          </form>
+          </div>
         </div>
       </motion.div>
     </div>

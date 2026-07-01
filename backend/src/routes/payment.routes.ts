@@ -43,7 +43,43 @@ router.post('/checkout', authMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message || 'Erro interno ao gerar pagamento' });
   }
 });
+/**
+ * POST /api/payments/transparent
+ * Processa o pagamento transparente via Cartão de Crédito
+ */
+router.post('/transparent', authMiddleware, async (req, res) => {
+  try {
+    const { plan, token, issuer_id, payment_method_id, installments, payer, email } = req.body;
+    const companyId = req.user?.companyId;
+    
+    if (!companyId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
+    let price = 0;
+    if (plan === 'start') price = 149.90;
+    else if (plan === 'basic') price = 299.90;
+    else if (plan === 'pro') price = 399.90;
+    else if (plan === 'annual') price = 3999.90;
+    else return res.status(400).json({ error: 'Plano inválido' });
+
+    const response = await mpService.createPayment(
+      companyId, email, token, installments, payment_method_id, issuer_id, payer, plan, price
+    );
+
+    // Se o pagamento for aprovado (ou pré-aprovado), já libera a conta instantaneamente
+    if (response.status === 'approved' || response.status === 'authorized') {
+      await pool.query(`
+        UPDATE companies 
+        SET plan = $1, active = true, updated_at = NOW() 
+        WHERE id = $2
+      `, [plan, companyId]);
+    }
+
+    res.json({ status: response.status, id: response.id });
+  } catch (error: any) {
+    console.error('Erro no checkout transparente:', error);
+    res.status(500).json({ error: error.message || 'Erro interno ao processar pagamento' });
+  }
+});
 /**
  * POST /api/payments/webhook
  * Recebe notificações assíncronas do Mercado Pago

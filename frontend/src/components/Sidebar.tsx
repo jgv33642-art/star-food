@@ -91,7 +91,7 @@ export const Sidebar = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
 
   const handleCopyDeliveryLink = () => {
     if (!user?.companyId) return;
-    const url = `${window.location.origin}/delivery/${user.companyId}`;
+    const url = `${window.location.origin}/loja/${user.companyId}`;
     navigator.clipboard.writeText(url);
     alert(`Link copiado com sucesso!\n\n${url}\n\nCole na bio do Instagram ou envie aos clientes no WhatsApp.`);
   };
