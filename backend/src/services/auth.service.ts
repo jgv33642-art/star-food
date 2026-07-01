@@ -179,9 +179,9 @@ export class AuthService {
 
     const token = generateToken({
       userId: user.id,
-      companyId: company.id,
+      companyId: newCompany.id,
       role: 'admin',
-      plan: company.plan || 'start',
+      plan: newCompany.plan || 'start',
     });
 
     return {
@@ -191,9 +191,9 @@ export class AuthService {
         name: user.name,
         companyName: companyName,
         email: user.email,
-        companyId: company.id,
+        companyId: newCompany.id,
         role: 'admin',
-        plan: company.plan || 'start',
+        plan: newCompany.plan || 'start',
         hasStaff: false
       },
     };
