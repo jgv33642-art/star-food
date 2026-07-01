@@ -60,7 +60,7 @@ export const Checkout = () => {
 
     try {
       // 1. Cria a conta no banco
-      await register(companyName, password, planKey);
+      await register(companyName, userName, email, password, planKey);
       
       // 2. Chama a rota de pagamento transparente
       const response = await api.post<any>('/payments/transparent', { 

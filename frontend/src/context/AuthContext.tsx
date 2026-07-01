@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   login: (companyName: string, password: string) => Promise<void>;
   loginDevice: (companyName: string, password: string) => Promise<void>;
-  register: (companyName: string, password: string, plan?: string) => Promise<void>;
+  register: (companyName: string, userName: string, email: string, password: string, plan?: string) => Promise<void>;
   loginWithToken: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -122,8 +122,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
   };
 
-  const register = async (companyName: string, password: string, plan?: string): Promise<void> => {
-    const res = await api.post<LoginResponse>('/auth/register', { companyName, password, plan });
+  const register = async (companyName: string, userName: string, email: string, password: string, plan?: string) => {
+    const res = await api.post<LoginResponse>('/auth/register', { 
+      companyName, 
+      userName, 
+      email, 
+      password, 
+      plan 
+    });
     // registrants are always admins/gerencia
     const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
