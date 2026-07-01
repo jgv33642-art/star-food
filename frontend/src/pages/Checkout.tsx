@@ -35,6 +35,7 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(searchParams.get('status') === 'success');
   const [error, setError] = useState('');
+  const [step, setStep] = useState<1 | 2>(1);
   
   // Form state
   const [companyName, setCompanyName] = useState('');
@@ -54,11 +55,6 @@ export const Checkout = () => {
 
   // Custom form submission not handled manually anymore; CardPayment handles it
   const onSubmitMP = async (formData: any) => {
-    if (!companyName || !userName || !email || !password) {
-      setError('Por favor, preencha os campos da conta acima primeiro.');
-      return;
-    }
-    
     setError('');
     setLoading(true);
 
@@ -85,11 +81,21 @@ export const Checkout = () => {
       let errorMessage = err.message || 'Erro ao processar o pagamento e criar conta.';
       if (errorMessage.includes('users_email_key')) {
         errorMessage = 'Este e-mail já está cadastrado. Por favor, tente fazer login ou use outro e-mail.';
+        setStep(1); // Volta para o passo 1 se o email já existe
       }
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNextStep = () => {
+    if (!companyName || !userName || !email || !password) {
+      setError('Por favor, preencha todos os dados do restaurante.');
+      return;
+    }
+    setError('');
+    setStep(2);
   };
 
   const initialization = {
@@ -205,50 +211,69 @@ export const Checkout = () => {
                 {error}
               </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Nome do Restaurante</label>
-                <input type="text" required value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Minha Lanchonete" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Seu Nome Completo</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input type="text" required value={userName} onChange={e => setUserName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="João Silva" />
+            {step === 1 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Nome do Restaurante</label>
+                    <input type="text" required value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Minha Lanchonete" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Seu Nome Completo</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input type="text" required value={userName} onChange={e => setUserName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="João Silva" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">E-mail de Acesso</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="admin@email.com" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Senha de Acesso</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="********" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">E-mail de Acesso</label>
+                    <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="admin@email.com" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Senha de Acesso</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                      <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="********" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Componente Invisível do Mercado Pago */}
-            <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Dados de Pagamento</h3>
-              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                <CardPayment
-                  initialization={initialization}
-                  customization={{
-                    visual: { style: { theme: 'default' } },
-                    paymentMethods: { maxInstallments: 1 }
-                  }}
-                  onSubmit={onSubmitMP}
-                />
-              </div>
-            </div>
-            {loading && <div className="text-center text-indigo-500 font-bold mt-4 animate-pulse">Processando Assinatura... Aguarde.</div>}
-            <p className="text-xs text-center text-slate-500 mt-4">Transação 100% segura. Cancele quando quiser.</p>
+                <button 
+                  type="button"
+                  onClick={handleNextStep}
+                  className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex justify-center items-center gap-2 mt-4"
+                >
+                  Continuar para Pagamento <ArrowLeft className="w-5 h-5 rotate-180" />
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Componente Invisível do Mercado Pago */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-slate-50 dark:bg-slate-950/50">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Dados do Cartão</h3>
+                    <button type="button" onClick={() => setStep(1)} className="text-sm text-indigo-500 hover:underline">
+                      Alterar dados da conta
+                    </button>
+                  </div>
+                  <div className="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <CardPayment
+                      initialization={initialization}
+                      customization={{
+                        visual: { style: { theme: 'default' } },
+                        paymentMethods: { maxInstallments: 1 }
+                      }}
+                      onSubmit={onSubmitMP}
+                    />
+                  </div>
+                </div>
+                {loading && <div className="text-center text-indigo-500 font-bold mt-4 animate-pulse">Processando Assinatura... Aguarde.</div>}
+                <p className="text-xs text-center text-slate-500 mt-4">Transação 100% segura. Cancele quando quiser.</p>
+              </>
+            )}
           </div>
         </div>
       </motion.div>
