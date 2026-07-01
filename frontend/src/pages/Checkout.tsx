@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 
-initMercadoPago((import.meta as any).env.VITE_MERCADO_PAGO_PUBLIC_KEY || '', { locale: 'pt-BR' });
+// Chave Pública do Mercado Pago (Segura para ser exposta no Frontend)
+initMercadoPago('APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b', { locale: 'pt-BR' });
 
 const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: string, priceAnnual: string }> = {
   start: {
