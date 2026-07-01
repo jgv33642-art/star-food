@@ -17,6 +17,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   login: (companyName: string, password: string) => Promise<void>;
+  loginDevice: (companyName: string, password: string) => Promise<void>;
   register: (companyName: string, password: string, plan?: string) => Promise<void>;
   loginWithToken: (token: string, user: User) => void;
   logout: () => void;
@@ -115,6 +116,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
   };
 
+  const loginDevice = async (companyName: string, password: string): Promise<void> => {
+    // Valida credenciais na API mas não entra como usuário. Apenas salva o slug do estabelecimento.
+    await api.post<LoginResponse>('/auth/login', { companyName, password });
+    localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
+  };
+
   const register = async (companyName: string, password: string, plan?: string): Promise<void> => {
     const res = await api.post<LoginResponse>('/auth/register', { companyName, password, plan });
     // registrants are always admins/gerencia
@@ -132,7 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, loginWithToken, logout }}>
+    <AuthContext.Provider value={{ user, login, loginDevice, register, loginWithToken, logout }}>
       {children}
     </AuthContext.Provider>
   );

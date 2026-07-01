@@ -55,7 +55,11 @@ const PinDisplay = ({ pin, maxLen = 6 }: { pin: string; maxLen?: number }) => (
 
 export const Login = () => {
   // Tab: 'email' | 'pin'
-  const [mode, setMode] = useState<'email' | 'pin'>('email');
+  const [mode, setMode] = useState<'email' | 'pin'>(() => {
+    const slug = localStorage.getItem('@Lanchonete:companySlug');
+    const userStr = localStorage.getItem('@Lanchonete:user');
+    return (slug || userStr) ? 'pin' : 'email';
+  });
 
   // Company Name / Password mode
   const [companyName, setCompanyName] = useState('');
@@ -72,7 +76,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login, loginWithToken } = useAuth();
+  const { login, loginDevice, loginWithToken } = useAuth();
   const navigate = useNavigate();
   const { isInstallable, installApp } = usePWA();
 
@@ -103,14 +107,17 @@ export const Login = () => {
 
       // Strategy 2: resolve company by slug (human-readable name) stored locally.
       // The client NEVER sends a raw UUID — only the company's public slug.
-      const savedUser = localStorage.getItem('@Lanchonete:user');
-      let companySlug = '';
-      if (savedUser) {
-        try {
-          const parsed = JSON.parse(savedUser);
-          // Build slug from stored company name if available, otherwise skip
-          companySlug = (parsed.companyName || parsed.company || '').toLowerCase().replace(/\s+/g, '-');
-        } catch {}
+      let companySlug = localStorage.getItem('@Lanchonete:companySlug') || '';
+      
+      if (!companySlug) {
+        const savedUser = localStorage.getItem('@Lanchonete:user');
+        if (savedUser) {
+          try {
+            const parsed = JSON.parse(savedUser);
+            // Build slug from stored company name if available, otherwise skip
+            companySlug = (parsed.companyName || parsed.company || '').toLowerCase().replace(/\s+/g, '-');
+          } catch {}
+        }
       }
 
       if (!companySlug) {
@@ -135,8 +142,10 @@ export const Login = () => {
     setLoading(true);
     setError('');
     try {
-      await login(companyName, password);
-      navigate('/');
+      await loginDevice(companyName, password);
+      setCompanyName('');
+      setPassword('');
+      setMode('pin');
     } catch (err: any) {
       setError(err.message || 'Nome do estabelecimento ou senha inválidos.');
     } finally {
