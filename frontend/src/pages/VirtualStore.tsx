@@ -57,7 +57,7 @@ const getEmojiForProduct = (name: string, categoryName: string) => {
 export const VirtualStore = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
   const { isInstallable, installApp } = usePWA();
-  const [company, setCompany] = useState<{ name: string; phone?: string; whatsapp_number?: string; is_delivery_open?: boolean; delivery_fee?: string } | null>(null);
+  const [company, setCompany] = useState<{ name: string; phone?: string; whatsapp_number?: string; is_delivery_open?: boolean; delivery_fee?: string; theme_color?: string; logo_url?: string } | null>(null);
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [search, setSearch] = useState('');
   
@@ -94,7 +94,7 @@ export const VirtualStore = () => {
       }
 
       const menuData = await api.get<{
-        company: { id: string; name: string; phone?: string };
+        company: { id: string; name: string; phone?: string; theme_color?: string; logo_url?: string };
         categories: DBCategory[];
         products: DBProduct[];
       }>(`/public/menu/${tenantId}`);
@@ -321,14 +321,18 @@ export const VirtualStore = () => {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-24">
       {/* Header Premium (Capa + Logo) */}
       <header className="bg-white sticky top-0 z-30 shadow-sm border-b border-slate-100">
-        <div className="h-32 bg-red-600 relative w-full overflow-hidden">
+        <div className="h-32 relative w-full overflow-hidden" style={{ backgroundColor: company?.theme_color || '#dc2626' }}>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
         </div>
         
         <div className="px-4 pb-4 relative mt-[-2.5rem]">
           <div className="flex justify-between items-start">
             <div className="w-20 h-20 bg-white rounded-full shadow-lg border-2 border-white flex items-center justify-center text-4xl overflow-hidden relative z-10">
-              ⭐
+              {company?.logo_url ? (
+                <img src={company.logo_url} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                '⭐'
+              )}
             </div>
             
             <div className="mt-12 flex items-center gap-2">

@@ -23,7 +23,7 @@ export class PublicController {
     try {
       const { companyId } = req.params;
       
-      const companyResult = await queryWithRLS(companyId, 'SELECT id, name, phone, whatsapp_number, is_delivery_open, operating_hours, delivery_fee FROM companies WHERE id = $1', [companyId]);
+      const companyResult = await queryWithRLS(companyId, 'SELECT id, name, phone, whatsapp_number, is_delivery_open, operating_hours, delivery_fee, theme_color, logo_url FROM companies WHERE id = $1', [companyId]);
       if (companyResult.rows.length === 0) {
         return res.status(404).json({ message: 'Company not found' });
       }
