@@ -6,6 +6,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 export const Register = () => {
   const [companyName, setCompanyName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -15,13 +17,13 @@ export const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!companyName || !password) return;
+    if (!companyName || !userName || !email || !password) return;
 
     setLoading(true);
     setError('');
 
     try {
-      await register(companyName, password);
+      await register(companyName, userName, email, password);
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta. Verifique os dados e tente novamente.');
@@ -72,6 +74,32 @@ export const Register = () => {
                 placeholder="Nome da empresa / lanchonete"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Seu Nome Completo"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              <input
+                type="email"
+                placeholder="E-mail de Acesso"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 required
                 disabled={loading}
