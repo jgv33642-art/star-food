@@ -153,7 +153,14 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create Company
-    const company = await this.userRepository.createCompany(companyName, plan || 'start');
+    const newCompany = await this.userRepository.createCompany(companyName, plan || 'start');
+    const companyId = newCompany.id;
+
+    // Inserir categorias padrão para o novo estabelecimento
+    const defaultCategories = ['Bebidas', 'Drinks', 'Porções', 'Lanches', 'Combos', 'Sobremesas', 'Adicionais'];
+    for (const cat of defaultCategories) {
+      await pool.query('INSERT INTO categories (name, company_id) VALUES ($1, $2)', [cat, companyId]);
+    }
 
     // Get Admin Role
     const role = await this.userRepository.findRoleByName('admin');
@@ -163,7 +170,7 @@ export class AuthService {
 
     // Create Admin User for Company
     const user = await this.userRepository.createUser({
-      companyId: company.id,
+      companyId: companyId,
       roleId: role.id,
       name: companyName, // Use companyName as the user name for the Admin
       email: ghostEmail,
