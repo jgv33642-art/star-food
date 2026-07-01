@@ -5,28 +5,24 @@ import { api } from '../lib/api';
 import { useLowStock } from '../hooks/useLowStock';
 
 const dataFaturamento = [
-  { name: 'Seg', atual: 4000, altura: 'h-[40%]' },
-  { name: 'Ter', atual: 3000, altura: 'h-[30%]' },
-  { name: 'Qua', atual: 8000, altura: 'h-[80%]' },
-  { name: 'Qui', atual: 2780, altura: 'h-[27%]' },
-  { name: 'Sex', atual: 5890, altura: 'h-[58%]' },
-  { name: 'Sáb', atual: 9390, altura: 'h-[93%]' },
-  { name: 'Dom', atual: 7490, altura: 'h-[74%]' },
+  { name: 'Seg', atual: 0, altura: 'h-[0%]' },
+  { name: 'Ter', atual: 0, altura: 'h-[0%]' },
+  { name: 'Qua', atual: 0, altura: 'h-[0%]' },
+  { name: 'Qui', atual: 0, altura: 'h-[0%]' },
+  { name: 'Sex', atual: 0, altura: 'h-[0%]' },
+  { name: 'Sáb', atual: 0, altura: 'h-[0%]' },
+  { name: 'Dom', atual: 0, altura: 'h-[0%]' },
 ];
 
 const dataProdutos = [
-  { name: 'X-Burger', vendas: 120, pct: 'w-[100%]' },
-  { name: 'Pizza', vendas: 98, pct: 'w-[80%]' },
-  { name: 'Refrigerante', vendas: 150, pct: 'w-[60%]' },
-  { name: 'Fritas', vendas: 86, pct: 'w-[40%]' },
-  { name: 'Cerveja', vendas: 110, pct: 'w-[30%]' },
+  { name: 'Nenhum item vendido', vendas: 0, pct: 'w-[0%]' }
 ];
 
 const dataPagamento = [
-  { name: 'PIX', value: '45%', color: 'bg-indigo-500' },
-  { name: 'Cartão de Crédito', value: '30%', color: 'bg-emerald-500' },
-  { name: 'Dinheiro', value: '15%', color: 'bg-amber-500' },
-  { name: 'Débito', value: '10%', color: 'bg-purple-500' },
+  { name: 'PIX', value: '0%', color: 'bg-indigo-500' },
+  { name: 'Cartão de Crédito', value: '0%', color: 'bg-emerald-500' },
+  { name: 'Dinheiro', value: '0%', color: 'bg-amber-500' },
+  { name: 'Débito', value: '0%', color: 'bg-purple-500' },
 ];
 
 interface DashboardStats {

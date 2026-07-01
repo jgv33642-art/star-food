@@ -126,11 +126,7 @@ export const Finance = () => {
 
   // Mix dynamic database sales (inflows) with realistic operational expenses (outflows)
   // to display a realistic cash flow statement
-  const staticExpenses = [
-    { id: 'EXP-001', date: 'Conta de Energia', amount: 320.00, method: 'Boleto', category: 'Fixo' },
-    { id: 'EXP-002', date: 'Fornecedor de Bebidas', amount: 450.00, method: 'PIX', category: 'Insumos' },
-    { id: 'EXP-003', date: 'Plataforma Digital SaaS', amount: 120.00, method: 'Cartão', category: 'Fixo' },
-  ];
+  const staticExpenses: any[] = [];
 
   const transactions = [
     ...sales.map(sale => ({
