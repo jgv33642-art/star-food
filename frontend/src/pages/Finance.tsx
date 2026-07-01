@@ -346,24 +346,26 @@ export const Finance = () => {
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-emerald-500" /> Faturamento por Hora (Pico)
                   </h3>
-                  <div className="flex items-end justify-between h-28 gap-2 mt-6">
-                    {eveningHours.map((hour) => {
-                      const amount = salesByHour[hour];
-                      const heightPercent = maxEveningRevenue > 0 ? (amount / maxEveningRevenue) * 100 : 0;
-                      return (
-                        <div key={hour} className="w-full bg-slate-50 dark:bg-slate-950 rounded-t-lg relative group h-full flex flex-col justify-end">
-                          <motion.div 
-                            initial={{ height: 0 }} 
-                            animate={{ height: `${Math.max(4, heightPercent)}%` }} 
-                            className={`w-full rounded-t-lg transition-all ${amount > 0 ? 'bg-indigo-500 hover:bg-indigo-400' : 'bg-slate-850'}`}
-                          />
-                          <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono whitespace-nowrap">
-                            R$ {amount.toFixed(0)}
-                          </span>
-                          <div className="text-[10px] text-slate-500 text-center mt-2 font-bold font-mono">{hour}h</div>
-                        </div>
-                      );
-                    })}
+                  <div className="overflow-x-auto custom-scrollbar pb-2">
+                    <div className="flex items-end justify-between h-28 min-w-[350px] gap-2 mt-6">
+                      {eveningHours.map((hour) => {
+                        const amount = salesByHour[hour];
+                        const heightPercent = maxEveningRevenue > 0 ? (amount / maxEveningRevenue) * 100 : 0;
+                        return (
+                          <div key={hour} className="w-full bg-slate-50 dark:bg-slate-950 rounded-t-lg relative group h-full flex flex-col justify-end">
+                            <motion.div 
+                              initial={{ height: 0 }} 
+                              animate={{ height: `${Math.max(4, heightPercent)}%` }} 
+                              className={`w-full rounded-t-lg transition-all ${amount > 0 ? 'bg-indigo-500 hover:bg-indigo-400' : 'bg-slate-850'}`}
+                            />
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono whitespace-nowrap">
+                              R$ {amount.toFixed(0)}
+                            </span>
+                            <div className="text-[10px] text-slate-500 text-center mt-2 font-bold font-mono">{hour}h</div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </motion.div>
               </div>

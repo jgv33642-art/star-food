@@ -177,16 +177,18 @@ export const AdminDashboard = () => {
             </select>
           </div>
 
-          <div className="h-[250px] w-full flex items-end justify-between gap-2 px-2">
-            {dataFaturamento.map((dia, idx) => (
-              <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md mb-2">
-                  R$ {dia.atual}
+          <div className="overflow-x-auto custom-scrollbar pb-2">
+            <div className="h-[250px] min-w-[350px] w-full flex items-end justify-between gap-2 px-2">
+              {dataFaturamento.map((dia, idx) => (
+                <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md mb-2">
+                    R$ {dia.atual}
+                  </div>
+                  <div className={`w-full max-w-[40px] ${dia.altura} bg-gradient-to-t from-indigo-600/50 to-indigo-500 rounded-t-lg group-hover:from-indigo-500 group-hover:to-indigo-400 transition-all`}></div>
+                  <span className="text-xs text-slate-500 font-medium mt-3">{dia.name}</span>
                 </div>
-                <div className={`w-full max-w-[40px] ${dia.altura} bg-gradient-to-t from-indigo-600/50 to-indigo-500 rounded-t-lg group-hover:from-indigo-500 group-hover:to-indigo-400 transition-all`}></div>
-                <span className="text-xs text-slate-500 font-medium mt-3">{dia.name}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
