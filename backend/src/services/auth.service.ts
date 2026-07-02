@@ -134,16 +134,13 @@ export class AuthService {
   }
 
   async register(data: any) {
-    const { companyName, password, plan } = data;
+    const { companyName, userName, email, password, plan } = data;
 
-    if (!companyName || !password) {
-      throw { status: 400, message: 'Nome do estabelecimento e senha são obrigatórios.' };
+    if (!companyName || !password || !userName || !email) {
+      throw { status: 400, message: 'Todos os campos são obrigatórios.' };
     }
 
-    const slug = slugify(companyName);
-    const ghostEmail = `${slug}@starfood.local`;
-
-    const existingUser = await this.userRepository.findByEmail(ghostEmail);
+    const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw { status: 400, message: 'Já existe um estabelecimento com este nome.' };
     }
@@ -172,8 +169,8 @@ export class AuthService {
     const user = await this.userRepository.createUser({
       companyId: companyId,
       roleId: role.id,
-      name: companyName, // Use companyName as the user name for the Admin
-      email: ghostEmail,
+      name: userName, // Use the provided user name
+      email: email, // Use the provided email
       password: hashedPassword,
     });
 

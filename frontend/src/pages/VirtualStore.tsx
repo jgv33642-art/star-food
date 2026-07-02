@@ -55,7 +55,7 @@ const getEmojiForProduct = (name: string, categoryName: string) => {
 };
 
 export const VirtualStore = () => {
-  const { tenantId } = useParams<{ tenantId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { isInstallable, installApp } = usePWA();
   const [company, setCompany] = useState<{ name: string; phone?: string; whatsapp_number?: string; is_delivery_open?: boolean; delivery_fee?: string; theme_color?: string; logo_url?: string } | null>(null);
   const [products, setProducts] = useState<MenuItem[]>([]);
@@ -89,7 +89,7 @@ export const VirtualStore = () => {
   const loadMenuData = async (showLoading = false) => {
     if (showLoading) setCheckoutStep('loading');
     try {
-      if (!tenantId) {
+      if (!slug) {
         throw new Error('Empresa inválida ou não especificada.');
       }
 
@@ -97,7 +97,7 @@ export const VirtualStore = () => {
         company: { id: string; name: string; phone?: string; theme_color?: string; logo_url?: string };
         categories: DBCategory[];
         products: DBProduct[];
-      }>(`/public/menu/${tenantId}`);
+      }>(`/public/menu/${slug}`);
 
       setCompany(menuData.company);
       

@@ -20,7 +20,7 @@ export class UserRepository {
 
   async createCompany(name: string, plan: string = 'start') {
     const result = await pool.query(
-      'INSERT INTO companies (name, plan) VALUES ($1, $2) RETURNING id',
+      'INSERT INTO companies (name, plan) VALUES ($1, $2) RETURNING id, plan',
       [name, plan]
     );
     return result.rows[0];
