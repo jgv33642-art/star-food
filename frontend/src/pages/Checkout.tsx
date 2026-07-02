@@ -94,6 +94,28 @@ export const Checkout = () => {
       setError('Por favor, preencha todos os dados do restaurante.');
       return;
     }
+    
+    if (companyName.length < 2) {
+      setError('O nome do estabelecimento deve ter pelo menos 2 letras.');
+      return;
+    }
+    
+    if (userName.length < 2) {
+      setError('O seu nome deve ter pelo menos 2 letras.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
     setError('');
     setStep(2);
   };
