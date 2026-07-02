@@ -134,19 +134,19 @@ export const VirtualStore = () => {
       loadMenuData(false);
     }, 10000); 
     return () => clearInterval(interval);
-  }, [tenantId]);
+  }, [slug]);
 
   useEffect(() => {
     if (checkoutStep === 'tracking' && trackingCode) {
       const interval = setInterval(async () => {
         try {
-          const data: any = await api.get(`/public/order-status/${tenantId}/${trackingCode}`);
+          const data: any = await api.get(`/public/order-status/${slug}/${trackingCode}`);
           setOrderStatus(data.status);
         } catch (e) {}
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [checkoutStep, trackingCode, tenantId]);
+  }, [checkoutStep, trackingCode, slug]);
 
   // Derived Data
   const filteredProducts = useMemo(() => {
@@ -190,7 +190,7 @@ export const VirtualStore = () => {
   const handleApplyCoupon = async () => {
     try {
       setCouponError('');
-      const data: any = await api.post(`/public/coupon/${tenantId}`, { code: couponCode });
+      const data: any = await api.post(`/public/coupon/${slug}`, { code: couponCode });
       setAppliedCoupon({ code: data.code, type: data.discount_type, value: Number(data.discount_value) });
     } catch (err: any) {
       setCouponError(err.response?.data?.message || 'Cupom inválido');
@@ -199,7 +199,7 @@ export const VirtualStore = () => {
   };
 
   const handleFinish = async () => {
-    if (!tenantId || cart.length === 0) return;
+    if (!slug || cart.length === 0) return;
     
     try {
       const orderItems = cart.map(c => ({
@@ -209,7 +209,7 @@ export const VirtualStore = () => {
         notes: `Delivery - Nome: ${customerName} | Contato: ${customerPhone}${c.notes ? ` | Obs: ${c.notes}` : ''}`
       }));
 
-      const orderData: any = await api.post(`/public/order/${tenantId}`, {
+      const orderData: any = await api.post(`/public/order/${slug}`, {
         items: orderItems,
         customerName,
         customerPhone,

@@ -75,7 +75,7 @@ export class MercadoPagoService {
           description: `Assinatura Plano ${plan.toUpperCase()}`,
           installments: installments,
           payment_method_id: paymentMethodId,
-          issuer_id: issuerId,
+          issuer_id: issuerId ? Number(issuerId) : undefined,
           payer: {
             email: email,
             identification: payer.identification
