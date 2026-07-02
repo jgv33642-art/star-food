@@ -8,6 +8,19 @@ import { pool } from '../config/db';
 const router = Router();
 const authController = new AuthController();
 
+// TEMPORARY DEV ROUTE TO FIX STUCK ACCOUNTS
+router.get('/dev/nuke', async (req, res) => {
+  try {
+    // Apaga os usuários fantasmas ou da urbs drinks
+    await pool.query(`DELETE FROM users WHERE email ILIKE '%@starfood.local%' OR email ILIKE '%urbs%'`);
+    // Apaga as empresas urbs drinks
+    await pool.query(`DELETE FROM companies WHERE name ILIKE '%urbs%'`);
+    res.json({ success: true, message: 'Todas as contas da Urbs Drinks foram apagadas do banco de dados!' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Standard email/password login ─────────────────────────────────────────────
 router.post('/login', validateRequest(loginSchema), authController.login);
 
