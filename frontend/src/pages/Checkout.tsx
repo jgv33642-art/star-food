@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 
-const mpKey = import.meta.env.VITE_MERCADO_PAGO_PUBLIC_KEY || 'APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b';
+const mpKey = (import.meta as any).env.VITE_MERCADO_PAGO_PUBLIC_KEY || 'APP_USR-d415a207-6e9f-49c8-8614-48d75cb3565b';
 initMercadoPago(mpKey, { locale: 'pt-BR' });
 
 const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: string, priceAnnual: string }> = {
