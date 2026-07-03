@@ -28,7 +28,7 @@ router.post('/checkout', authMiddleware, async (req, res) => {
 
     // Define o preço baseado no plano escolhido
     let price = 0;
-    if (plan === 'start') price = 149.90;
+    if (plan === 'start') price = 1.00; // Alterado para teste (Original: 149.90)
     else if (plan === 'basic') price = 299.90;
     else if (plan === 'pro') price = 399.90;
     else if (plan === 'annual') price = 3999.90; // 12x com desconto
@@ -55,7 +55,7 @@ router.post('/transparent', authMiddleware, async (req, res) => {
     if (!companyId) return res.status(401).json({ error: 'Usuário não autenticado' });
 
     let price = 0;
-    if (plan === 'start') price = 149.90;
+    if (plan === 'start') price = 1.00; // Alterado para teste (Original: 149.90)
     else if (plan === 'basic') price = 299.90;
     else if (plan === 'pro') price = 399.90;
     else if (plan === 'annual') price = 3999.90;
