@@ -13,7 +13,7 @@ const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: 
   start: {
     title: 'Plano Start',
     desc: 'Atendimento de balcão e relatórios simplificados.',
-    priceMonthly: '1,00',
+    priceMonthly: '149,90',
     priceAnnual: '1.618,80',
   },
   basic: {
@@ -25,7 +25,7 @@ const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: 
   pro: {
     title: 'Plano Pro (SaaS)',
     desc: 'Acesso completo com Delivery White Label.',
-    priceMonthly: '399,90',
+    priceMonthly: '1,00',
     priceAnnual: '4.318,92',
   }
 };
