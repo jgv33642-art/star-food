@@ -30,7 +30,7 @@ router.post('/checkout', authMiddleware, async (req, res) => {
     let price = 0;
     if (plan === 'start') price = 149.90;
     else if (plan === 'basic') price = 299.90;
-    else if (plan === 'pro') price = 1.00; // Alterado para teste (Original: 399.90)
+    else if (plan === 'pro') price = 5.00; // Alterado para teste (Original: 399.90, Min: 5.00)
     else if (plan === 'annual') price = 3999.90; // 12x com desconto
     else return res.status(400).json({ error: 'Plano inválido' });
 
@@ -57,7 +57,7 @@ router.post('/transparent', authMiddleware, async (req, res) => {
     let price = 0;
     if (plan === 'start') price = 149.90;
     else if (plan === 'basic') price = 299.90;
-    else if (plan === 'pro') price = 1.00; // Alterado para teste (Original: 399.90)
+    else if (plan === 'pro') price = 5.00; // Alterado para teste (Original: 399.90, Min: 5.00)
     else if (plan === 'annual') price = 3999.90;
     else return res.status(400).json({ error: 'Plano inválido' });
 
