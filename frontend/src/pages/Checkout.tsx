@@ -44,7 +44,7 @@ export const Checkout = () => {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { user, register } = useAuth();
 
   const planKey = searchParams.get('plan') || 'basic';
   const billingCycle = searchParams.get('billing') || 'monthly';
@@ -59,8 +59,11 @@ export const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1. Cria a conta no banco
-      await register(companyName, userName, email, password, planKey);
+      // 1. Cria a conta no banco apenas se ainda não estiver logado com o mesmo e-mail
+      // (Isso resolve o problema de tentar pagar novamente se o cartão falhar na primeira vez)
+      if (!user || user.email !== email) {
+        await register(companyName, userName, email, password, planKey);
+      }
       
       // 2. Chama a rota de pagamento transparente
       const response = await api.post<any>('/payments/transparent', { 
