@@ -142,7 +142,7 @@ export class AuthService {
 
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
-      throw { status: 400, message: 'Já existe um estabelecimento com este nome.' };
+      throw { status: 400, message: 'Este e-mail já está cadastrado no sistema.' };
     }
 
     // Hash password
