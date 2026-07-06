@@ -59,12 +59,6 @@ export const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1. Cria a conta no banco apenas se ainda não estiver logado com o mesmo e-mail
-      // (Isso resolve o problema de tentar pagar novamente se o cartão falhar na primeira vez)
-      if (!user || user.email !== email) {
-        await register(companyName, userName, email, password, planKey);
-      }
-      
       // 2. Chama a rota de pagamento transparente
       const response = await api.post<any>('/payments/transparent', { 
         plan: planKey,
@@ -78,21 +72,16 @@ export const Checkout = () => {
       if (response.status === 'authorized' || response.status === 'approved' || response.status === 'preapproved') {
         setIsSuccess(true);
       } else {
-        setError('O pagamento não foi aprovado pelo cartão. Verifique o saldo ou tente outro.');
+        setError('O pagamento não foi aprovado pelo cartão. Verifique os dados ou tente outro.');
       }
     } catch (err: any) {
-      let errorMessage = err.message || 'Erro ao processar o pagamento e criar conta.';
-      if (errorMessage.includes('users_email_key')) {
-        errorMessage = 'Este e-mail já está cadastrado. Por favor, tente fazer login ou use outro e-mail.';
-        setStep(1); // Volta para o passo 1 se o email já existe
-      }
-      setError(errorMessage);
+      setError(err.message || 'Erro ao processar o pagamento.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (!companyName || !userName || !email || !password) {
       setError('Por favor, preencha todos os dados do restaurante.');
       return;
@@ -120,7 +109,24 @@ export const Checkout = () => {
     }
 
     setError('');
-    setStep(2);
+    setLoading(true);
+
+    try {
+      // Cria a conta antes de ir para a tela de pagamento.
+      // Se o usuário já estiver logado com o mesmo email (ex: recarregou a página ou voltou), não recria.
+      if (!user || user.email !== email) {
+        await register(companyName, userName, email, password, planKey);
+      }
+      setStep(2);
+    } catch (err: any) {
+      let errorMessage = err.message || 'Erro ao criar conta.';
+      if (errorMessage.includes('users_email_key') || errorMessage.toLowerCase().includes('já está cadastrado') || errorMessage.toLowerCase().includes('already exists')) {
+        errorMessage = 'Este e-mail já está cadastrado. Por favor, faça login clicando em "Já tenho conta" no topo da página ou use outro e-mail.';
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const initialization = {
