@@ -46,6 +46,13 @@ const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: Re
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+
+  if (user.companyActive === false && location.pathname !== '/checkout') {
+    if (user.role === 'gerencia') {
+      return <Navigate to="/checkout" replace />;
+    }
+    return <AccessDenied />;
+  }
   
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <AccessDenied />;
@@ -92,7 +99,7 @@ const AppRoutes = () => {
       } />
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
-      <Route path="/checkout" element={user ? <Navigate to="/" replace /> : <Checkout />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="/saas-admin" element={<SuperAdmin />} />
       <Route path="/dev" element={<DevPanel />} />
       

@@ -44,7 +44,7 @@ export const Checkout = () => {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
-  const { user, register } = useAuth();
+  const { user, register, loginWithToken } = useAuth();
 
   const planKey = searchParams.get('plan') || 'basic';
   const billingCycle = searchParams.get('billing') || 'monthly';
@@ -71,6 +71,10 @@ export const Checkout = () => {
 
       if (response.status === 'authorized' || response.status === 'approved' || response.status === 'preapproved') {
         setIsSuccess(true);
+        if (user) {
+          const updatedUser = { ...user, companyActive: true };
+          loginWithToken(localStorage.getItem('@Lanchonete:token') || '', updatedUser);
+        }
       } else {
         setError('O pagamento não foi aprovado pelo cartão. Verifique os dados ou tente outro.');
       }

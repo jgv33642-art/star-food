@@ -62,7 +62,7 @@ export const Login = () => {
   });
 
   // Company Name / Password mode
-  const [companyName, setCompanyName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   // PIN mode
@@ -138,16 +138,16 @@ export const Login = () => {
   // Handle Company Name / password login
   const handleCompanyLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!companyName || !password) return;
+    if (!email || !password) return;
     setLoading(true);
     setError('');
     try {
-      await loginDevice(companyName, password);
-      setCompanyName('');
+      await loginDevice(email, password);
+      setEmail('');
       setPassword('');
       setMode('pin');
     } catch (err: any) {
-      setError(err.message || 'Nome do estabelecimento ou senha inválidos.');
+      setError(err.message || 'E-mail ou senha inválidos.');
     } finally {
       setLoading(false);
     }
@@ -286,10 +286,10 @@ export const Login = () => {
                   <div className="relative">
                     <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                     <input
-                      type="text"
-                      placeholder="Nome do estabelecimento"
-                      value={companyName}
-                      onChange={e => setCompanyName(e.target.value)}
+                      type="email"
+                      placeholder="E-mail de acesso"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                       required
                       disabled={loading}

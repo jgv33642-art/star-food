@@ -3,7 +3,7 @@ import { pool } from '../config/db';
 export class UserRepository {
   async findByEmail(email: string) {
     const result = await pool.query(
-      `SELECT u.*, r.name as role, c.plan as company_plan
+      `SELECT u.*, r.name as role, c.plan as company_plan, c.name as company_name, c.active as company_active
        FROM users u 
        LEFT JOIN roles r ON u.role_id = r.id 
        LEFT JOIN companies c ON u.company_id = c.id
@@ -20,7 +20,7 @@ export class UserRepository {
 
   async createCompany(name: string, plan: string = 'start') {
     const result = await pool.query(
-      'INSERT INTO companies (name, plan) VALUES ($1, $2) RETURNING id, plan',
+      'INSERT INTO companies (name, plan, active) VALUES ($1, $2, false) RETURNING id, plan',
       [name, plan]
     );
     return result.rows[0];

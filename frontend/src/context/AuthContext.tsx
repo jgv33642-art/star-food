@@ -12,12 +12,13 @@ export interface User {
   companyId: string;
   plan: string;
   hasStaff?: boolean;
+  companyActive?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (companyName: string, password: string) => Promise<void>;
-  loginDevice: (companyName: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  loginDevice: (email: string, password: string) => Promise<void>;
   register: (companyName: string, userName: string, email: string, password: string, plan?: string) => Promise<void>;
   loginWithToken: (token: string, user: User) => void;
   logout: () => void;
@@ -34,6 +35,8 @@ interface BackendUser {
   company_id?: string;
   plan?: string;
   hasStaff?: boolean;
+  companyActive?: boolean;
+  company_active?: boolean;
 }
 
 interface LoginResponse {
@@ -60,6 +63,7 @@ function buildUser(backendUser: BackendUser): User {
     companyId: backendUser.companyId || backendUser.company_id || '',
     plan: backendUser.plan || 'pro', // Default to pro if undefined so features work for admins
     hasStaff: backendUser.hasStaff,
+    companyActive: backendUser.companyActive ?? backendUser.company_active ?? true,
   };
 }
 
@@ -109,17 +113,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(u);
   };
 
-  const login = async (companyName: string, password: string): Promise<void> => {
-    const res = await api.post<LoginResponse>('/auth/login', { companyName, password });
+  const login = async (email: string, password: string): Promise<void> => {
+    const res = await api.post<LoginResponse>('/auth/login', { email, password });
     const mappedUser = buildUser(res.user);
     persistUser(mappedUser, res.token);
-    localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
+    localStorage.setItem('@Lanchonete:companySlug', slugify(res.user.companyName || ''));
   };
 
-  const loginDevice = async (companyName: string, password: string): Promise<void> => {
+  const loginDevice = async (email: string, password: string): Promise<void> => {
     // Valida credenciais na API mas não entra como usuário. Apenas salva o slug do estabelecimento.
-    await api.post<LoginResponse>('/auth/login', { companyName, password });
-    localStorage.setItem('@Lanchonete:companySlug', slugify(companyName));
+    const res = await api.post<LoginResponse>('/auth/login', { email, password });
+    localStorage.setItem('@Lanchonete:companySlug', slugify(res.user.companyName || ''));
   };
 
   const register = async (companyName: string, userName: string, email: string, password: string, plan?: string) => {

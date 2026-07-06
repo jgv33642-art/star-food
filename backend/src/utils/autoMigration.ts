@@ -258,33 +258,7 @@ export function runAutoMigration(): Promise<void> {
       `);
       console.log('[AUTO-MIGRATION] Composite indexes verified.');
 
-      console.log('[AUTO-MIGRATION] Ensuring default admin user exists...');
-      await client.query(`
-        DO $$ 
-        DECLARE 
-          v_company_id UUID;
-          v_role_id UUID;
-        BEGIN
-          -- Only create if the user does not exist
-          IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'jgv33642@gmail.com') THEN
-            INSERT INTO companies (name, plan, active) 
-            VALUES ('Lanchonete Star Food', 'pro', true) 
-            RETURNING id INTO v_company_id;
-
-            SELECT id INTO v_role_id FROM roles WHERE name = 'admin' LIMIT 1;
-
-            INSERT INTO users (company_id, role_id, name, email, password, active) 
-            VALUES (
-              v_company_id, 
-              v_role_id, 
-              'Administrador', 
-              'jgv33642@gmail.com', 
-              '$2a$10$hQXD1TCbqsr.0hvEUWm72OkaQd7B36B2POvbmbNpFkTZwNSWswFv6', 
-              true
-            );
-          END IF;
-        END $$;
-      `);
+      console.log('[AUTO-MIGRATION] Default admin creation block disabled.');
 
     } catch (migrationErr: any) {
       console.error('[AUTO-MIGRATION] Fatal migration error:', migrationErr);

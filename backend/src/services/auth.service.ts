@@ -15,18 +15,15 @@ export class AuthService {
   private userRepository = new UserRepository();
 
   async login(data: any) {
-    const { companyName, password } = data;
+    const { email, password } = data;
 
-    if (!companyName || !password) {
-      throw { status: 400, message: 'Nome do estabelecimento e senha são obrigatórios.' };
+    if (!email || !password) {
+      throw { status: 400, message: 'E-mail e senha são obrigatórios.' };
     }
 
-    const slug = slugify(companyName);
-    const ghostEmail = `${slug}@starfood.local`;
-
-    const user = await this.userRepository.findByEmail(ghostEmail);
+    const user = await this.userRepository.findByEmail(email);
     if (!user || !user.active) {
-      throw { status: 401, message: 'Estabelecimento não encontrado ou inativo.' };
+      throw { status: 401, message: 'Usuário não encontrado ou inativo.' };
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -53,11 +50,12 @@ export class AuthService {
       user: {
         id: user.id,
         name: user.name,
-        companyName: companyName,
+        companyName: user.company_name,
         email: user.email,
         companyId: user.company_id,
         role: user.role,
         plan: user.company_plan || 'basic',
+        companyActive: user.company_active,
         hasStaff
       },
     };
@@ -74,7 +72,7 @@ export class AuthService {
 
     // Buscar usuário pelo ID (aceita login por PIN apenas para cargos não-admin)
     const res = await pool.query(
-      `SELECT u.*, r.name as role, c.plan as company_plan
+      `SELECT u.*, r.name as role, c.plan as company_plan, c.name as company_name, c.active as company_active
        FROM users u
        LEFT JOIN roles r ON u.role_id = r.id
        LEFT JOIN companies c ON u.company_id = c.id
@@ -85,6 +83,9 @@ export class AuthService {
     const user = res.rows[0];
     if (!user || !user.active) {
       throw { status: 401, message: 'Usuário não encontrado ou inativo.' };
+    }
+    if (!user.company_active) {
+      throw { status: 401, message: 'Estabelecimento inativo ou pagamento pendente.' };
     }
 
     // O PIN fica armazenado no campo password (hash bcrypt)
@@ -106,9 +107,11 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
+        companyName: user.company_name,
         companyId: user.company_id,
         role: user.role,
         plan: user.company_plan || 'basic',
+        companyActive: user.company_active,
       },
     };
   }
@@ -191,6 +194,7 @@ export class AuthService {
         companyId: newCompany.id,
         role: 'admin',
         plan: newCompany.plan || 'start',
+        companyActive: false,
         hasStaff: false
       },
     };
