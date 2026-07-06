@@ -181,7 +181,7 @@ export const Landing = () => {
                 <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white text-center">Plano Pro</h3>
                 <p className="text-indigo-200 mb-6 text-center">O carro-chefe para quem quer Delivery.</p>
                 <div className="mb-8 text-center">
-                  <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">R$ {isAnnual ? '4.318,92' : '399,90'}</span>
+                  <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">R$ {isAnnual ? '4.318,92' : '1,00'}</span>
                   <span className="text-slate-600 dark:text-slate-400">{isAnnual ? '/ano' : '/mês'}</span>
                   {isAnnual && <div className="text-sm text-slate-500 mt-2">Equivalente a R$ 359,90 por mês</div>}
                 </div>
