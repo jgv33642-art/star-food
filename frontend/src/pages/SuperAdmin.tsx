@@ -13,7 +13,7 @@ export const SuperAdmin = () => {
   
   const [activeTab, setActiveTab] = useState<'overview' | 'planos' | 'gateway' | 'teste' | 'monitor'>('overview');
   
-  const [healthData, setHealthData] = useState<any>(null);
+  const [healthData, setHealthData] = useState<Record<string, unknown> | null>(null);
   const [healthLoading, setHealthLoading] = useState(false);
   const [healthError, setHealthError] = useState(false);
 
@@ -21,8 +21,7 @@ export const SuperAdmin = () => {
     setHealthLoading(true);
     setHealthError(false);
     try {
-      // Usar porta 3000 explicitamente para a API local em testes
-      const res = await fetch('http://localhost:3000/api/health');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/health`);
       if (res.ok || res.status === 503) {
         const data = await res.json();
         setHealthData(data);
@@ -37,7 +36,7 @@ export const SuperAdmin = () => {
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (activeTab === 'monitor') {
       fetchHealth(); // Fetch immediately when opening the tab
       interval = setInterval(fetchHealth, 10000); // 10 seconds
@@ -378,7 +377,7 @@ export const SuperAdmin = () => {
                     <Server className="w-6 h-6 text-blue-500"/> API Core
                   </div>
                   <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-                    {Math.floor(healthData.uptime_seconds / 3600)}h {Math.floor((healthData.uptime_seconds % 3600) / 60)}m
+                    {Math.floor(Number(healthData.uptime_seconds) / 3600)}h {Math.floor((Number(healthData.uptime_seconds) % 3600) / 60)}m
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-3 w-3">
@@ -396,11 +395,11 @@ export const SuperAdmin = () => {
                     <Database className="w-6 h-6 text-amber-500"/> Supabase DB
                   </div>
                   <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-                    {healthData.services?.database?.latency ?? '-'} ms
+                    {(healthData.services as any)?.database?.latency ?? '-'} ms
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-3 w-3">
-                      {healthData.services?.database?.status === 'up' ? (
+                      {(healthData.services as any)?.database?.status === 'up' ? (
                         <>
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
@@ -409,8 +408,8 @@ export const SuperAdmin = () => {
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_red]"></span>
                       )}
                     </span>
-                    <span className={`text-sm font-bold ${healthData.services?.database?.status === 'up' ? 'text-emerald-500' : 'text-red-500 animate-pulse'}`}>
-                      {healthData.services?.database?.status === 'up' ? 'Conexão Estável' : 'BANCO DE DADOS CAIU!'}
+                    <span className={`text-sm font-bold ${(healthData.services as any)?.database?.status === 'up' ? 'text-emerald-500' : 'text-red-500 animate-pulse'}`}>
+                      {(healthData.services as any)?.database?.status === 'up' ? 'Conexão Estável' : 'BANCO DE DADOS CAIU!'}
                     </span>
                   </div>
                 </div>
@@ -422,14 +421,14 @@ export const SuperAdmin = () => {
                     <Activity className="w-6 h-6 text-purple-500"/> Memória (RAM)
                   </div>
                   <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-                    {healthData.memory ? (healthData.memory.heapUsed / 1024 / 1024).toFixed(1) : '-'} MB
+                    {healthData.memory ? (Number((healthData.memory as any).heapUsed) / 1024 / 1024).toFixed(1) : '-'} MB
                   </h3>
                   <div className="flex items-center gap-2">
                     <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full" style={{ width: `${Math.min(100, (healthData.memory?.heapUsed / healthData.memory?.heapTotal) * 100 || 0)}%` }}></div>
+                      <div className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full" style={{ width: `${Math.min(100, (Number((healthData.memory as any)?.heapUsed) / Number((healthData.memory as any)?.heapTotal)) * 100 || 0)}%` }}></div>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400 mt-2 text-right">de {healthData.memory ? (healthData.memory.heapTotal / 1024 / 1024).toFixed(0) : '-'} MB (Heap)</p>
+                  <p className="text-xs text-slate-400 mt-2 text-right">de {healthData.memory ? (Number((healthData.memory as any).heapTotal) / 1024 / 1024).toFixed(0) : '-'} MB (Heap)</p>
                 </div>
               </div>
             ) : (
