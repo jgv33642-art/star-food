@@ -227,6 +227,48 @@ export function runAutoMigration(): Promise<void> {
       // These indexes ensure every tenant-scoped query hits (company_id, id)
       // which both speeds up lookups AND prevents cross-tenant data leaks via
       // sequential scans that might expose row counts or timing side-channels.
+      console.log('[AUTO-MIGRATION] Ensuring settings tables...');
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS store_settings (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            company_id UUID REFERENCES companies(id) ON DELETE CASCADE UNIQUE,
+            logo_url TEXT,
+            banner_url TEXT,
+            primary_color VARCHAR(7) DEFAULT '#0f172a',
+            secondary_color VARCHAR(7) DEFAULT '#f59e0b',
+            font_family VARCHAR(50) DEFAULT 'Inter',
+            favicon_url TEXT,
+            store_name VARCHAR(255),
+            whatsapp VARCHAR(20),
+            phone VARCHAR(20),
+            social_links JSONB DEFAULT '{"instagram": "", "facebook": ""}'::jsonb,
+            is_open_manual BOOLEAN DEFAULT true,
+            opening_hours JSONB DEFAULT '{"monday": [{"open": "18:00", "close": "23:59"}], "tuesday": [{"open": "18:00", "close": "23:59"}], "wednesday": [{"open": "18:00", "close": "23:59"}], "thursday": [{"open": "18:00", "close": "23:59"}], "friday": [{"open": "18:00", "close": "02:00"}], "saturday": [{"open": "18:00", "close": "02:00"}], "sunday": [{"open": "18:00", "close": "23:59"}]}'::jsonb,
+            estimated_delivery_time INTEGER DEFAULT 45,
+            max_delivery_radius_km NUMERIC(5,2) DEFAULT 10.00,
+            fee_type VARCHAR(20) DEFAULT 'fixed',
+            base_delivery_fee NUMERIC(10,2) DEFAULT 0.00,
+            fee_per_km NUMERIC(10,2) DEFAULT 0.00,
+            minimum_order_value NUMERIC(10,2) DEFAULT 0.00,
+            store_latitude NUMERIC(10,8),
+            store_longitude NUMERIC(11,8),
+            accepts_pix_online BOOLEAN DEFAULT false,
+            accepts_card_delivery BOOLEAN DEFAULT true,
+            accepts_cash BOOLEAN DEFAULT true,
+            accepts_pix_delivery BOOLEAN DEFAULT true,
+            updated_at TIMESTAMP DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS delivery_neighborhoods (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+            name VARCHAR(255) NOT NULL,
+            fee NUMERIC(10,2) DEFAULT 0.00,
+            active BOOLEAN DEFAULT true,
+            created_at TIMESTAMP DEFAULT now()
+        );
+      `);
+
       console.log('[AUTO-MIGRATION] Ensuring composite tenant isolation indexes...');
       await client.query(`
         CREATE INDEX IF NOT EXISTS idx_users_company_id_id

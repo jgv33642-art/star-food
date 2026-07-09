@@ -38,3 +38,15 @@ export const logger = winston.createLogger({
   format,
   transports,
 });
+
+// Captura erros fatais que não foram tratados e derrubariam o servidor sem logar
+process.on('uncaughtException', (error) => {
+  logger.error(`[UNCAUGHT EXCEPTION] ${error.message}\nStack: ${error.stack}`);
+  // Em produção, você pode disparar um webhook para Discord/Slack aqui
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error(`[UNHANDLED REJECTION] Reason: ${reason}`);
+  // Opcional: process.exit(1);
+});

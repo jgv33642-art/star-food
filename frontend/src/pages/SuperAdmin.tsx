@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { DollarSign, Users, Building, Shield, Save, Key, CreditCard, Lock, ListChecks, Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { DollarSign, Users, Building, Shield, Save, Key, CreditCard, Lock, ListChecks, Plus, Trash2, Activity, Server, Database, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const INITIAL_PLANS = [
@@ -11,7 +11,40 @@ export const SuperAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [password, setPassword] = useState('');
   
-  const [activeTab, setActiveTab] = useState<'overview' | 'planos' | 'gateway' | 'teste'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'planos' | 'gateway' | 'teste' | 'monitor'>('overview');
+  
+  const [healthData, setHealthData] = useState<any>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthError, setHealthError] = useState(false);
+
+  const fetchHealth = async () => {
+    setHealthLoading(true);
+    setHealthError(false);
+    try {
+      // Usar porta 3000 explicitamente para a API local em testes
+      const res = await fetch('http://localhost:3000/api/health');
+      if (res.ok || res.status === 503) {
+        const data = await res.json();
+        setHealthData(data);
+      } else {
+        setHealthError(true);
+      }
+    } catch (e) {
+      setHealthError(true);
+    } finally {
+      setHealthLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (activeTab === 'monitor') {
+      fetchHealth(); // Fetch immediately when opening the tab
+      interval = setInterval(fetchHealth, 10000); // 10 seconds
+    }
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const [gatewayKey, setGatewayKey] = useState('');
   
   const [plans, setPlans] = useState(INITIAL_PLANS);
@@ -132,6 +165,15 @@ export const SuperAdmin = () => {
         >
           <Building className="w-5 h-5" /> Ambiente de Teste
         </button>
+
+        <button 
+          onClick={() => { setActiveTab('monitor'); fetchHealth(); }}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === 'monitor' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-white hover:bg-slate-100 dark:bg-slate-800'
+          }`}
+        >
+          <Activity className="w-5 h-5" /> Saúde (Monitor)
+        </button>
       </div>
 
       {/* Área Principal */}
@@ -139,7 +181,8 @@ export const SuperAdmin = () => {
         <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-8">
           {activeTab === 'overview' ? 'Gestão de Assinantes (Tenants)' : 
            activeTab === 'planos' ? 'Configuração de Planos SaaS' : 
-           activeTab === 'teste' ? 'Laboratório de Testes' : 'Gateway de Assinaturas'}
+           activeTab === 'teste' ? 'Laboratório de Testes' : 
+           activeTab === 'monitor' ? 'Monitor de Sistema em Tempo Real' : 'Gateway de Assinaturas'}
         </h1>
 
         {activeTab === 'overview' && (
@@ -301,6 +344,99 @@ export const SuperAdmin = () => {
                 </button>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'monitor' && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <div className="flex items-center justify-between">
+              <p className="text-slate-600 dark:text-slate-400">Visão global dos servidores (API e Banco de Dados).</p>
+              <button 
+                onClick={fetchHealth} 
+                disabled={healthLoading}
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl flex items-center gap-2 transition-all disabled:opacity-50"
+              >
+                <Activity className={`w-5 h-5 ${healthLoading ? 'animate-spin' : ''}`} /> 
+                {healthLoading ? 'Escaneando...' : 'Atualizar Manualmente'}
+              </button>
+            </div>
+
+            {healthError && !healthData ? (
+               <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-500">
+                 <AlertTriangle className="w-8 h-8 shrink-0" />
+                 <div>
+                   <h3 className="font-bold text-lg">Servidor Principal Offline!</h3>
+                   <p className="text-sm">A API não respondeu ou caiu completamente (Erro 502/Connection Refused).</p>
+                 </div>
+               </div>
+            ) : healthData ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                {/* Uptime Card */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-lg relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl"></div>
+                  <div className="flex items-center gap-3 mb-4 text-slate-600 dark:text-slate-400">
+                    <Server className="w-6 h-6 text-blue-500"/> API Core
+                  </div>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
+                    {Math.floor(healthData.uptime_seconds / 3600)}h {Math.floor((healthData.uptime_seconds % 3600) / 60)}m
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-sm font-bold text-emerald-500">Online & Saudável</span>
+                  </div>
+                </div>
+
+                {/* Database Card */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-lg relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
+                  <div className="flex items-center gap-3 mb-4 text-slate-600 dark:text-slate-400">
+                    <Database className="w-6 h-6 text-amber-500"/> Supabase DB
+                  </div>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
+                    {healthData.services?.database?.latency ?? '-'} ms
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-3 w-3">
+                      {healthData.services?.database?.status === 'up' ? (
+                        <>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </>
+                      ) : (
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_red]"></span>
+                      )}
+                    </span>
+                    <span className={`text-sm font-bold ${healthData.services?.database?.status === 'up' ? 'text-emerald-500' : 'text-red-500 animate-pulse'}`}>
+                      {healthData.services?.database?.status === 'up' ? 'Conexão Estável' : 'BANCO DE DADOS CAIU!'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Memory Card */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-lg relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl"></div>
+                  <div className="flex items-center gap-3 mb-4 text-slate-600 dark:text-slate-400">
+                    <Activity className="w-6 h-6 text-purple-500"/> Memória (RAM)
+                  </div>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
+                    {healthData.memory ? (healthData.memory.heapUsed / 1024 / 1024).toFixed(1) : '-'} MB
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full" style={{ width: `${Math.min(100, (healthData.memory?.heapUsed / healthData.memory?.heapTotal) * 100 || 0)}%` }}></div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-2 text-right">de {healthData.memory ? (healthData.memory.heapTotal / 1024 / 1024).toFixed(0) : '-'} MB (Heap)</p>
+                </div>
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-500 animate-pulse">
+                Iniciando monitoramento dos serviços...
+              </div>
+            )}
           </motion.div>
         )}
       </div>

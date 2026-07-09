@@ -8,6 +8,7 @@ import routes from './routes';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { runAutoMigration } from './utils/autoMigration';
 import { logger } from './utils/logger';
+import healthRoutes from './routes/health.routes';
 
 const app = express();
 
@@ -48,9 +49,7 @@ app.use('/api', routes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', environment: env.NODE_ENV });
-});
+app.use('/api', healthRoutes); // Isso vai criar /api/health
 
 // Global Error Handler
 app.use(errorMiddleware);
