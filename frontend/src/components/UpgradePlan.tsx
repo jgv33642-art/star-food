@@ -16,8 +16,8 @@ export const UpgradePlan = ({ isOpen, onClose, requiredPlan }: UpgradePlanProps)
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      // @ts-ignore
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/checkout`, {
+      const API_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000/api' : '/api';
+      const response = await fetch(`${API_URL}/payments/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -21,7 +21,8 @@ export const SuperAdmin = () => {
     setHealthLoading(true);
     setHealthError(false);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/health`);
+      const API_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000/api' : '/api';
+      const res = await fetch(`${API_URL}/health`);
       if (res.ok || res.status === 503) {
         const data = await res.json();
         setHealthData(data);
