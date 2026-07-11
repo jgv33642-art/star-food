@@ -23,13 +23,13 @@ export class PublicController {
     try {
       const { companyId } = req.params;
       
-      const companyResult = await queryWithRLS(companyId, 'SELECT id, name, phone, whatsapp_number, is_delivery_open, operating_hours, delivery_fee, theme_color, logo_url FROM companies WHERE id = $1', [companyId]);
+      const companyResult = await queryWithRLS(companyId, 'SELECT c.id, c.name, c.phone, c.whatsapp_number, c.is_delivery_open, c.operating_hours, c.delivery_fee, s.primary_color as theme_color, s.logo_url FROM companies c LEFT JOIN store_settings s ON c.id = s.company_id WHERE c.id = $1', [companyId]);
       if (companyResult.rows.length === 0) {
         return res.status(404).json({ message: 'Company not found' });
       }
 
-      const categoriesResult = await queryWithRLS(companyId, 'SELECT * FROM categories ORDER BY created_at ASC');
-      const productsResult = await queryWithRLS(companyId, 'SELECT * FROM products WHERE active = true ORDER BY name ASC');
+      const categoriesResult = await queryWithRLS(companyId, 'SELECT * FROM categories WHERE company_id = $1 ORDER BY created_at ASC', [companyId]);
+      const productsResult = await queryWithRLS(companyId, 'SELECT * FROM products WHERE company_id = $1 AND active = true ORDER BY name ASC', [companyId]);
       
       res.json({
         company: companyResult.rows[0],
