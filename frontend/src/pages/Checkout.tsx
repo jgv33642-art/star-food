@@ -44,7 +44,7 @@ export const Checkout = () => {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
-  const { user, register, loginWithToken } = useAuth();
+  const { user, register, loginWithToken, logout } = useAuth();
 
   const planKey = searchParams.get('plan') || 'basic';
   const billingCycle = searchParams.get('billing') || 'monthly';
@@ -196,9 +196,9 @@ export const Checkout = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex justify-center items-center p-4 relative ">
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px]" />
       
-      <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors z-10 font-medium">
+      <button onClick={() => { logout(); navigate('/'); }} className="absolute top-8 left-8 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors z-10 font-medium">
         <ArrowLeft className="w-5 h-5" /> Voltar ao Início
-      </Link>
+      </button>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
