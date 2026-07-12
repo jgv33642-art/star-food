@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Layout } from '../components/Layout';
 import { useQuery } from '@tanstack/react-query';
 import { useCartStore } from '../store/cartStore';
+import { useBarcodeScanner } from '../hooks/useBarcodeScanner';
+import { usePrinter } from '../context/PrinterContext';
 import { 
   Search, 
   Plus, 
@@ -17,7 +19,8 @@ import {
   CheckCircle2, 
   RefreshCw,
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
@@ -39,6 +42,8 @@ const getEmoji = (productName: string, categoryName: string) => {
 export const PDV = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [search, setSearch] = useState('');
+  
+  const { isSupported: isPrinterSupported, isConnected: isPrinterConnected, connect: connectPrinter, printPosReceipt } = usePrinter();
   
   // Zustand Store para Carrinho
   const { cart, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCartStore();
@@ -171,6 +176,22 @@ export const PDV = () => {
       await api.post('/sales', payload);
 
       setSuccessMessage('Venda realizada com sucesso!');
+
+      // Imprime o cupom automaticamente se estiver conectado
+      if (isPrinterConnected) {
+        try {
+          await printPosReceipt({
+            storeName: 'Nossa Lanchonete',
+            orderId: order.id,
+            items: cart.map(c => ({ name: c.item.name, qty: c.quantity, price: c.item.price })),
+            total: total,
+            paymentMethod: partialPayments.length > 0 ? 'Múltiplo' : paymentMethod
+          });
+        } catch (e) {
+          console.error("Erro ao imprimir", e);
+        }
+      }
+
       clearCart();
       setPartialPayments([]);
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -182,6 +203,19 @@ export const PDV = () => {
       setSubmitting(false);
     }
   };
+
+  useBarcodeScanner({
+    onScan: (barcode) => {
+      // Find product by id or name acting as barcode
+      const product = products.find((p: any) => p.id === barcode || p.name.includes(barcode));
+      if (product) {
+        addToCart(product);
+      } else {
+        setError(`Produto com código ${barcode} não encontrado`);
+        setTimeout(() => setError(null), 3000);
+      }
+    }
+  });
 
 
 
@@ -278,6 +312,22 @@ export const PDV = () => {
           {/* Esquerda: Produtos */}
           <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Produtos</h2>
+                {isPrinterSupported && (
+                  <button 
+                    onClick={connectPrinter}
+                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                      isPrinterConnected 
+                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20' 
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <Printer className="w-4 h-4" />
+                    {isPrinterConnected ? 'Impressora Conectada' : 'Conectar Impressora'}
+                  </button>
+                )}
+              </div>
               <div className="relative mb-4 flex gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />

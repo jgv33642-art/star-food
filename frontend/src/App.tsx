@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PrinterProvider } from './context/PrinterContext';
 
 const queryClient = new QueryClient();
 
@@ -309,11 +310,13 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AuthProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
-        </AuthProvider>
+        <PrinterProvider>
+          <AuthProvider>
+            <Router>
+              <AppRoutes />
+            </Router>
+          </AuthProvider>
+        </PrinterProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
