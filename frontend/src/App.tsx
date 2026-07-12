@@ -49,7 +49,7 @@ const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: Re
 
   if (user.companyActive === false && location.pathname !== '/checkout') {
     if (user.role === 'gerencia') {
-      return <Navigate to="/checkout" replace />;
+      return <Navigate to="/" replace />;
     }
     return <AccessDenied />;
   }
@@ -88,7 +88,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={
-        user ? (
+        user && user.companyActive !== false ? (
           user.role === 'gerencia' ? ((user.plan || 'start').toLowerCase() === 'start' ? <Navigate to="/caixa" replace /> : <Navigate to="/admin" replace />) :
           user.role === 'caixa' ? <Navigate to="/caixa" replace /> :
           user.role === 'garcom' ? <Navigate to="/pedidos" replace /> :
