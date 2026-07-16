@@ -39,6 +39,8 @@ import { StockImport } from './pages/StockImport';
 import { Complements } from './pages/Complements';
 import { Team } from './pages/Team';
 import { PaymentCheckout } from './pages/PaymentCheckout';
+import { CRM } from './pages/admin/CRM';
+import { Permissions } from './pages/admin/Permissions';
 
 const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: React.ReactNode, allowedRoles?: string[], allowedPlans?: string[] }) => {
   const { user } = useAuth();
@@ -226,7 +228,7 @@ const AppRoutes = () => {
         path="/admin/crm" 
         element={
           <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
-            <Loyalty />
+            <CRM />
           </ProtectedRoute>
         } 
       />
@@ -299,6 +301,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
             <Users />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/permissoes" 
+        element={
+          <ProtectedRoute allowedRoles={['gerencia']} allowedPlans={['basic', 'pro']}>
+            <Permissions />
           </ProtectedRoute>
         } 
       />
