@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -7,40 +7,40 @@ import { PrinterProvider } from './context/PrinterContext';
 
 const queryClient = new QueryClient();
 
-import { Landing } from './pages/Landing';
-import { Register } from './pages/Register';
-import { Login } from './pages/Login';
-import { WaiterDashboard } from './pages/WaiterDashboard';
-import { CashierDashboard } from './pages/CashierDashboard';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { PDV } from './pages/PDV';
-import { Tables } from './pages/Tables';
+const Landing = lazy(() => import('./pages/Landing').then(m => ({ default: m.Landing })));
+const Register = lazy(() => import('./pages/Register').then(m => ({ default: m.Register })));
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const WaiterDashboard = lazy(() => import('./pages/WaiterDashboard').then(m => ({ default: m.WaiterDashboard })));
+const CashierDashboard = lazy(() => import('./pages/CashierDashboard').then(m => ({ default: m.CashierDashboard })));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const PDV = lazy(() => import('./pages/PDV').then(m => ({ default: m.PDV })));
+const Tables = lazy(() => import('./pages/Tables').then(m => ({ default: m.Tables })));
 
-import { Finance } from './pages/Finance';
-import { Products } from './pages/Products';
-import { Categories } from './pages/Categories';
-import { Ingredients } from './pages/Ingredients';
-import { Reports } from './pages/Reports';
-import { Inventory } from './pages/Inventory';
-import { Delivery } from './pages/Delivery';
-import { DigitalMenu } from './pages/DigitalMenu';
-import { Settings } from './pages/Settings';
-import { DeliverySettings } from './pages/admin/DeliverySettings';
-import { Integrations } from './pages/admin/Integrations';
-import { Couriers } from './pages/admin/Couriers';
-import { Loyalty } from './pages/admin/Loyalty';
-import { SuperAdmin } from './pages/SuperAdmin';
-import { Checkout } from './pages/Checkout';
-import { VirtualStore } from './pages/VirtualStore';
-import { DevPanel } from './pages/DevPanel';
-import { Users } from './pages/Users';
-import { AccessDenied } from './pages/AccessDenied';
-import { StockImport } from './pages/StockImport';
-import { Complements } from './pages/Complements';
-import { Team } from './pages/Team';
-import { PaymentCheckout } from './pages/PaymentCheckout';
-import { CRM } from './pages/admin/CRM';
-import { Permissions } from './pages/admin/Permissions';
+const Finance = lazy(() => import('./pages/Finance').then(m => ({ default: m.Finance })));
+const Products = lazy(() => import('./pages/Products').then(m => ({ default: m.Products })));
+const Categories = lazy(() => import('./pages/Categories').then(m => ({ default: m.Categories })));
+const Ingredients = lazy(() => import('./pages/Ingredients').then(m => ({ default: m.Ingredients })));
+const Reports = lazy(() => import('./pages/Reports').then(m => ({ default: m.Reports })));
+const Inventory = lazy(() => import('./pages/Inventory').then(m => ({ default: m.Inventory })));
+const Delivery = lazy(() => import('./pages/Delivery').then(m => ({ default: m.Delivery })));
+const DigitalMenu = lazy(() => import('./pages/DigitalMenu').then(m => ({ default: m.DigitalMenu })));
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
+const DeliverySettings = lazy(() => import('./pages/admin/DeliverySettings').then(m => ({ default: m.DeliverySettings })));
+const Integrations = lazy(() => import('./pages/admin/Integrations').then(m => ({ default: m.Integrations })));
+const Couriers = lazy(() => import('./pages/admin/Couriers').then(m => ({ default: m.Couriers })));
+const Loyalty = lazy(() => import('./pages/admin/Loyalty').then(m => ({ default: m.Loyalty })));
+const SuperAdmin = lazy(() => import('./pages/SuperAdmin').then(m => ({ default: m.SuperAdmin })));
+const Checkout = lazy(() => import('./pages/Checkout').then(m => ({ default: m.Checkout })));
+const VirtualStore = lazy(() => import('./pages/VirtualStore').then(m => ({ default: m.VirtualStore })));
+const DevPanel = lazy(() => import('./pages/DevPanel').then(m => ({ default: m.DevPanel })));
+const Users = lazy(() => import('./pages/Users').then(m => ({ default: m.Users })));
+const AccessDenied = lazy(() => import('./pages/AccessDenied').then(m => ({ default: m.AccessDenied })));
+const StockImport = lazy(() => import('./pages/StockImport').then(m => ({ default: m.StockImport })));
+const Complements = lazy(() => import('./pages/Complements').then(m => ({ default: m.Complements })));
+const Team = lazy(() => import('./pages/Team').then(m => ({ default: m.Team })));
+const PaymentCheckout = lazy(() => import('./pages/PaymentCheckout').then(m => ({ default: m.PaymentCheckout })));
+const CRM = lazy(() => import('./pages/admin/CRM').then(m => ({ default: m.CRM })));
+const Permissions = lazy(() => import('./pages/admin/Permissions').then(m => ({ default: m.Permissions })));
 
 const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: React.ReactNode, allowedRoles?: string[], allowedPlans?: string[] }) => {
   const { user } = useAuth();
@@ -323,7 +323,9 @@ export default function App() {
         <PrinterProvider>
           <AuthProvider>
             <Router>
-              <AppRoutes />
+              <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950"><div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+                <AppRoutes />
+              </Suspense>
             </Router>
           </AuthProvider>
         </PrinterProvider>
