@@ -45,6 +45,8 @@ export const Checkout = () => {
 
   const navigate = useNavigate();
   const { user, register, loginWithToken, logout } = useAuth();
+  
+  const [step, setStep] = useState<1 | 2>(user ? 2 : 1);
 
   const planKey = searchParams.get('plan') || 'basic';
   const billingCycle = searchParams.get('billing') || 'monthly';
@@ -66,7 +68,7 @@ export const Checkout = () => {
         issuer_id: formData.issuer_id,
         payment_method_id: formData.payment_method_id,
         installments: formData.installments,
-        payer: { ...formData.payer, email: email }
+        payer: { ...formData.payer, email: email || user?.email }
       });
 
       if (response.status === 'authorized' || response.status === 'approved' || response.status === 'preapproved') {

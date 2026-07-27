@@ -91,7 +91,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={
-        user && user.companyActive !== false ? (
+        user ? (
+          user.companyActive === false ? <Navigate to="/checkout" replace /> :
           user.role === 'gerencia' ? ((user.plan || 'start').toLowerCase() === 'start' ? <Navigate to="/caixa" replace /> : <Navigate to="/admin" replace />) :
           user.role === 'caixa' ? <Navigate to="/caixa" replace /> :
           user.role === 'garcom' ? <Navigate to="/pedidos" replace /> :
