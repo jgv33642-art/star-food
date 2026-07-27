@@ -18,6 +18,21 @@ router.get('/:companyId/public', async (req, res) => {
   }
 });
 
+// Buscar configurações privadas da Loja (Admin)
+router.get('/:companyId/private', authMiddleware, requirePlan('pro'), async (req, res) => {
+  try {
+    const companyId = req.user?.companyId;
+    if (companyId !== req.params.companyId) return res.status(403).json({ error: 'Forbidden' });
+    const result = await pool.query(
+      'SELECT * FROM store_settings WHERE company_id = $1',
+      [companyId]
+    );
+    res.json(result.rows[0] || {});
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch private settings' });
+  }
+});
+
 // Salvar/Atualizar configurações (Apenas ADMIN via Painel) - Exige Plano PRO
 router.post('/save', authMiddleware, requirePlan('pro'), async (req, res) => {
   try {
@@ -28,9 +43,10 @@ router.post('/save', authMiddleware, requirePlan('pro'), async (req, res) => {
     const result = await pool.query(`
       INSERT INTO store_settings (
         company_id, primary_color, secondary_color, logo_url, banner_url, 
-        is_open_manual, opening_hours, fee_type, max_delivery_radius_km
+        is_open_manual, opening_hours, fee_type, max_delivery_radius_km,
+        printer_kitchen_ip, printer_bar_ip, printer_cashier_ip
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       ON CONFLICT (company_id) DO UPDATE SET
         primary_color = EXCLUDED.primary_color,
         secondary_color = EXCLUDED.secondary_color,
@@ -40,11 +56,15 @@ router.post('/save', authMiddleware, requirePlan('pro'), async (req, res) => {
         opening_hours = EXCLUDED.opening_hours,
         fee_type = EXCLUDED.fee_type,
         max_delivery_radius_km = EXCLUDED.max_delivery_radius_km,
+        printer_kitchen_ip = EXCLUDED.printer_kitchen_ip,
+        printer_bar_ip = EXCLUDED.printer_bar_ip,
+        printer_cashier_ip = EXCLUDED.printer_cashier_ip,
         updated_at = now()
       RETURNING *;
     `, [
       companyId, data.primary_color, data.secondary_color, data.logo_url, data.banner_url,
-      data.is_open_manual, JSON.stringify(data.opening_hours), data.fee_type, data.max_delivery_radius_km
+      data.is_open_manual, JSON.stringify(data.opening_hours), data.fee_type, data.max_delivery_radius_km,
+      data.printer_kitchen_ip, data.printer_bar_ip, data.printer_cashier_ip
     ]);
 
     res.json({ success: true, settings: result.rows[0] });

@@ -16,7 +16,8 @@ export class OrderRepository {
               'quantity', oi.quantity,
               'price', oi.price,
               'notes', oi.notes,
-              'complements', oi.complements
+              'complements', oi.complements,
+              'printer_sector', c.printer_sector
             )
           ) FILTER (WHERE oi.id IS NOT NULL),
           '[]'
@@ -25,6 +26,7 @@ export class OrderRepository {
       LEFT JOIN tables t ON t.id = o.table_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
       LEFT JOIN products p ON p.id = oi.product_id
+      LEFT JOIN categories c ON c.id = p.category_id
       WHERE o.company_id = $1
       GROUP BY o.id, o.customer_name, o.customer_phone, o.delivery_address, t.number
       ORDER BY o.opened_at DESC`,
@@ -48,7 +50,8 @@ export class OrderRepository {
               'quantity', oi.quantity,
               'price', oi.price,
               'notes', oi.notes,
-              'complements', oi.complements
+              'complements', oi.complements,
+              'printer_sector', c.printer_sector
             )
           ) FILTER (WHERE oi.id IS NOT NULL),
           '[]'
@@ -57,6 +60,7 @@ export class OrderRepository {
       LEFT JOIN tables t ON t.id = o.table_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
       LEFT JOIN products p ON p.id = oi.product_id
+      LEFT JOIN categories c ON c.id = p.category_id
       WHERE o.id = $1 AND o.company_id = $2
       GROUP BY o.id, o.customer_name, o.customer_phone, o.delivery_address, t.number`,
       [id, companyId]

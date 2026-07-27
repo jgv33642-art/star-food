@@ -15,6 +15,8 @@ export const Settings = () => {
   
   // Hardware & Printer Wizard States
   const [printerIP, setPrinterIP] = useState('192.168.1.100');
+  const [printerKitchenIP, setPrinterKitchenIP] = useState('');
+  const [printerBarIP, setPrinterBarIP] = useState('');
   const [printerType, setPrinterType] = useState<'network' | 'usb'>('network');
   const [usbVendorId, setUsbVendorId] = useState('0x04b8');
   const [usbProductId, setUsbProductId] = useState('0x0202');
@@ -30,12 +32,29 @@ export const Settings = () => {
         const config = JSON.parse(saved);
         setPrinterType(config.printerType || 'network');
         setPrinterIP(config.printerIP || '192.168.1.100');
+        setPrinterKitchenIP(config.printerKitchenIP || '');
+        setPrinterBarIP(config.printerBarIP || '');
         setUsbVendorId(config.usbVendorId || '0x04b8');
         setUsbProductId(config.usbProductId || '0x0202');
       } catch (e) {
         console.error('Erro ao ler config da impressora:', e);
       }
     }
+    
+    // Fetch settings from DB
+    const userCompanyId = JSON.parse(localStorage.getItem('starfood_user') || '{}')?.companyId;
+    if (userCompanyId) {
+      fetch(`http://localhost:3000/api/settings/${userCompanyId}/private`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('starfood_token')}`
+        }
+      }).then(res => res.json()).then(data => {
+        if (data.printer_kitchen_ip) { setPrinterKitchenIP(data.printer_kitchen_ip); }
+        if (data.printer_bar_ip) { setPrinterBarIP(data.printer_bar_ip); }
+        if (data.printer_cashier_ip) { setPrinterIP(data.printer_cashier_ip); }
+      }).catch(console.error);
+    }
+    
     checkAgentStatus();
   }, []);
 
@@ -95,10 +114,29 @@ export const Settings = () => {
           // Salva no localStorage para uso do caixa e garçons
           localStorage.setItem('starfood_printer_config', JSON.stringify({
             printerType,
-            printerIP,
+            printerIP, // Cashier IP
+            printerKitchenIP,
+            printerBarIP,
             usbVendorId,
             usbProductId
           }));
+
+          // Save to backend
+          const token = localStorage.getItem('starfood_token');
+          if (token) {
+            fetch('http://localhost:3000/api/settings/save', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                printer_kitchen_ip: printerKitchenIP,
+                printer_bar_ip: printerBarIP,
+                printer_cashier_ip: printerIP
+              })
+            }).catch(console.error);
+          }
         }
       } else {
         setTestStatus('error');
@@ -413,15 +451,37 @@ export const Settings = () => {
                       </div>
 
                       {printerType === 'network' ? (
-                        <div>
-                          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">Endereço IP na Rede</label>
-                          <input 
-                            type="text" 
-                            value={printerIP}
-                            onChange={(e) => setPrinterIP(e.target.value)}
-                            placeholder="Ex: 192.168.1.100" 
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                          />
+                        <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">IP do Caixa (Recibos)</label>
+                            <input 
+                              type="text" 
+                              value={printerIP}
+                              onChange={(e) => setPrinterIP(e.target.value)}
+                              placeholder="Ex: 192.168.1.100" 
+                              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">IP da Cozinha (Comida)</label>
+                            <input 
+                              type="text" 
+                              value={printerKitchenIP}
+                              onChange={(e) => setPrinterKitchenIP(e.target.value)}
+                              placeholder="Deixe em branco p/ não usar" 
+                              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">IP do Bar (Bebidas)</label>
+                            <input 
+                              type="text" 
+                              value={printerBarIP}
+                              onChange={(e) => setPrinterBarIP(e.target.value)}
+                              placeholder="Deixe em branco p/ não usar" 
+                              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                            />
+                          </div>
                         </div>
                       ) : (
                         <div className="grid grid-cols-2 gap-4">

@@ -10,10 +10,11 @@ export class CategoryRepository {
   }
 
   async create(companyId: string, data: any) {
-    const { name } = data;
+    const { name, printerSector } = data;
+    const pSector = printerSector || 'none';
     const result = await pool.query(
-      `INSERT INTO categories (company_id, name) VALUES ($1, $2) RETURNING *`,
-      [companyId, name]
+      `INSERT INTO categories (company_id, name, printer_sector) VALUES ($1, $2, $3) RETURNING *`,
+      [companyId, name, pSector]
     );
     return result.rows[0];
   }

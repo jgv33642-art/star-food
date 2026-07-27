@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
 import { useSocket } from '../hooks/useSocket';
+import { usePrinter } from '../context/PrinterContext';
 
 interface OrderItem {
   id: string;
@@ -50,6 +51,7 @@ interface CashRegister {
 export const CashierDashboard = () => {
   const navigate = useNavigate();
   const socket = useSocket();
+  const { printOrderToSectors } = usePrinter();
 
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState('');
@@ -106,13 +108,25 @@ export const CashierDashboard = () => {
       fetchCashierAndOrders(false);
     };
 
-    socket.on('new_order', handleUpdate);
+    const handleNewOrder = async (data: any) => {
+      handleUpdate();
+      try {
+        const orderDetail = await api.get<Order>(`/orders/${data.id}`);
+        if (orderDetail) {
+          printOrderToSectors(orderDetail);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar pedido para auto-impressão', err);
+      }
+    };
+
+    socket.on('new_order', handleNewOrder);
     socket.on('order_status_changed', handleUpdate);
     socket.on('order_payment_partial', handleUpdate);
     socket.on('order_closed', handleUpdate);
 
     return () => {
-      socket.off('new_order', handleUpdate);
+      socket.off('new_order', handleNewOrder);
       socket.off('order_status_changed', handleUpdate);
       socket.off('order_payment_partial', handleUpdate);
       socket.off('order_closed', handleUpdate);

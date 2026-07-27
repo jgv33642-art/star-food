@@ -17,6 +17,7 @@ import { api } from '../lib/api';
 interface Category {
   id: string;
   name: string;
+  printer_sector?: string;
   created_at: string;
 }
 
@@ -34,6 +35,7 @@ export const Categories = () => {
 
   // Form States
   const [name, setName] = useState('');
+  const [printerSector, setPrinterSector] = useState('kitchen');
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -54,6 +56,7 @@ export const Categories = () => {
 
   const handleOpenAdd = () => {
     setName('');
+    setPrinterSector('kitchen');
     setEditingCategory(null);
     setShowAddModal(true);
   };
@@ -61,6 +64,7 @@ export const Categories = () => {
   const handleOpenEdit = (item: Category) => {
     setEditingCategory(item);
     setName(item.name);
+    setPrinterSector(item.printer_sector || 'kitchen');
     setShowAddModal(true);
   };
 
@@ -74,13 +78,13 @@ export const Categories = () => {
 
     try {
       if (editingCategory) {
-        // Update (assuming PUT /categories/:id exists, or POST if it handles upsert. Let's use PUT)
-        const updated = await api.put<Category>(`/categories/${editingCategory.id}`, { name });
+        // Update
+        const updated = await api.put<Category>(`/categories/${editingCategory.id}`, { name, printerSector });
         setCategories(prev => prev.map(c => c.id === updated.id ? updated : c));
         setSuccess('Categoria atualizada com sucesso!');
       } else {
         // Create
-        const created = await api.post<Category>('/categories', { name });
+        const created = await api.post<Category>('/categories', { name, printerSector });
         setCategories(prev => [created, ...prev]);
         setSuccess('Categoria criada com sucesso!');
       }
@@ -178,6 +182,7 @@ export const Categories = () => {
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 text-xs tracking-wider text-slate-500 uppercase">
                   <th className="py-4 px-6 font-medium">Nome da Categoria</th>
+                  <th className="py-4 px-6 font-medium text-center">Setor de Impressão</th>
                   <th className="py-4 px-6 font-medium text-center">Ações</th>
                 </tr>
               </thead>
@@ -195,6 +200,15 @@ export const Categories = () => {
                         </div>
                         <span className="font-bold text-slate-900 dark:text-white text-base">{cat.name}</span>
                       </div>
+                    </td>
+                    <td className="py-4 px-6 text-center">
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        cat.printer_sector === 'bar' ? 'bg-amber-500/10 text-amber-500' :
+                        cat.printer_sector === 'kitchen' ? 'bg-emerald-500/10 text-emerald-500' :
+                        'bg-slate-500/10 text-slate-500'
+                      }`}>
+                        {cat.printer_sector === 'bar' ? 'Bar' : cat.printer_sector === 'kitchen' ? 'Cozinha' : 'Nenhum'}
+                      </span>
                     </td>
                     <td className="py-4 px-6 text-center">
                       <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -254,6 +268,20 @@ export const Categories = () => {
                     placeholder="Ex: Lanches, Bebidas, Sobremesas"
                     className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Setor de Impressão Padrão</label>
+                  <select
+                    value={printerSector}
+                    onChange={(e) => setPrinterSector(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  >
+                    <option value="kitchen">Cozinha (Pratos, Lanches)</option>
+                    <option value="bar">Bar (Bebidas, Drinks)</option>
+                    <option value="none">Não Imprimir (Ex: Couvert)</option>
+                  </select>
+                  <p className="text-xs text-slate-500 mt-2">Quando um pedido for aprovado, os itens desta categoria serão impressos automaticamente neste setor.</p>
                 </div>
 
                 <div className="pt-4 flex gap-3">
