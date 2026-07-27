@@ -35,7 +35,6 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(searchParams.get('status') === 'success');
   const [error, setError] = useState('');
-  const [step, setStep] = useState<1 | 2>(1);
   
   // Form state
   const [companyName, setCompanyName] = useState('');
