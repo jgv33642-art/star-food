@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { openDB, IDBPDatabase } from 'idb';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 
 const DB_NAME = 'star-food-offline-db';
 const DB_VERSION = 1;
@@ -34,6 +35,9 @@ export const useOfflineQueue = () => {
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [queueLength, setQueueLength] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const { user } = useAuth();
+  
+  const isPro = user?.plan === 'pro' || user?.plan === 'premium' || user?.plan === 'annual';
 
   // Update online status
   useEffect(() => {
@@ -83,6 +87,23 @@ export const useOfflineQueue = () => {
       return null;
     }
   };
+
+  const syncCacheDown = useCallback(async (companyId: string) => {
+    if (!isOnline || !isPro) return;
+    try {
+      const [categories, products, tables] = await Promise.all([
+        api.get(`/categories?company_id=${companyId}`),
+        api.get(`/products?company_id=${companyId}`),
+        api.get(`/tables?company_id=${companyId}`)
+      ]);
+      await setCache('categories', categories);
+      await setCache('products', products);
+      await setCache('tables', tables);
+      console.log('[OFFLINE] Menu and Tables cached successfully for offline use.');
+    } catch (e) {
+      console.error('[OFFLINE] Failed to cache menu:', e);
+    }
+  }, [isOnline, isPro]);
 
   // Add action to offline queue
   const queueAction = async (type: OfflineAction['type'], payload: any) => {
@@ -187,6 +208,7 @@ export const useOfflineQueue = () => {
     isSyncing,
     queueAction,
     syncQueue,
+    syncCacheDown,
     setCache,
     getCache,
   };

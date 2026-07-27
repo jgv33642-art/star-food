@@ -3,12 +3,12 @@ import { Layout } from '../components/Layout';
 import { 
   BarChart3, PieChart, Download, Calendar, 
   Percent, ArrowUpRight, 
-  TrendingUp, Award, Table, AlertCircle, Loader2
+  TrendingUp, Award, Table, AlertCircle, Loader2, Sparkles, Link
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
-type TabType = 'cmv' | 'top-products' | 'export';
+type TabType = 'cmv' | 'top-products' | 'intelligence' | 'export';
 type PeriodType = 'today' | '7days' | '30days' | 'month' | 'custom';
 
 interface CmvSummary {
@@ -61,6 +61,8 @@ export const Reports = () => {
   const [cmvSummary, setCmvSummary] = useState<CmvSummary | null>(null);
   const [cmvProducts, setCmvProducts] = useState<CmvProductItem[]>([]);
   const [topProducts, setTopProducts] = useState<TopProductItem[]>([]);
+  const [heatmap, setHeatmap] = useState<any[]>([]);
+  const [affinity, setAffinity] = useState<any[]>([]);
 
   // Calculate ISO date strings based on selected period
   const getDates = useCallback(() => {
@@ -104,6 +106,13 @@ export const Reports = () => {
       } else if (activeTab === 'top-products') {
         const top = await api.get<TopProductItem[]>(`/reports/top-products${queryParams}`);
         setTopProducts(top);
+      } else if (activeTab === 'intelligence') {
+        const [hm, aff] = await Promise.all([
+          api.get<any[]>(`/reports/heatmap${queryParams}`),
+          api.get<any[]>(`/reports/affinity${queryParams}`)
+        ]);
+        setHeatmap(hm);
+        setAffinity(aff);
       }
     } catch (err: any) {
       console.error(err);
@@ -180,6 +189,18 @@ export const Reports = () => {
             >
               <PieChart className="w-4 h-4" /> Top Produtos
             </button>
+            {(user?.plan === 'premium' || user?.plan === 'annual') && (
+              <button
+                onClick={() => setActiveTab('intelligence')}
+                className={`px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+                  activeTab === 'intelligence' 
+                    ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' 
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" /> Inteligência
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('export')}
               className={`px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
@@ -452,7 +473,96 @@ export const Reports = () => {
               </div>
             )}
 
-            {/* ── TAB 3: EXPORTAÇÃO CONTÁBIL ───────────────────────────── */}
+            {/* ── TAB 3: INTELIGÊNCIA E COMBOS ─────────────────────────── */}
+            {activeTab === 'intelligence' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Heatmap */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Mapa de Calor (Vendas)</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">Identifique seus horários de pico para alocar mais garçons.</p>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-center border-collapse text-xs">
+                        <thead>
+                          <tr>
+                            <th className="p-2 text-slate-500">Hora</th>
+                            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
+                              <th key={d} className="p-2 text-slate-700 dark:text-slate-300 font-bold">{d}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Array.from({ length: 15 }).map((_, i) => {
+                            const hour = i + 10; // das 10h as 24h
+                            return (
+                              <tr key={hour}>
+                                <td className="p-2 font-mono text-slate-500">{hour}:00</td>
+                                {[7, 1, 2, 3, 4, 5, 6].map(dow => {
+                                  const cell = heatmap.find(h => Number(h.day_of_week) === dow && Number(h.hour_of_day) === hour);
+                                  const count = cell ? Number(cell.order_count) : 0;
+                                  
+                                  let bgClass = 'bg-slate-50 dark:bg-slate-800/50';
+                                  if (count > 0 && count < 5) bgClass = 'bg-amber-200/50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400';
+                                  else if (count >= 5 && count < 15) bgClass = 'bg-orange-300/60 dark:bg-orange-800/60 text-orange-800 dark:text-orange-300 font-bold';
+                                  else if (count >= 15) bgClass = 'bg-red-500 text-white font-black shadow-md';
+                                  
+                                  return (
+                                    <td key={dow} className="p-1">
+                                      <div className={`w-full h-8 flex items-center justify-center rounded-md transition-colors ${bgClass}`}>
+                                        {count > 0 ? count : '-'}
+                                      </div>
+                                    </td>
+                                  )
+                                })}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Affinity Combos */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          <Link className="w-5 h-5 text-indigo-500" /> Afinidade de Produtos
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Sugestões de Combos baseadas no histórico de compras</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {affinity.length === 0 ? (
+                        <div className="text-center py-8 text-slate-500">Sem dados suficientes para cruzamento.</div>
+                      ) : (
+                        affinity.map((pair, idx) => (
+                          <div key={idx} className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="bg-indigo-500/10 text-indigo-500 font-black text-lg w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                                #{idx + 1}
+                              </span>
+                              <div>
+                                <span className="font-bold text-slate-900 dark:text-white block">{pair.product_a}</span>
+                                <span className="text-xs font-black text-slate-400">+ {pair.product_b}</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <span className="block text-xl font-black text-emerald-500">{pair.times_bought_together}x</span>
+                              <span className="text-[10px] uppercase font-bold text-slate-500">Comprados Juntos</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── TAB 4: EXPORTAÇÃO CONTÁBIL ───────────────────────────── */}
             {activeTab === 'export' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:border-indigo-500/50 transition-colors cursor-pointer group">

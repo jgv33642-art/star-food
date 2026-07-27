@@ -167,4 +167,63 @@ export class ReportsController {
       next(error);
     }
   };
+
+  // ── Módulo 8: Mapa de Calor (Heatmap DOW x HOUR) ─────────────────────────
+  heatmap = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const from = req.query.from as string || new Date(Date.now() - 30 * 86400000).toISOString();
+      const to   = req.query.to   as string || new Date().toISOString();
+
+      const result = await pool.query(`
+        SELECT
+          EXTRACT(ISODOW FROM o.opened_at) AS day_of_week,
+          EXTRACT(HOUR FROM o.opened_at)   AS hour_of_day,
+          COUNT(o.id)                      AS order_count,
+          SUM(s.final_amount)              AS total_revenue
+        FROM orders o
+        JOIN sales s ON o.id = s.order_id
+        WHERE o.company_id = $1
+          AND o.status = 'closed'
+          AND o.opened_at BETWEEN $2 AND $3
+        GROUP BY day_of_week, hour_of_day
+        ORDER BY day_of_week, hour_of_day
+      `, [companyId, from, to]);
+
+      res.json(result.rows);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ── Módulo 9: Afinidade de Produtos (Combos) ──────────────────────────────
+  affinity = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const companyId = req.user!.companyId;
+      const from = req.query.from as string || new Date(Date.now() - 30 * 86400000).toISOString();
+      const to   = req.query.to   as string || new Date().toISOString();
+
+      const result = await pool.query(`
+        SELECT
+          p1.name AS product_a,
+          p2.name AS product_b,
+          COUNT(*) AS times_bought_together
+        FROM order_items oi1
+        JOIN order_items oi2 ON oi1.order_id = oi2.order_id AND oi1.product_id < oi2.product_id
+        JOIN products p1 ON oi1.product_id = p1.id
+        JOIN products p2 ON oi2.product_id = p2.id
+        JOIN orders o ON oi1.order_id = o.id
+        WHERE o.company_id = $1
+          AND o.status = 'closed'
+          AND o.created_at BETWEEN $2 AND $3
+        GROUP BY product_a, product_b
+        ORDER BY times_bought_together DESC
+        LIMIT 10
+      `, [companyId, from, to]);
+
+      res.json(result.rows);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
