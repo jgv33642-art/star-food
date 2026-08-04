@@ -49,11 +49,85 @@ export const SuperAdmin = () => {
   
   const [plans, setPlans] = useState(INITIAL_PLANS);
 
-  const tenants = [
-    { id: 'T001', name: 'Lanchonete do Zé', plan: 'Pro', status: 'Ativo', mrr: 149.90 },
-    { id: 'T002', name: 'Burger & Co', plan: 'Básico', status: 'Ativo', mrr: 89.90 },
-    { id: 'T003', name: 'Pizzaria Bella', plan: 'Pro', status: 'Inadimplente', mrr: 149.90 },
-  ];
+  const [tenants, setTenants] = useState<any[]>([]);
+  const [tenantsLoading, setTenantsLoading] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState<any>(null);
+  const [tenantUsers, setTenantUsers] = useState<any[]>([]);
+  const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+  
+  // New User Form State
+  const [newUser, setNewUser] = useState({ name: '', role: 'cashier', pin: '' });
+
+  const fetchTenants = async () => {
+    setTenantsLoading(true);
+    try {
+      const API_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000/api' : '/api';
+      const res = await fetch(`${API_URL}/saas/tenants`, {
+        headers: { 'x-saas-secret': password }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTenants(data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setTenantsLoading(false);
+    }
+  };
+
+  const fetchTenantUsers = async (tenantId: string) => {
+    try {
+      const API_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000/api' : '/api';
+      const res = await fetch(`${API_URL}/saas/tenants/${tenantId}/users`, {
+        headers: { 'x-saas-secret': password }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTenantUsers(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleOpenUsersModal = (tenant: any) => {
+    setSelectedTenant(tenant);
+    setIsUsersModalOpen(true);
+    fetchTenantUsers(tenant.id);
+  };
+
+  const handleCreateTenantUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTenant) return;
+    try {
+      const API_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000/api' : '/api';
+      const res = await fetch(`${API_URL}/saas/tenants/${selectedTenant.id}/users`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-saas-secret': password 
+        },
+        body: JSON.stringify(newUser)
+      });
+      if (res.ok) {
+        setNewUser({ name: '', role: 'cashier', pin: '' });
+        fetchTenantUsers(selectedTenant.id); // Refresh list
+        alert('Funcionário criado com sucesso!');
+      } else {
+        const error = await res.json();
+        alert(`Erro: ${error.message}`);
+      }
+    } catch (e) {
+      alert('Erro de conexão ao criar usuário.');
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'overview') {
+      fetchTenants();
+    }
+  }, [isAuthenticated, activeTab]);
 
   const totalMRR = tenants.reduce((acc, curr) => curr.status === 'Ativo' ? acc + curr.mrr : acc, 0);
 
@@ -206,24 +280,101 @@ export const SuperAdmin = () => {
                     <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Plano</th>
                     <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Mensalidade</th>
                     <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="py-4 px-6 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tenants.map(t => (
+                  {tenantsLoading ? (
+                    <tr><td colSpan={5} className="py-4 text-center">Carregando...</td></tr>
+                  ) : tenants.length === 0 ? (
+                    <tr><td colSpan={5} className="py-4 text-center">Nenhum cliente encontrado.</td></tr>
+                  ) : tenants.map(t => (
                     <tr key={t.id} className="border-b border-slate-200 dark:border-slate-800">
                       <td className="py-4 px-6 font-medium text-slate-900 dark:text-white">{t.name}</td>
-                      <td className="py-4 px-6 text-slate-600 dark:text-slate-400">{t.plan}</td>
+                      <td className="py-4 px-6 text-slate-600 dark:text-slate-400 capitalize">{t.plan}</td>
                       <td className="py-4 px-6 text-slate-600 dark:text-slate-400">R$ {t.mrr.toFixed(2)}</td>
                       <td className="py-4 px-6">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           t.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
                         }`}>{t.status}</span>
                       </td>
+                      <td className="py-4 px-6 text-right">
+                        <button 
+                          onClick={() => handleOpenUsersModal(t)}
+                          className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                        >
+                          <Users className="w-4 h-4 inline mr-1" /> Equipe
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            
+            {/* Modal de Equipe */}
+            <AnimatePresence>
+              {isUsersModalOpen && selectedTenant && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-2xl font-black text-slate-900 dark:text-white">Equipe: {selectedTenant.name}</h2>
+                      <button onClick={() => setIsUsersModalOpen(false)} className="text-slate-400 hover:text-red-500 font-bold text-xl">&times;</button>
+                    </div>
+
+                    <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                      <h3 className="text-lg font-bold mb-4">Adicionar Funcionário</h3>
+                      <form onSubmit={handleCreateTenantUser} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="md:col-span-2">
+                          <input type="text" placeholder="Nome do Funcionário" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2" />
+                        </div>
+                        <div>
+                          <select value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2">
+                            <option value="cashier">Caixa</option>
+                            <option value="waiter">Garçom</option>
+                            <option value="manager">Gerente</option>
+                            <option value="admin">Administrador</option>
+                          </select>
+                        </div>
+                        <div>
+                          <input type="text" placeholder="PIN/Senha" value={newUser.pin} onChange={e => setNewUser({...newUser, pin: e.target.value})} required className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2" />
+                        </div>
+                        <div className="md:col-span-4">
+                          <button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 rounded-xl transition-colors">Cadastrar Acesso</button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <h3 className="text-lg font-bold mb-4">Funcionários Atuais</h3>
+                    <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+                            <th className="py-3 px-4 text-xs font-semibold">Nome</th>
+                            <th className="py-3 px-4 text-xs font-semibold">Cargo</th>
+                            <th className="py-3 px-4 text-xs font-semibold">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tenantUsers.map(u => (
+                            <tr key={u.id} className="border-b border-slate-200 dark:border-slate-800 last:border-0">
+                              <td className="py-3 px-4">{u.name}</td>
+                              <td className="py-3 px-4 capitalize">{u.role === 'cashier' ? 'Caixa' : u.role === 'waiter' ? 'Garçom' : u.role === 'manager' ? 'Gerente' : 'Admin'}</td>
+                              <td className="py-3 px-4">
+                                <span className={`px-2 py-1 rounded text-xs font-bold ${u.active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>{u.active ? 'Ativo' : 'Inativo'}</span>
+                              </td>
+                            </tr>
+                          ))}
+                          {tenantUsers.length === 0 && (
+                            <tr><td colSpan={3} className="py-4 text-center text-slate-500">Nenhum funcionário cadastrado.</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 

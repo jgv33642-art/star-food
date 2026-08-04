@@ -190,6 +190,7 @@ async function runTest() {
 
   } catch (error: any) {
     console.error('\n❌ ERRO NO TESTE:');
+    console.error(error);
     if (error.response) {
       console.error('API Response Error:', error.response.data);
     } else {

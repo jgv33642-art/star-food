@@ -6,6 +6,8 @@ const randomSuffix = Math.floor(Math.random() * 1000000);
 const testEmail = `owner_${randomSuffix}@test.com`;
 const testCompany = `Test Company ${randomSuffix}`;
 
+jest.setTimeout(30000); // 30 segundos para evitar erro de timeout na nuvem
+
 describe('01 - Subscription Flow', () => {
   afterAll(async () => {
     // Cleanup everything related to the test company and users

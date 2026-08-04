@@ -19,6 +19,7 @@ import paymentRoutes from './payment.routes';
 import courierRoutes from './courier.routes';
 import customerRoutes from './customer.routes';
 import complementRoutes from './complement.routes';
+import saasRoutes from './saas.routes';
 
 const router = Router();
 
@@ -42,5 +43,6 @@ router.use('/payments', paymentRoutes);
 router.use('/couriers', courierRoutes);
 router.use('/customers', customerRoutes);
 router.use('/complements', complementRoutes);
+router.use('/saas', saasRoutes);
 
 export default router;
