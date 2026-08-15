@@ -24,7 +24,7 @@ export const Register = () => {
 
     try {
       await register(companyName, userName, email, password);
-      navigate('/');
+      navigate('/onboarding/checkout');
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta. Verifique os dados e tente novamente.');
     } finally {

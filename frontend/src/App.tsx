@@ -30,7 +30,6 @@ const Integrations = lazy(() => import('./pages/admin/Integrations').then(m => (
 const Couriers = lazy(() => import('./pages/admin/Couriers').then(m => ({ default: m.Couriers })));
 const Loyalty = lazy(() => import('./pages/admin/Loyalty').then(m => ({ default: m.Loyalty })));
 const SuperAdmin = lazy(() => import('./pages/SuperAdmin').then(m => ({ default: m.SuperAdmin })));
-const Checkout = lazy(() => import('./pages/Checkout').then(m => ({ default: m.Checkout })));
 const VirtualStore = lazy(() => import('./pages/VirtualStore').then(m => ({ default: m.VirtualStore })));
 const DevPanel = lazy(() => import('./pages/DevPanel').then(m => ({ default: m.DevPanel })));
 const Users = lazy(() => import('./pages/Users').then(m => ({ default: m.Users })));
@@ -41,6 +40,8 @@ const Team = lazy(() => import('./pages/Team').then(m => ({ default: m.Team })))
 const PaymentCheckout = lazy(() => import('./pages/PaymentCheckout').then(m => ({ default: m.PaymentCheckout })));
 const CRM = lazy(() => import('./pages/admin/CRM').then(m => ({ default: m.CRM })));
 const Permissions = lazy(() => import('./pages/admin/Permissions').then(m => ({ default: m.Permissions })));
+const OnboardingCheckout = lazy(() => import('./pages/OnboardingCheckout').then(m => ({ default: m.OnboardingCheckout })));
+const OnboardingStaff = lazy(() => import('./pages/OnboardingStaff').then(m => ({ default: m.OnboardingStaff })));
 
 const ProtectedRoute = ({ children, allowedRoles, allowedPlans }: { children: React.ReactNode, allowedRoles?: string[], allowedPlans?: string[] }) => {
   const { user } = useAuth();
@@ -103,7 +104,9 @@ const AppRoutes = () => {
       } />
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
-      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/checkout" element={<Navigate to="/onboarding/checkout" replace />} />
+      <Route path="/onboarding/checkout" element={user ? <OnboardingCheckout /> : <Navigate to="/login" replace />} />
+      <Route path="/onboarding/staff" element={user ? <OnboardingStaff /> : <Navigate to="/login" replace />} />
       <Route path="/saas-admin" element={<SuperAdmin />} />
       <Route path="/dev" element={<DevPanel />} />
       

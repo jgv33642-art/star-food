@@ -30,7 +30,7 @@ const PLAN_DETAILS: Record<string, { title: string, desc: string, priceMonthly: 
   }
 };
 
-export const Checkout = () => {
+export const OnboardingCheckout = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(searchParams.get('status') === 'success');
@@ -186,8 +186,9 @@ export const Checkout = () => {
           </button>
         </motion.div>
         
-        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => navigate('/admin')} className="mt-12 text-slate-500 hover:text-slate-900 dark:text-white underline z-10">
-          Acessar pelo navegador web por enquanto
+        
+        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => navigate('/onboarding/staff')} className="mt-12 w-full max-w-sm bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-900 dark:text-white font-bold py-4 rounded-xl shadow-lg transition-all z-10 text-lg">
+          Prosseguir para Cadastro de Equipe
         </motion.button>
       </div>
     );
