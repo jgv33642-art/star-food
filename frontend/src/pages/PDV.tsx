@@ -37,7 +37,34 @@ const getEmoji = (productName: string, categoryName: string) => {
   return '🍽️';
 };
 
-
+const playSound = (type: 'beep' | 'cash') => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    if (type === 'beep') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } else {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1000, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {}
+};
 
 export const PDV = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
@@ -54,7 +81,6 @@ export const PDV = () => {
   // States para Divisão e Pagamento Parcial
   const [showSplitModal, setShowSplitModal] = useState(false);
   const [splitCount, setSplitCount] = useState(2);
-  const [useTenPercent, setUseTenPercent] = useState(true);
   
   // Pagamentos Adicionados na Venda Atual
   const [partialPayments, setPartialPayments] = useState<{method: string, amount: number}[]>([]);
@@ -176,6 +202,7 @@ export const PDV = () => {
       await api.post('/sales', payload);
 
       setSuccessMessage('Venda realizada com sucesso!');
+      playSound('cash');
 
       // Imprime o cupom automaticamente se estiver conectado
       if (isPrinterConnected) {
@@ -197,12 +224,82 @@ export const PDV = () => {
       setTimeout(() => setSuccessMessage(null), 3000);
       setShowSplitModal(false);
     } catch (err: any) {
-      console.error(err);
-      setError('Erro ao processar venda: ' + (err.response?.data?.message || err.message));
+      if (!navigator.onLine || err.message === 'Failed to fetch' || err.message.includes('Network')) {
+        // Fallback: Modo Offline
+        const offlineSale = {
+          id: 'offline-' + Date.now(),
+          cart: [...cart],
+          total,
+          cashierId: cashier.id,
+          paymentMethod: partialPayments.length > 0 ? 'Múltiplo' : paymentMethod,
+          partialPayments: [...partialPayments]
+        };
+        const queue = JSON.parse(localStorage.getItem('@Lanchonete:offline_sales') || '[]');
+        queue.push(offlineSale);
+        localStorage.setItem('@Lanchonete:offline_sales', JSON.stringify(queue));
+        
+        playSound('cash');
+        setSuccessMessage('Modo Offline: A venda foi salva localmente e será enviada quando a internet voltar.');
+        clearCart();
+        setPartialPayments([]);
+        setShowSplitModal(false);
+        setTimeout(() => setSuccessMessage(null), 4000);
+      } else {
+        console.error(err);
+        setError('Erro ao processar venda: ' + (err.response?.data?.message || err.message));
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Sync Offline Queue automatically
+  useEffect(() => {
+    const syncOffline = async () => {
+      if (!navigator.onLine) return;
+      const queue = JSON.parse(localStorage.getItem('@Lanchonete:offline_sales') || '[]');
+      if (queue.length === 0) return;
+      
+      const newQueue = [...queue];
+      for (let i = queue.length - 1; i >= 0; i--) {
+        const sale = queue[i];
+        try {
+          const order = await api.post<any>('/orders', { tableId: null, waiterId: null });
+          for (const cartItem of sale.cart) {
+            await api.post(`/orders/${order.id}/items`, {
+              productId: cartItem.item.id,
+              quantity: cartItem.quantity,
+              price: cartItem.item.price,
+              notes: ''
+            });
+          }
+          await api.put(`/orders/${order.id}/close`);
+          await api.post('/sales', {
+            orderId: order.id,
+            cashRegisterId: sale.cashierId,
+            totalAmount: sale.total,
+            discount: 0,
+            finalAmount: sale.total,
+            payments: sale.partialPayments.length > 0 ? sale.partialPayments : [{ method: sale.paymentMethod, amount: sale.total }],
+            items: sale.cart.map((c: any) => ({
+              productId: c.item.id,
+              quantity: c.quantity,
+              price: c.item.price
+            }))
+          });
+          newQueue.splice(i, 1);
+        } catch(e) {
+          console.error('Failed to sync offline sale', e);
+        }
+      }
+      localStorage.setItem('@Lanchonete:offline_sales', JSON.stringify(newQueue));
+    };
+
+    window.addEventListener('online', syncOffline);
+    if (navigator.onLine) syncOffline();
+    
+    return () => window.removeEventListener('online', syncOffline);
+  }, []);
 
   useBarcodeScanner({
     onScan: (barcode) => {
@@ -393,8 +490,11 @@ export const PDV = () => {
                   {filteredItems.map(item => (
                     <div 
                       key={item.id}
-                      onClick={() => addToCart(item)}
-                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center text-center group"
+                      onClick={() => {
+                        playSound('beep');
+                        addToCart(item);
+                      }}
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center text-center group active:scale-95"
                     >
                       <div className="w-16 h-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform">
                         {item.img}
@@ -425,27 +525,37 @@ export const PDV = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {cart.map(({ item, quantity }) => (
-                    <div key={item.id} className="flex gap-3 items-center">
-                      <div className="flex-1">
-                        <p className="text-slate-900 dark:text-white font-medium text-sm">{item.name}</p>
-                        <p className="text-slate-600 dark:text-slate-400 text-xs">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-1">
-                        <button onClick={() => updateQuantity(item.id, -1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"><Minus className="w-3 h-3" /></button>
-                        <span className="w-4 text-center text-sm font-bold text-slate-900 dark:text-white">{quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, 1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors"><Plus className="w-3 h-3" /></button>
-                      </div>
-                      <div className="w-16 text-right font-bold text-slate-900 dark:text-white text-sm">
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * quantity)}
-                      </div>
-                      <button onClick={() => removeFromCart(item.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                  <AnimatePresence mode="popLayout">
+                    {cart.map(({ item, quantity }) => (
+                      <motion.div 
+                        key={item.id} 
+                        layout
+                        initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, x: -20 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        className="flex gap-3 items-center"
+                      >
+                        <div className="flex-1">
+                          <p className="text-slate-900 dark:text-white font-medium text-sm">{item.name}</p>
+                          <p className="text-slate-600 dark:text-slate-400 text-xs">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-1">
+                          <button onClick={() => updateQuantity(item.id, -1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors cursor-pointer"><Minus className="w-3 h-3" /></button>
+                          <span className="w-4 text-center text-sm font-bold text-slate-900 dark:text-white">{quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, 1)} className="p-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors cursor-pointer"><Plus className="w-3 h-3" /></button>
+                        </div>
+                        <div className="w-16 text-right font-bold text-slate-900 dark:text-white text-sm">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * quantity)}
+                        </div>
+                        <button onClick={() => removeFromCart(item.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors cursor-pointer">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
@@ -541,45 +651,22 @@ export const PDV = () => {
                   <div className="flex-1 space-y-4">
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dividir a conta para quantas pessoas?</label>
                     <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 w-fit">
-                      <button onClick={() => setSplitCount(Math.max(2, splitCount - 1))} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700">
+                      <button onClick={() => setSplitCount(Math.max(2, splitCount - 1))} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700 cursor-pointer">
                         <Minus className="w-4 h-4" />
                       </button>
                       <span className="text-xl font-bold text-slate-900 dark:text-white w-8 text-center">{splitCount}</span>
-                      <button onClick={() => setSplitCount(splitCount + 1)} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700">
+                      <button onClick={() => setSplitCount(splitCount + 1)} className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-700 cursor-pointer">
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
-                  </div>
-                  
-                  <div className="flex-1 space-y-4">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Taxa de Serviço (10%)</label>
-                    <button 
-                      onClick={() => setUseTenPercent(!useTenPercent)}
-                      className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border ${
-                        useTenPercent ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-slate-50 dark:bg-slate-950 text-slate-500 border-slate-200 dark:border-slate-800'
-                      }`}
-                    >
-                      <CheckCircle2 className={`w-5 h-5 ${useTenPercent ? 'text-indigo-400' : 'text-slate-600'}`} />
-                      {useTenPercent ? 'Aplicando 10% do Garçom' : 'Sem Taxa de Serviço'}
-                    </button>
                   </div>
                 </div>
 
                 {/* Calculation Display */}
                 <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-slate-600 dark:text-slate-400">Subtotal dos itens</span>
-                    <span className="text-slate-900 dark:text-white font-medium">R$ {total.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-slate-600 dark:text-slate-400">Taxa de Serviço {useTenPercent ? '(10%)' : '(0%)'}</span>
-                    <span className="text-emerald-400 font-medium">+ R$ {(useTenPercent ? total * 0.1 : 0).toFixed(2)}</span>
-                  </div>
-                  <div className="h-px bg-slate-100 dark:bg-slate-800 w-full mb-4"></div>
-                  
-                  <div className="flex justify-between items-end mb-6">
-                    <span className="text-slate-700 dark:text-slate-300 font-bold">Total a Pagar</span>
-                    <span className="text-3xl font-black text-slate-900 dark:text-white">R$ {(total * (useTenPercent ? 1.1 : 1)).toFixed(2)}</span>
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-slate-600 dark:text-slate-400">Total da Conta</span>
+                    <span className="text-slate-900 dark:text-white font-medium text-xl">R$ {total.toFixed(2)}</span>
                   </div>
 
                   <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex items-center justify-between">
@@ -591,7 +678,7 @@ export const PDV = () => {
                       </div>
                     </div>
                     <span className="text-2xl font-black text-indigo-400">
-                      R$ {((total * (useTenPercent ? 1.1 : 1)) / splitCount).toFixed(2)}
+                      R$ {(total / splitCount).toFixed(2)}
                     </span>
                   </div>
                 </div>
