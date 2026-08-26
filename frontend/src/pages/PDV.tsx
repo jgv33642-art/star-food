@@ -20,7 +20,8 @@ import {
   RefreshCw,
   AlertTriangle,
   ArrowRight,
-  Printer
+  Printer,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../lib/api';
@@ -411,19 +412,30 @@ export const PDV = () => {
             <div className="p-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">Produtos</h2>
-                {isPrinterSupported && (
-                  <button 
-                    onClick={connectPrinter}
-                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
-                      isPrinterConnected 
-                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20' 
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
+                <div className="flex gap-2">
+                  <a
+                    href="/downloads/Imprimidor-StarFood.exe"
+                    download
+                    className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border bg-indigo-500/10 text-indigo-500 border-indigo-500/20 hover:bg-indigo-500/20"
+                    title="Baixar Módulo de Impressão de Rede para Cozinha"
                   >
-                    <Printer className="w-4 h-4" />
-                    {isPrinterConnected ? 'Impressora Conectada' : 'Conectar Impressora'}
-                  </button>
-                )}
+                    <Download className="w-4 h-4" />
+                    Motor de Rede
+                  </a>
+                  {isPrinterSupported && (
+                    <button 
+                      onClick={connectPrinter}
+                      className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                        isPrinterConnected 
+                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20' 
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      <Printer className="w-4 h-4" />
+                      {isPrinterConnected ? 'Impressora Conectada' : 'Conectar Impressora'}
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="relative mb-4 flex gap-3">
                 <div className="relative flex-1">
